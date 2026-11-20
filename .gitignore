@@ -3,7 +3,6 @@
 .RData
 .Ruserdata
 .DS_Store
-docs/
 inst/doc
 *.tar.gz
 *.Rcheck/
@@ -18,3 +17,5 @@ temp/
 *.pdf
 *.pptx
 01-build-merger-panel.rmd
+
+.claude/

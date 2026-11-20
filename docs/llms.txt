@@ -1,0 +1,141 @@
+# npmerger
+
+Build nonprofit merger datasets from IRS Form 990 e-file data.
+
+**npmerger** finds candidate mergers in Schedule N (liquidation,
+termination, dissolution, or significant disposition of assets). It
+classifies each transaction and builds analysis tables around every
+merger event: donor and recipient attributes, Part VII rosters, and
+fiscal-health panels. Data is retrieved with
+[panel990](https://github.com/Nonprofit-Open-Data-Collective/panel990),
+and fiscal metrics come from
+[fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
+
+> Status: early development. Retrieval, cleaning, filing-level features,
+> and the rule-based classifier are working. Case building, attribute
+> tables, and panels are stubs. See the
+> [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md)
+> and the
+> [overview](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html).
+
+## Installation
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("Nonprofit-Open-Data-Collective/npmerger")
+```
+
+## Usage
+
+``` r
+
+library(npmerger)
+
+sn  <- get_schedule_n(2019:2021)   # Schedule N tables via panel990
+tx  <- sn_transactions(sn)         # one row per asset line (Parts I + II)
+fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
+lab <- classify_transactions(fl)   # merger2, mergerN, closure, ...
+sched_n_table(lab)
+```
+
+## Transaction types
+
+| Label | Meaning |
+|----|----|
+| `merger2` | Dissolved; one dominant nonprofit successor; leadership continuity |
+| `mergerN` | Same, but the successor absorbs 2+ dissolving organizations |
+| `consolidation` | mergerN into a newly formed entity |
+| `asset_transfer` | Dissolved; one dominant nonprofit successor; no continuity evidence |
+| `closure` | Dissolved; assets dispersed or not going to a nonprofit |
+| `asset_disposition` | Part II only: more than 25% of net assets transferred, but the organization continues |
+| `reorganization` | Assets transferred to the filer’s own EIN |
+
+Leadership continuity uses Schedule N lines 2a–2c **or** overlap of
+people listed on the donor’s and the recipient’s Part VII
+(`merger_rules(leader = "either")`).
+
+Merger IDs take the form `YEAR-FROMEIN-TOEIN`
+([`merger_id()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_id.md)),
+and `YEAR-TOEIN` groups multi-party mergers
+([`merger_group_id()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_id.md)).
+
+# Package index
+
+## Retrieve Schedule N
+
+Download Schedule N tables (and, later, core 990 tables for selected
+organizations) through panel990.
+
+- [`get_schedule_n()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_schedule_n.md)
+  : Retrieve Schedule N tables
+- [`sn_table_names()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_table_names.md)
+  : Schedule N table names in the NCCS efile release
+- [`get_core()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_core.md)
+  : Retrieve core 990 tables for a set of organizations
+
+## Clean and stack transactions
+
+Turn raw Schedule N tables into one row per asset line and one row per
+filing.
+
+- [`sn_transactions()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_transactions.md)
+  : Stack Schedule N Part I and Part II asset lines
+- [`sn_filings()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_filings.md)
+  : One row per Schedule N filing
+- [`sn_flag()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_flag.md)
+  : Parse efile checkbox values
+- [`clean_ein()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/clean_ein.md)
+  [`as_ein2()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/clean_ein.md)
+  : Clean EINs
+- [`parse_irc_section()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/parse_irc_section.md)
+  : Classify the free-text IRC section / entity type of a Schedule N
+  recipient
+
+## Classify transactions
+
+Label each filing as a merger, asset transfer, closure, disposition, or
+reorganization, using rules you can change.
+
+- [`classify_transactions()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/classify_transactions.md)
+  : Classify Schedule N filings into transaction types
+- [`merger_rules()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_rules.md)
+  : Default transaction classification rules
+- [`transaction_types()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/transaction_types.md)
+  : Transaction type labels
+- [`leader_overlap()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/leader_overlap.md)
+  : Part VII leadership overlap between donor and recipient
+
+## Build merger cases and tables
+
+Merger identifiers, donor-recipient cases, and the analysis tables built
+around each merger.
+
+- [`merger_id()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_id.md)
+  [`merger_group_id()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_id.md)
+  : Build merger identifiers
+- [`build_merger_cases()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_cases.md)
+  : Build merger cases (donor-recipient pairs)
+- [`transfer_value()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/transfer_value.md)
+  : Value of assets transferred to each recipient
+- [`sched_n_table()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sched_n_table.md)
+  : Schedule N transaction table
+- [`merger_attributes()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_attributes.md)
+  : Donor and recipient attribute tables
+- [`merger_part7()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_part7.md)
+  : Part VII panel around each merger
+- [`merger_fiscal_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_fiscal_panel.md)
+  : Fiscal-health panel around each merger
+
+## Package
+
+- [`npmerger`](https://nonprofit-open-data-collective.github.io/npmerger/reference/npmerger-package.md)
+  [`npmerger-package`](https://nonprofit-open-data-collective.github.io/npmerger/reference/npmerger-package.md)
+  : npmerger: Build Nonprofit Merger Datasets from IRS 990 Efile Data
+
+# Articles
+
+### All vignettes
+
+- [Overview: finding nonprofit mergers in IRS 990
+  data](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.md):

@@ -13,7 +13,8 @@ Description: Identify nonprofit mergers, asset transfers, dispositions, and
     build donor, recipient, Part VII, and fiscal-health panels around each
     merger event. Data retrieval relies on 'panel990' and fiscal metrics on
     'fiscal'.
-URL: https://github.com/Nonprofit-Open-Data-Collective/npmerger
+URL: https://nonprofit-open-data-collective.github.io/npmerger/,
+    https://github.com/Nonprofit-Open-Data-Collective/npmerger
 BugReports: https://github.com/Nonprofit-Open-Data-Collective/npmerger/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -31,6 +32,8 @@ Suggests:
 Remotes:
     Nonprofit-Open-Data-Collective/panel990,
     Nonprofit-Open-Data-Collective/fiscal
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Config/Needs/website: Nonprofit-Open-Data-Collective/pkgstyle

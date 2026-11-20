@@ -7,6 +7,8 @@
 ^data-raw$
 ^docs$
 ^_pkgdown\.yml$
+^pkgdown$
+^vignettes/articles$
 ^\.github$
 ^PANEL990$
 ^data-cache$
@@ -15,3 +17,4 @@
 ^.*\.pdf$
 ^.*\.pptx$
 ^01-build-merger-panel\.rmd$
+^\.claude$

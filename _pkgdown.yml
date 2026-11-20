@@ -1,0 +1,58 @@
+url: https://nonprofit-open-data-collective.github.io/npmerger/
+destination: docs
+
+# The NODC site style (colours, fonts, navbar, light/dark switch) comes from
+# the pkgstyle template package. Do not add bslib settings or
+# pkgdown/extra.css here unless this site needs to differ.
+template:
+  package: pkgstyle
+
+home:
+  title: "npmerger: Nonprofit Merger Datasets from IRS 990 E-File Data"
+
+navbar:
+  structure:
+    left: [intro, reference, roadmap, news]
+  components:
+    intro:
+      text: Overview
+      href: articles/npmerger.html
+    roadmap:
+      text: Roadmap
+      href: https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md
+
+reference:
+- title: Retrieve Schedule N
+  desc: Download Schedule N tables (and, later, core 990 tables for selected organizations) through panel990.
+  contents:
+  - get_schedule_n
+  - sn_table_names
+  - get_core
+- title: Clean and stack transactions
+  desc: Turn raw Schedule N tables into one row per asset line and one row per filing.
+  contents:
+  - sn_transactions
+  - sn_filings
+  - sn_flag
+  - clean_ein
+  - parse_irc_section
+- title: Classify transactions
+  desc: Label each filing as a merger, asset transfer, closure, disposition, or reorganization, using rules you can change.
+  contents:
+  - classify_transactions
+  - merger_rules
+  - transaction_types
+  - leader_overlap
+- title: Build merger cases and tables
+  desc: Merger identifiers, donor-recipient cases, and the analysis tables built around each merger.
+  contents:
+  - merger_id
+  - build_merger_cases
+  - transfer_value
+  - sched_n_table
+  - merger_attributes
+  - merger_part7
+  - merger_fiscal_panel
+- title: Package
+  contents:
+  - npmerger-package

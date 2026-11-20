@@ -11,7 +11,9 @@ and fiscal metrics come from [fiscal](https://github.com/Nonprofit-Open-Data-Col
 
 > Status: early development. Retrieval, cleaning, filing-level features, and
 > the rule-based classifier are working. Case building, attribute tables, and
-> panels are stubs. See [PLAN.md](PLAN.md).
+> panels are stubs. See the
+> [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md)
+> and the [overview](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html).
 
 ## Installation
 

@@ -1,0 +1,235 @@
+---
+title: "Overview: finding nonprofit mergers in IRS 990 data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview: finding nonprofit mergers in IRS 990 data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+Nonprofit mergers are rare, hard to see, and easy to confuse with other ways
+an organization winds down. **npmerger** builds research datasets of
+mergers from IRS Form 990 e-file data:
+
+1. It finds candidate transactions in **Schedule N**.
+2. It decides which of them are mergers rather than closures or asset sales.
+3. It assembles the tables needed to study what happens to the organizations
+   involved.
+
+Data comes from the NCCS e-file release through
+[panel990](https://nonprofit-open-data-collective.github.io/panel990/), and
+fiscal-health metrics come from
+[fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
+
+> **Status.** Retrieval, cleaning, filing-level features, and the classifier
+> work today. Merger cases, attribute tables, and the Part VII and fiscal
+> panels are planned; their functions are documented but stop with a
+> "not implemented yet" message. See the
+> [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md).
+
+## What counts as a merger
+
+Following the Wilder Research study of Minnesota mergers, a merger is the
+integration of two or more organizations into one legal entity, in which at
+least one organization ceases to exist and its programs, assets, or staff
+move to the successor. In 990 data that means three things have to be
+visible:
+
+* **The donor closes.** It files Schedule N Part I (liquidation,
+  termination, or dissolution). Its final return usually shows assets
+  near zero.
+* **Its assets go to a nonprofit successor.** One nonprofit recipient
+  receives most of the transferred value. Assets that are scattered across
+  many charities, or go to individuals or businesses, look like a closure.
+* **People go with them.** Officers, directors, or key employees join the
+  successor.
+
+The recipient keeps operating in almost every case, so that condition
+adds little information. Leadership continuity and the concentration of
+transferred assets are what separate a merger from a closure.
+
+## Where the evidence comes from
+
+**Schedule N.** Part I lists each asset distributed by an organization that
+dissolved: a description, the date, fair market value (FMV), and the
+recipient's name, EIN, address, and IRC section. Part II lists the same for
+an organization that disposed of more than 25% of its net assets and kept
+operating. Lines 2a–2c ask whether any officer, director, trustee, or key
+employee became a director, employee, or owner of the successor.
+
+**Part VII.** Those Schedule N boxes are under-reported. npmerger also
+matches the people listed on the donor's Part VII (years t-1 and t)
+against the recipient's Part VII (years t and t+1). In 2019–21 data, 87–100%
+of donor–recipient pairs that checked a box shared at least one person,
+against 9% for closures. About 40% of asset transfers with no box checked
+shared people too. Leadership continuity counts when either source shows
+it.
+
+**Corroborating disclosures.** A dissolution to one nonprofit successor
+with no leadership evidence is promoted to a merger when at least two of
+these agree:
+
+* merger language in the donor's Schedule O narrative;
+* merger language in the recipient's Schedule O narrative;
+* a significant change to the recipient's governing documents (Part VI
+  line 4) in the merger year or the year after.
+
+**Affiliation** is recorded separately from the label. It covers Schedule R
+links, 509(a)(3) supporting organizations, group exemptions, and chapters.
+About a third of two-party mergers and two-thirds of multi-party mergers
+happen inside one family of organizations, and many analyses will want to
+separate them from arm's-length mergers.
+
+## Transaction types
+
+```{r}
+library(npmerger)
+transaction_types()
+```
+
+| Label | Meaning |
+|---|---|
+| `merger2` | Dissolved; one dominant nonprofit successor; leadership continuity or corroboration |
+| `mergerN` | The same, where the successor absorbs two or more dissolving organizations |
+| `consolidation` | A `mergerN` into a newly formed entity |
+| `asset_transfer` | Dissolved; one dominant nonprofit successor; no continuity evidence |
+| `closure` | Dissolved; assets dispersed, or not going to a nonprofit |
+| `asset_disposition` | Part II only: more than 25% of net assets transferred, organization continues |
+| `reorganization` | Assets transferred to the filer's own EIN |
+
+A first pass over 2019–21 filings (14,399 Schedule N returns) gave these
+shares. This was before corroboration was applied, and it used Schedule N
+flags or Part VII overlap as the leadership evidence:
+
+| Label | Filings | Share |
+|---|---|---|
+| closure | 5,784 | 40% |
+| asset_disposition | 3,250 | 23% |
+| asset_transfer | 2,632 | 18% |
+| merger2 | 2,306 | 16% |
+| mergerN | 427 | 3% |
+
+## The pipeline
+
+Each stage is a separate function, so you can stop at any point, inspect the
+result, or substitute your own step.
+
+```{r, eval = FALSE}
+sn  <- get_schedule_n(2019:2021)   # Schedule N tables, via panel990
+tx  <- sn_transactions(sn)         # one row per asset line, Parts I and II
+fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
+lab <- classify_transactions(fl)   # labels plus the evidence behind them
+sched_n_table(lab)                 # YEAR, OBJECTID, EIN2, TYPE, evidence
+```
+
+`get_schedule_n()` downloads about 1 MB per tax year and caches it. The
+other functions run in memory.
+
+### Cleaning
+
+Schedule N is messy, and the low-level helpers handle the recurring
+problems. Checkboxes come in several encodings:
+
+```{r}
+sn_flag(c("1", "true", "X", "0", "false", NA))
+```
+
+Recipient EINs arrive in many formats, including placeholders:
+
+```{r}
+clean_ein(c("01-0215911", "10215911", "000000000", "EIN-01-0215911"))
+as_ein2("010215911")
+```
+
+The recipient's IRC section is free text, with dozens of spellings of
+501(c)(3) alone:
+
+```{r}
+parse_irc_section(c("501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
+                    "Individual", "City of Portland", NA))
+```
+
+`sn_filings()` also deals with Schedule N's header and asset tables not
+lining up. Some filings have only one or the other, so the filing list is
+built from both.
+
+### Classifying
+
+`classify_transactions()` takes a filing-level table and adds a label, plus
+the evidence used to reach it. Here is a small made-up example with one
+filing of each kind:
+
+```{r}
+filings <- data.frame(
+  case          = c("sale", "dispersed", "flags", "part7", "corroborated", "no evidence"),
+  EIN2          = paste0("EIN-01-000000", 1:6),
+  HAS_P1        = c(FALSE, TRUE, TRUE, TRUE, TRUE, TRUE),
+  HAS_P2        = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+  LEADER_SN     = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE),
+  LEADER_P7     = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
+  N_NP_RECIP    = c(0L, 6L, 1L, 1L, 1L, 1L),
+  TOP_SHARE     = c(NA, 0.2, 1, 1, 1, 1),
+  TOP_RECIP_EIN = c(NA, "020000002", "020000002", "020000002", "020000002", "020000002"),
+  SO_MERGER_TEXT_DONOR = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
+  GOV_DOC_CHANGE_RECIP = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)
+)
+
+out <- classify_transactions(filings)
+out[, c("case", "LEADER", "N_CORROBORATE", "BASIS", "TYPE")]
+```
+
+The rules are arguments, so you can run strict and broad definitions side by
+side. For example, the strict definition counts only the Schedule N boxes
+and turns off promotion:
+
+```{r}
+strict <- classify_transactions(filings, merger_rules(leader = "sn", promote = FALSE))
+data.frame(case = filings$case, default = out$TYPE, strict = strict$TYPE)
+```
+
+`merger_rules()` also sets three thresholds:
+
+* the minimum share of transferred value going to the dominant recipient
+  (`min_top_share`, default 0.5);
+* how many dissolving donors make a merger multi-party (`min_donors_n`);
+* how recently a recipient must have been formed to count as a new
+  entity (`new_entity_years`).
+
+## Merger identifiers
+
+Every donor–recipient pair gets an ID of the form `YEAR-FROMEIN-TOEIN`,
+where the year is the donor's Schedule N tax year. A group ID ties together
+all the donors that fold into one recipient:
+
+```{r}
+merger_id(2020, "01-0215911", "010431680")
+merger_group_id(2020, "010431680")
+```
+
+## Planned output tables
+
+These functions are documented now and will be built next:
+
+* `sched_n_table()`: one row per Schedule N filing, with its label and
+  evidence. *Available now.*
+* `merger_attributes(role = "donor")` and `merger_attributes(role = "recipient")`:
+  the merger ID, Schedule N year, revenue, expenses, and assets for the
+  five years up to the merger, address, organization age, and NTEE code.
+* `merger_part7()`: everyone listed on Part VII for both organizations
+  from t-2 to t+2, with time from the merger and a flag for people who
+  appear on both.
+* `merger_fiscal_panel()`: the donor up to the merger year and the
+  recipient before and after it. It will include fiscal-health metrics from
+  **fiscal**, plus staff expenses, executive pay, grants, overhead, and
+  debt.
+
+Two design choices for the fiscal panel:
+
+* The fiscal-health index will be calibrated once on a reference sample and
+  then applied unchanged to every year, so scores can be compared over time.
+* Any smoothing will use only the current and past years. A centered window
+  would pull post-merger information into the pre-merger years.
