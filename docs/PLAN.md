@@ -174,15 +174,37 @@ Org age = tax year − min(formation year, ruling year).
 
 ## 4. Build sequence
 
-1.  **Skeleton + retrieval/cleaning** (`get_schedule_n`,
-    `sn_transactions`, flag/IRC/EIN parsers) with tests. Package via
-    usethis, git init.
-2.  **Filing features + classifier** (rules from section 2) and
+1.  ✅ **Skeleton + retrieval/cleaning** (`get_schedule_n`,
+    `sn_transactions`, flag/IRC/EIN parsers) with tests.
+2.  ✅ **Filing features + classifier** (rules from section 2) and
     [`sched_n_table()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sched_n_table.md).
-    Check by hand-reading about 50 Part III narratives per label. Report
-    a confusion matrix against the hand labels.
-3.  **Part VII overlap** (`leader_overlap`) added as a classifier input.
-    Add EZ Part VII.
+    *Still to do:* check by hand-reading about 50 Part III narratives
+    per label, and report a confusion matrix against the hand labels.
+3.  ✅ **Merger evidence wired into the classifier**
+    ([`get_evidence_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_evidence_tables.md),
+    [`merger_features()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_features.md)):
+    - Part VII overlap:
+      [`leader_overlap()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/leader_overlap.md).
+      The F9 Part VII table also covers EZ filers: 89% of merger donors
+      and recipients have rows.
+    - Multi-party counts:
+      [`add_donor_counts()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_donor_counts.md).
+    - New-entity detection and filing history:
+      [`add_filing_history()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_filing_history.md).
+    - Corroboration:
+      [`add_corroboration()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_corroboration.md).
+    - Affiliation:
+      [`add_affiliation()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_affiliation.md).
+    - Mission similarity:
+      [`add_mission_similarity()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_mission_similarity.md).
+
+    Real-data check on 2021 (5,167 filings; script `dev/run-2021.R`):
+    closure 2,160; asset_disposition 1,090; asset_transfer 938; merger2
+    858; mergerN 107; consolidation 14. Of these, 54 mergers rest on
+    corroboration rather than leadership. Affiliated pairs make up 37%
+    of merger2, 76% of mergerN, and 4% of closures. 98% of merger donors
+    file a final return. Evidence retrieval takes about 2.5 minutes cold
+    (from the parquet cache) and 0.4 minutes warm.
 4.  **Cases + IDs + asset values** (`build_merger_cases`,
     `transfer_value`).
 5.  **Attribute tables** (donor/recipient), with BMF NTEE + age.

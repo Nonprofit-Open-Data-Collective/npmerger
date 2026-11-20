@@ -36,13 +36,26 @@ reference:
   - sn_flag
   - clean_ein
   - parse_irc_section
+- title: Gather merger evidence
+  desc: Read the 990 tables for the donors and recipients involved, and add leadership, multi-party, filing-history, corroboration, and affiliation evidence to each filing.
+  contents:
+  - get_evidence_tables
+  - evidence_tables
+  - merger_features
+  - leader_overlap
+  - add_donor_counts
+  - add_filing_history
+  - add_corroboration
+  - add_affiliation
+  - add_mission_similarity
+  - person_key
+  - merger_text_pattern
 - title: Classify transactions
   desc: Label each filing as a merger, asset transfer, closure, disposition, or reorganization, using rules you can change.
   contents:
   - classify_transactions
   - merger_rules
   - transaction_types
-  - leader_overlap
 - title: Build merger cases and tables
   desc: Merger identifiers, donor-recipient cases, and the analysis tables built around each merger.
   contents:

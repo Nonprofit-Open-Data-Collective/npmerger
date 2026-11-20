@@ -15,10 +15,11 @@ Data comes from the NCCS e-file release through
 and fiscal-health metrics come from
 [fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
 
-> **Status.** Retrieval, cleaning, filing-level features, and the
-> classifier work today. Merger cases, attribute tables, and the Part
-> VII and fiscal panels are planned; their functions are documented but
-> stop with a “not implemented yet” message. See the
+> **Status.** Retrieval, cleaning, filing-level features, merger
+> evidence, and the classifier work today. Merger cases, attribute
+> tables, and the Part VII and fiscal panels are planned; their
+> functions are documented but stop with a “not implemented yet”
+> message. See the
 > [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md).
 
 ## What counts as a merger
@@ -119,13 +120,30 @@ the result, or substitute your own step.
 sn  <- get_schedule_n(2019:2021)   # Schedule N tables, via panel990
 tx  <- sn_transactions(sn)         # one row per asset line, Parts I and II
 fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
-lab <- classify_transactions(fl)   # labels plus the evidence behind them
+ev  <- get_evidence_tables(fl)     # 990 tables for the donors and recipients
+fe  <- merger_features(fl, ev)     # add the evidence to each filing
+lab <- classify_transactions(fe)   # labels plus the evidence behind them
 sched_n_table(lab)                 # YEAR, OBJECTID, EIN2, TYPE, evidence
 ```
 
 [`get_schedule_n()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_schedule_n.md)
-downloads about 1 MB per tax year and caches it. The other functions run
-in memory.
+downloads about 1 MB per tax year.
+[`get_evidence_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_evidence_tables.md)
+is much heavier on its first run: Schedule O is about 150 MB per year
+and Part VII about 100 MB. Both cache what they download, and the
+evidence step then reads only the rows for the organizations involved.
+
+[`merger_features()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_features.md)
+adds one group of columns per kind of evidence:
+
+| Function | Adds | Source |
+|----|----|----|
+| [`leader_overlap()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/leader_overlap.md) | `LEADER_P7`, `N_SHARED_P7` | Part VII names, donor t-1..t vs recipient t..t+1 |
+| [`add_donor_counts()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_donor_counts.md) | `N_DONORS` | Other dissolving donors with the same dominant successor, t±1 |
+| [`add_filing_history()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_filing_history.md) | `FINAL_RETURN`, `DONOR_FILES_LATER`, `R_FORMED`, `R_NEW` | 990 header |
+| [`add_corroboration()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_corroboration.md) | `SO_MERGER_TEXT_DONOR`, `SO_MERGER_TEXT_RECIP`, `GOV_DOC_CHANGE_RECIP` | Schedule O, Part VI line 4 |
+| [`add_affiliation()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_affiliation.md) | `AFF_SCHED_R`, `AFF_SUPPORT_ORG`, `AFF_GROUP`, `AFFILIATED` | Schedule R Part II, Schedule A, group exemption number |
+| [`add_mission_similarity()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_mission_similarity.md) | `MISSION_SIM` | Part III mission statements |
 
 ### Cleaning
 

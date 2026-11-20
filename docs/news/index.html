@@ -42,7 +42,11 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.0.9000" id="npmerger-0009000">npmerger 0.0.0.9000<a class="anchor" aria-label="anchor" href="#npmerger-0009000"></a></h2>
-<ul><li>Initial package skeleton: Schedule N retrieval, flag/EIN/IRC-section parsers, transaction-level stacking of Schedule N Parts I and II, merger ID helpers, and default classification rules.</li>
+<ul><li>Merger evidence: <code><a href="../reference/get_evidence_tables.html">get_evidence_tables()</a></code> reads the 990 header, Part VII, Part VI, Schedule O, Schedule R, Schedule A, and mission tables for the donors and recipients in a set of filings. <code><a href="../reference/merger_features.html">merger_features()</a></code> adds: Part VII leadership overlap (<code><a href="../reference/leader_overlap.html">leader_overlap()</a></code>), counts of dissolving donors sharing a successor (<code><a href="../reference/add_donor_counts.html">add_donor_counts()</a></code>), donor and recipient filing history and new-entity detection (<code><a href="../reference/add_filing_history.html">add_filing_history()</a></code>), corroborating disclosures (<code><a href="../reference/add_corroboration.html">add_corroboration()</a></code>), affiliation (<code><a href="../reference/add_affiliation.html">add_affiliation()</a></code>), and mission similarity (<code><a href="../reference/add_mission_similarity.html">add_mission_similarity()</a></code>).</li>
+<li>
+<code><a href="../reference/classify_transactions.html">classify_transactions()</a></code> promotes an asset transfer to a merger when at least two corroborating signals agree, and records <code>BASIS</code> and <code>N_CORROBORATE</code>.</li>
+<li>pkgdown site using the NODC <code>pkgstyle</code> template, and an overview vignette.</li>
+<li>Initial package skeleton: Schedule N retrieval, flag/EIN/IRC-section parsers, transaction-level stacking of Schedule N Parts I and II, merger ID helpers, and default classification rules.</li>
 </ul></div>
   </main></div>
 

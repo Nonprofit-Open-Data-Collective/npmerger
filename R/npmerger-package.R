@@ -16,7 +16,7 @@
 #' @keywords internal
 "_PACKAGE"
 
-#' @importFrom data.table := .N .SD .BY data.table as.data.table setDT fcase fifelse fcoalesce rbindlist uniqueN
+#' @importFrom data.table := .N .SD .BY .I %between% data.table as.data.table setDT fcase fifelse fcoalesce rbindlist uniqueN
 NULL
 
 utils::globalVariables(c(

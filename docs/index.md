@@ -12,8 +12,8 @@ and fiscal metrics come from
 [fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
 
 > Status: early development. Retrieval, cleaning, filing-level features,
-> and the rule-based classifier are working. Case building, attribute
-> tables, and panels are stubs. See the
+> merger evidence, and the rule-based classifier are working. Case
+> building, attribute tables, and panels are stubs. See the
 > [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md)
 > and the
 > [overview](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html).
@@ -35,7 +35,9 @@ library(npmerger)
 sn  <- get_schedule_n(2019:2021)   # Schedule N tables via panel990
 tx  <- sn_transactions(sn)         # one row per asset line (Parts I + II)
 fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
-lab <- classify_transactions(fl)   # merger2, mergerN, closure, ...
+ev  <- get_evidence_tables(fl)     # header, Part VII, VI, Sched O/R/A for these orgs
+fe  <- merger_features(fl, ev)     # leadership, donor counts, corroboration, affiliation
+lab <- classify_transactions(fe)   # merger2, mergerN, consolidation, closure, ...
 sched_n_table(lab)
 ```
 

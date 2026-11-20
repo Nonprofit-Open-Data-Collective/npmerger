@@ -30,6 +30,35 @@ filing.
   : Classify the free-text IRC section / entity type of a Schedule N
   recipient
 
+## Gather merger evidence
+
+Read the 990 tables for the donors and recipients involved, and add
+leadership, multi-party, filing-history, corroboration, and affiliation
+evidence to each filing.
+
+- [`get_evidence_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_evidence_tables.md)
+  : Retrieve the evidence tables for a set of Schedule N filings
+- [`evidence_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/evidence_tables.md)
+  : Evidence tables and the columns read from each
+- [`merger_features()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_features.md)
+  : Add all merger evidence to a filing table
+- [`leader_overlap()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/leader_overlap.md)
+  : Part VII leadership overlap between donor and recipient
+- [`add_donor_counts()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_donor_counts.md)
+  : Count dissolving donors that share a successor
+- [`add_filing_history()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_filing_history.md)
+  : Donor and recipient filing history
+- [`add_corroboration()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_corroboration.md)
+  : Corroborating merger disclosures
+- [`add_affiliation()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_affiliation.md)
+  : Affiliation between donor and recipient
+- [`add_mission_similarity()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_mission_similarity.md)
+  : Mission-statement similarity between donor and recipient
+- [`person_key()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/person_key.md)
+  : Normalize person names for matching
+- [`merger_text_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_text_pattern.md)
+  : Pattern for merger language in narrative text
+
 ## Classify transactions
 
 Label each filing as a merger, asset transfer, closure, disposition, or
@@ -41,8 +70,6 @@ reorganization, using rules you can change.
   : Default transaction classification rules
 - [`transaction_types()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/transaction_types.md)
   : Transaction type labels
-- [`leader_overlap()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/leader_overlap.md)
-  : Part VII leadership overlap between donor and recipient
 
 ## Build merger cases and tables
 

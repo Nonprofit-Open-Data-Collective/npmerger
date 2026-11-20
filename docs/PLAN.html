@@ -196,12 +196,17 @@
 <hr></div>
 <div class="section level2">
 <h2 id="id_4-build-sequence">4. Build sequence<a class="anchor" aria-label="anchor" href="#id_4-build-sequence"></a></h2>
-<ol style="list-style-type: decimal"><li>
-<strong>Skeleton + retrieval/cleaning</strong> (<code>get_schedule_n</code>, <code>sn_transactions</code>, flag/IRC/EIN parsers) with tests. Package via usethis, git init.</li>
-<li>
-<strong>Filing features + classifier</strong> (rules from section 2) and <code><a href="reference/sched_n_table.html">sched_n_table()</a></code>. Check by hand-reading about 50 Part III narratives per label. Report a confusion matrix against the hand labels.</li>
-<li>
-<strong>Part VII overlap</strong> (<code>leader_overlap</code>) added as a classifier input. Add EZ Part VII.</li>
+<ol style="list-style-type: decimal"><li>✅ <strong>Skeleton + retrieval/cleaning</strong> (<code>get_schedule_n</code>, <code>sn_transactions</code>, flag/IRC/EIN parsers) with tests.</li>
+<li>✅ <strong>Filing features + classifier</strong> (rules from section 2) and <code><a href="reference/sched_n_table.html">sched_n_table()</a></code>. <em>Still to do:</em> check by hand-reading about 50 Part III narratives per label, and report a confusion matrix against the hand labels.</li>
+<li>✅ <strong>Merger evidence wired into the classifier</strong> (<code><a href="reference/get_evidence_tables.html">get_evidence_tables()</a></code>, <code><a href="reference/merger_features.html">merger_features()</a></code>):
+<ul><li>Part VII overlap: <code><a href="reference/leader_overlap.html">leader_overlap()</a></code>. The F9 Part VII table also covers EZ filers: 89% of merger donors and recipients have rows.</li>
+<li>Multi-party counts: <code><a href="reference/add_donor_counts.html">add_donor_counts()</a></code>.</li>
+<li>New-entity detection and filing history: <code><a href="reference/add_filing_history.html">add_filing_history()</a></code>.</li>
+<li>Corroboration: <code><a href="reference/add_corroboration.html">add_corroboration()</a></code>.</li>
+<li>Affiliation: <code><a href="reference/add_affiliation.html">add_affiliation()</a></code>.</li>
+<li>Mission similarity: <code><a href="reference/add_mission_similarity.html">add_mission_similarity()</a></code>.</li>
+</ul>
+Real-data check on 2021 (5,167 filings; script <code>dev/run-2021.R</code>): closure 2,160; asset_disposition 1,090; asset_transfer 938; merger2 858; mergerN 107; consolidation 14. Of these, 54 mergers rest on corroboration rather than leadership. Affiliated pairs make up 37% of merger2, 76% of mergerN, and 4% of closures. 98% of merger donors file a final return. Evidence retrieval takes about 2.5 minutes cold (from the parquet cache) and 0.4 minutes warm.</li>
 <li>
 <strong>Cases + IDs + asset values</strong> (<code>build_merger_cases</code>, <code>transfer_value</code>).</li>
 <li>

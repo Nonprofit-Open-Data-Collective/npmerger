@@ -8,9 +8,11 @@
 #' @export
 sched_n_table <- function(classified) {
   x <- as.data.table(classified)
-  keep <- c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "HAS_P1", "HAS_P2", "LEADER_SN",
-            "LEADER_P7", "LEADER", "N_CORROBORATE", "BASIS", "N_RECIP", "N_NP_RECIP", "TOP_RECIP_EIN", "TOP_SHARE",
-            "FMV_TOTAL", "FMV_NP", "N_DONORS", "R_NEW")
+  keep <- c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "BASIS", "AFFILIATED", "HAS_P1", "HAS_P2",
+            "LEADER_SN", "LEADER_P7", "N_SHARED_P7", "LEADER", "SO_MERGER_TEXT_DONOR",
+            "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP", "N_CORROBORATE", "N_RECIP", "N_NP_RECIP",
+            "TOP_RECIP_EIN", "TOP_SHARE", "FMV_TOTAL", "FMV_NP", "N_DONORS", "R_NEW", "R_FORMED",
+            "FINAL_RETURN", "DONOR_FILES_LATER", "AFF_SCHED_R", "AFF_SUPPORT_ORG", "AFF_GROUP", "MISSION_SIM")
   x[, intersect(keep, names(x)), with = FALSE][order(TAX_YEAR, EIN2)]
 }
 
@@ -57,18 +59,4 @@ merger_part7 <- function(cases, window = -2:2, ...) {
 #' @export
 merger_fiscal_panel <- function(cases, pre = 5L, post = 5L, ...) {
   .not_yet("merger_fiscal_panel", "Plan step 6")
-}
-
-#' Part VII leadership overlap between donor and recipient
-#'
-#' Matches normalized person names on the donor's Part VII (t-1, t) against
-#' the recipient's Part VII (t, t+1).
-#'
-#' @param pairs A table with `EIN2`, `RECIP_EIN2`, `TAX_YEAR`.
-#' @param p7 Part VII person rows with `EIN2`, `TAX_YEAR`, and the person
-#'   name column `F9_07_COMP_DTK_NAME_PERS`.
-#' @return `pairs` with `N_DONOR_P7`, `N_RECIP_P7`, `N_SHARED`, `LEADER_P7`.
-#' @export
-leader_overlap <- function(pairs, p7) {
-  .not_yet("leader_overlap", "Plan step 3")
 }

@@ -86,9 +86,9 @@ organizations involved.</li>
 and fiscal-health metrics come from <a href="https://github.com/Nonprofit-Open-Data-Collective/fiscal" class="external-link">fiscal</a>.</p>
 <blockquote>
 <p><strong>Status.</strong> Retrieval, cleaning, filing-level features,
-and the classifier work today. Merger cases, attribute tables, and the
-Part VII and fiscal panels are planned; their functions are documented
-but stop with a “not implemented yet” message. See the <a href="https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md" class="external-link">roadmap</a>.</p>
+merger evidence, and the classifier work today. Merger cases, attribute
+tables, and the Part VII and fiscal panels are planned; their functions
+are documented but stop with a “not implemented yet” message. See the <a href="https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md" class="external-link">roadmap</a>.</p>
 </blockquote>
 <div class="section level2">
 <h2 id="what-counts-as-a-merger">What counts as a merger<a class="anchor" aria-label="anchor" href="#what-counts-as-a-merger"></a>
@@ -249,10 +249,73 @@ inspect the result, or substitute your own step.</p>
 <code class="sourceCode R"><span><span class="va">sn</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span>   <span class="co"># Schedule N tables, via panel990</span></span>
 <span><span class="va">tx</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sn_transactions.html">sn_transactions</a></span><span class="op">(</span><span class="va">sn</span><span class="op">)</span>         <span class="co"># one row per asset line, Parts I and II</span></span>
 <span><span class="va">fl</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sn_filings.html">sn_filings</a></span><span class="op">(</span><span class="va">sn</span>, <span class="va">tx</span><span class="op">)</span>          <span class="co"># one row per Schedule N filing</span></span>
-<span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">fl</span><span class="op">)</span>   <span class="co"># labels plus the evidence behind them</span></span>
+<span><span class="va">ev</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_evidence_tables.html">get_evidence_tables</a></span><span class="op">(</span><span class="va">fl</span><span class="op">)</span>     <span class="co"># 990 tables for the donors and recipients</span></span>
+<span><span class="va">fe</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merger_features.html">merger_features</a></span><span class="op">(</span><span class="va">fl</span>, <span class="va">ev</span><span class="op">)</span>     <span class="co"># add the evidence to each filing</span></span>
+<span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">fe</span><span class="op">)</span>   <span class="co"># labels plus the evidence behind them</span></span>
 <span><span class="fu"><a href="../reference/sched_n_table.html">sched_n_table</a></span><span class="op">(</span><span class="va">lab</span><span class="op">)</span>                 <span class="co"># YEAR, OBJECTID, EIN2, TYPE, evidence</span></span></code></pre></div>
-<p><code><a href="../reference/get_schedule_n.html">get_schedule_n()</a></code> downloads about 1 MB per tax year and
-caches it. The other functions run in memory.</p>
+<p><code><a href="../reference/get_schedule_n.html">get_schedule_n()</a></code> downloads about 1 MB per tax year.
+<code><a href="../reference/get_evidence_tables.html">get_evidence_tables()</a></code> is much heavier on its first run:
+Schedule O is about 150 MB per year and Part VII about 100 MB. Both
+cache what they download, and the evidence step then reads only the rows
+for the organizations involved.</p>
+<p><code><a href="../reference/merger_features.html">merger_features()</a></code> adds one group of columns per kind of
+evidence:</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Function</th>
+<th>Adds</th>
+<th>Source</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="../reference/leader_overlap.html">leader_overlap()</a></code></td>
+<td>
+<code>LEADER_P7</code>, <code>N_SHARED_P7</code>
+</td>
+<td>Part VII names, donor t-1..t vs recipient t..t+1</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/add_donor_counts.html">add_donor_counts()</a></code></td>
+<td><code>N_DONORS</code></td>
+<td>Other dissolving donors with the same dominant successor, t±1</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/add_filing_history.html">add_filing_history()</a></code></td>
+<td>
+<code>FINAL_RETURN</code>, <code>DONOR_FILES_LATER</code>,
+<code>R_FORMED</code>, <code>R_NEW</code>
+</td>
+<td>990 header</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/add_corroboration.html">add_corroboration()</a></code></td>
+<td>
+<code>SO_MERGER_TEXT_DONOR</code>,
+<code>SO_MERGER_TEXT_RECIP</code>,
+<code>GOV_DOC_CHANGE_RECIP</code>
+</td>
+<td>Schedule O, Part VI line 4</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/add_affiliation.html">add_affiliation()</a></code></td>
+<td>
+<code>AFF_SCHED_R</code>, <code>AFF_SUPPORT_ORG</code>,
+<code>AFF_GROUP</code>, <code>AFFILIATED</code>
+</td>
+<td>Schedule R Part II, Schedule A, group exemption number</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/add_mission_similarity.html">add_mission_similarity()</a></code></td>
+<td><code>MISSION_SIM</code></td>
+<td>Part III mission statements</td>
+</tr>
+</tbody>
+</table>
 <div class="section level3">
 <h3 id="cleaning">Cleaning<a class="anchor" aria-label="anchor" href="#cleaning"></a>
 </h3>
