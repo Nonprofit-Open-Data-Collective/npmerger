@@ -137,9 +137,45 @@ Design choices:
 
 ---
 
-## 5. Open questions
+## 5. Other 990 fields (tested 2026-11-20, `dev/experiments/06-other-fields.R`)
 
-1. **Merger evidence.** Should leadership continuity count from Schedule N flags **or** Part VII overlap (recommended), or Schedule N flags only (strict, as in the 2018 draft)?
-2. **990-EZ donors.** They are about half of Part I filers, but mostly tiny. Include them by default, with a size filter as an option?
-3. **Year range.** v3_1 covers roughly 2018–2024 here. Should the old 2011–2017 e-file years (v2_x) be supported too, or only the current release?
-4. **Affiliate consolidations** (chapters → national, hospital systems): keep them as mergerN, or give them their own `affiliate_consolidation` label?
+**Decision:** leadership continuity = Schedule N lines 2a–2c **or** Part VII overlap (`merger_rules(leader = "either")`).
+With that rule, 2019–21 counts are: closure 5,784; asset_disposition 3,250; asset_transfer 2,632; merger2 2,306; mergerN 427.
+
+The table below shows each field's rate by label. "Recip." is measured at the recipient in the merger year.
+
+| Field | merger2 | mergerN | asset_transfer | closure | Verdict |
+|---|---|---|---|---|---|
+| **Schedule R Part II**: donor and recipient list each other as related orgs | .35 | .64 | .08 | .03 | **Use.** Separates intra-system consolidation from arm's-length merger |
+| **Schedule O** text mentions merg/consolidat/acquir/affiliat (donor) | .33 | .54 | .10 | .04 | **Use** as tiebreaker evidence (all-filer baseline .06) |
+| Same, recipient's Schedule O | .28 | .53 | .13 | .01 | **Use** |
+| **Part VI line 4**: significant changes to governing documents (recip., t vs t-2) | .12 vs .04 | .13 vs .05 | .02 vs .09 | .04 | **Use**, about 3× lift at t |
+| **Schedule A**: donor is a 509(a)(3) supporting org | .18 | .25 | .09 | .05 | **Use** as affiliation flag |
+| **Part XII**: recipient's audit is consolidated | .34 | .63 | .30 | .25 | Descriptive (systems) |
+| Mission-text similarity (Jaccard, donor vs recipient; random = 0) | .07 | .09 | .03 | .00 | **Use** as relatedness measure (horizontal vs. other) |
+| Part III: significant new programs (recip., t vs t-2) | .06 vs .02 | .05 vs .11 | .02 | .01 | Weak, noisy |
+| Part VI line 1a: board grew t-2 → t+1 | .40 | .41 | .38 | .52 | Not useful |
+| Part XI line 9: other changes in net assets ≈ FMV received (±50%) | .23 | .08 | .08 | .02 | Use only to validate `transfer_value()` |
+| Part IV lines 31/32 or final return **without** Schedule N | — | — | — | — | No gap: 99–100% have Schedule N |
+
+What this means for the package:
+- Add an **affiliation** dimension, separate from the label: `AFFILIATED = Schedule R link | supporting org | same group exemption number | chapters (Part VI 10a)`. About a third of merger2 cases and two-thirds of mergerN cases are within one family of organizations. Analyses will usually want to split or drop them. This answers the earlier open question: keep the labels, and add a flag.
+- Add **corroborating evidence** columns (`SO_MERGER_TEXT`, `GOV_DOC_CHANGE_RECIP`, `MISSION_SIM`). Use them to report confidence, and optionally to promote an `asset_transfer` to `merger2` when two or more agree.
+- The universe is complete from Schedule N. Use Part IV and the final-return flag only for validation.
+
+Not tested, but worth adding to the panels:
+- Part V line 2a W-3 employee count (`F9_05_NUM_EMPL`) and Part I line 5 employees. These measure staff absorbed by the recipient.
+- Part VIII line 1g non-cash contributions and Schedule M at the recipient. These are where in-kind asset transfers show up.
+- Header `F9_00_GROUP_EXEMPT_NUM` / group returns (chapters), and the name-change / DBA fields (recipients that rename after a merger).
+- Schedule R Part V (transfers with related orgs), to cross-check transfer amounts within affiliated families.
+- Schedule D Part V (endowments): restricted funds that move with the merger.
+- Schedule H (hospitals), for a hospital-specific subsample.
+- Schedule B contributor names are redacted in public data, so it isn't usable.
+
+---
+
+## 6. Open questions
+
+1. **990-EZ donors.** They are about half of Part I filers, but mostly tiny. Include them by default, with a size filter as an option?
+2. **Year range.** v3_1 covers roughly 2018–2024 here. Should the old 2011–2017 e-file years (v2_x) be supported too, or only the current release?
+3. **Corroborating evidence.** Should Schedule O text plus governing-document changes be allowed to promote `asset_transfer` → `merger2` (about +10% of mergers), or be reported as confidence only?
