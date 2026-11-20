@@ -1,0 +1,36 @@
+Package: npmerger
+Title: Build Nonprofit Merger Datasets from IRS 990 Efile Data
+Version: 0.0.0.9000
+Authors@R:
+    person(given = "Jesse",
+           family = "Lecy",
+           role = c("aut", "cre"),
+           email = "jdlecy@gmail.com",
+           comment = c(ORCID = "0000-0003-4974-0782"))
+Description: Identify nonprofit mergers, asset transfers, dispositions, and
+    closures from IRS Form 990 Schedule N filings; classify transactions
+    using Schedule N disclosures and Part VII leadership continuity; and
+    build donor, recipient, Part VII, and fiscal-health panels around each
+    merger event. Data retrieval relies on 'panel990' and fiscal metrics on
+    'fiscal'.
+URL: https://github.com/Nonprofit-Open-Data-Collective/npmerger
+BugReports: https://github.com/Nonprofit-Open-Data-Collective/npmerger/issues
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends: R (>= 4.1.0)
+Imports:
+    data.table,
+    panel990
+Suggests:
+    fiscal,
+    duckdb,
+    arrow,
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Remotes:
+    Nonprofit-Open-Data-Collective/panel990,
+    Nonprofit-Open-Data-Collective/fiscal
+Config/testthat/edition: 3
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

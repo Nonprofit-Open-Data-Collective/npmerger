@@ -1,0 +1,17 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^README\.Rmd$
+^PLAN\.md$
+^dev$
+^data-raw$
+^docs$
+^_pkgdown\.yml$
+^\.github$
+^PANEL990$
+^data-cache$
+^temp$
+^.*\.docx$
+^.*\.pdf$
+^.*\.pptx$
+^01-build-merger-panel\.rmd$

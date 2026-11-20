@@ -1,0 +1,20 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+docs/
+inst/doc
+*.tar.gz
+*.Rcheck/
+
+# local data caches
+PANEL990/
+data-cache/
+
+# background material kept locally (large / third-party)
+temp/
+*.docx
+*.pdf
+*.pptx
+01-build-merger-panel.rmd
