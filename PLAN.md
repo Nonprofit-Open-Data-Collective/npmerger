@@ -119,7 +119,7 @@ Design choices:
 - **data.table throughout**, matching panel990 and fiscal. Return plain data.frames/data.tables with documented columns.
 - **Fetch selectively.** Schedule N is tiny (about 1 MB/yr), but header, summary and P07 are 50–100 MB/yr. Download Schedule N for all years, derive the EIN set, then read core tables with an EIN filter (duckdb parquet pushdown, `cache = "none"` option).
 - **Keep the stages separate.** raw → transactions → features → labels → cases → output tables. Each stage is a function, so users can step in anywhere (for example, swap in their own classifier).
-- **Get metrics from `fiscal`, not reimplement them.** One caution: `fiscal::get_panel()` defaults to efile **v2_1**, while panel990 uses **v3_1**. Field names need checking so that `compute_all_panel()` runs on panel990 output. This may need a small shim or a fix in fiscal.
+- **Get metrics from `fiscal`, not reimplement them.** fiscal now defaults to the current efile release (v3_1), the same as panel990. See section 7 for calibration and smoothing.
 - NTEE, ruling year and address come from the BMF through `panel990::bmf_merge()` / `fiscal::get_clean_ntee()`. Org age = tax year − min(formation year, ruling year).
 
 ---
@@ -160,7 +160,8 @@ The table below shows each field's rate by label. "Recip." is measured at the re
 
 What this means for the package:
 - Add an **affiliation** dimension, separate from the label: `AFFILIATED = Schedule R link | supporting org | same group exemption number | chapters (Part VI 10a)`. About a third of merger2 cases and two-thirds of mergerN cases are within one family of organizations. Analyses will usually want to split or drop them. This answers the earlier open question: keep the labels, and add a flag.
-- Add **corroborating evidence** columns (`SO_MERGER_TEXT`, `GOV_DOC_CHANGE_RECIP`, `MISSION_SIM`). Use them to report confidence, and optionally to promote an `asset_transfer` to `merger2` when two or more agree.
+- Add **corroborating evidence** columns: `SO_MERGER_TEXT_DONOR`, `SO_MERGER_TEXT_RECIP`, and `GOV_DOC_CHANGE_RECIP` (Part VI line 4 at the recipient, t or t+1). **Decision: allow promotion.** An `asset_transfer` becomes a merger label when ≥2 of the 3 signals agree (`merger_rules(promote = TRUE, min_corroborate = 2)`). The output records `BASIS = "corroborated"` (vs `"leader"`) and `N_CORROBORATE`. `MISSION_SIM` is descriptive only and does not count toward promotion.
+  - Tested on 2021: 54 of 999 asset transfers (5%) are promoted. They look like mergers on measures the rule doesn't use: 69% of donors end the year with near-zero assets, vs 37% for unpromoted transfers (65% for merger2), and median donor revenue is $61k vs $5k ($47k for merger2). One signal alone would promote 163 cases, which have weaker profiles (47% assets gone, $12k revenue), so the threshold stays at 2.
 - The universe is complete from Schedule N. Use Part IV and the final-return flag only for validation.
 
 Not tested, but worth adding to the panels:
@@ -174,8 +175,38 @@ Not tested, but worth adding to the panels:
 
 ---
 
+## 7. Fiscal health index and smoothing (tested 2026-11-20, `dev/experiments/07-fiscal-index-smoothing.R`)
+
+**Is the index calibrated?** No. fiscal 0.0.2 has a full measurement workflow:
+`fiscal_diagnostics()` → `fiscal_triage()` → `fiscal_dimensions()` → `fiscal_health_fit()` → `fiscal_weights()` → `fiscal_health_score()` → `fiscal_health_index()`.
+But no fitted model ships with it. The only bundled data are `dat10k` (10,000 orgs, tax year 2023) and `part010810`. The docs say triage and dimension discovery "require review and substantive judgment", so nothing is automated.
+- I fit the workflow on `dat10k` with all defaults. It runs end to end: 48 winsorized ratios, 3 PCA dimensions, and **29 standalone indicators**. With default equal weights, the standalones dominate the composite. So the defaults are a starting point, not a calibration.
+- **To do:** calibrate once on a stated reference sample, review triage, dimensions and weights, and save the fit. Then score every org-year with it. Options for the reference sample: a full single-year cross-section of all 990 filers; a pooled pre-period such as 2018–19; or `dat10k`.
+
+**Can we get metrics for every year and track change?** Yes, but use the right layer:
+- `compute_all_panel()` gives the raw ratios for every org-year. Its `_w` / `_z` / `_p` columns are **re-estimated within each year**: percentile and z-score are relative to that year's cross-section. They are good for ranking but not for tracking absolute change over time.
+- `fiscal_health_score()` with a fixed fit applies the stored centers, scales and coefficients without re-estimating. **This is the comparable-over-time index.** I tested it on 769 merger orgs (3,142 org-years, 2018–23) scored against the 2023 calibration, and it produced an index for every year.
+
+**Smoothing.** `panel990::panel_smooth()` is **centered only** (odd window, positions `t-1, t, t+1`). It also counts rows rather than calendar years, so filing gaps get bridged. There is no trailing option, in the installed version or on GitHub main.
+For merger panels this leaks post-merger information into pre-merger years. I compared on recipients (k = 3), measuring partial correlation of the t-1 index with the year-t index, controlling for t-2:
+
+| | raw | trailing (t-2..t) | centered (t-1..t+1) |
+|---|---|---|---|
+| Correlation of t-1 with year t (leakage) | .53 | .47 | **.61** |
+| Mean index at t-2 (recipients) | .21 | .20 | **.38** (inflated) |
+| Within-org year-to-year SD of index | .88 | .33 | .33 |
+
+- A trailing window cuts noise as much as centered does (−63% volatility), with no look-ahead.
+- Trailing does **lag** real changes: the post-merger rise is spread over k years (trailing .26 → .29 → .31 for t = 0..2).
+- Plan:
+  1. Add `align = c("center", "trailing")` to `panel990::panel_smooth()` and make the window calendar-year based. This is a separate panel990 change. npmerger needs it but shouldn't fork it.
+  2. In `merger_fiscal_panel()`, offer `smooth = "trailing"` (default `k = 3`).
+  3. Use trailing-smoothed values for matching covariates and baselines (t-2), and **raw** values for event-time outcome estimates. Otherwise the lag smears the merger effect.
+
+---
+
 ## 6. Open questions
 
 1. **990-EZ donors.** They are about half of Part I filers, but mostly tiny. Include them by default, with a size filter as an option?
 2. **Year range.** v3_1 covers roughly 2018–2024 here. Should the old 2011–2017 e-file years (v2_x) be supported too, or only the current release?
-3. **Corroborating evidence.** Should Schedule O text plus governing-document changes be allowed to promote `asset_transfer` → `merger2` (about +10% of mergers), or be reported as confidence only?
+3. **Fiscal index reference sample.** Which reference should the fiscal-health model be calibrated on (section 7)?

@@ -8,7 +8,10 @@ merger_rules(
   min_top_share = 0.5,
   leader = c("either", "sn", "p7"),
   min_donors_n = 2L,
-  new_entity_years = 1L
+  new_entity_years = 1L,
+  promote = TRUE,
+  min_corroborate = 2L,
+  corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP")
 )
 }
 \arguments{
@@ -25,6 +28,20 @@ window that makes a merger \code{mergerN}.}
 
 \item{new_entity_years}{A recipient formed within this many years before the
 merger year counts as a new entity (consolidation).}
+
+\item{promote}{If \code{TRUE} (default), a dissolution to one nonprofit successor
+with no leadership evidence is promoted from \code{asset_transfer} to a merger
+label when at least \code{min_corroborate} corroborating signals agree.}
+
+\item{min_corroborate}{Number of corroborating signals required for
+promotion. One signal alone was too loose on 2019-21 data; two promoted
+about 5\% of asset transfers, and those looked like mergers on measures
+the rule does not use.}
+
+\item{corroborate}{Names of logical columns that count as corroborating
+signals: Schedule O merger language on the donor's and the recipient's
+return, and a Part VI line 4 governing-document change at the recipient
+in year t or t+1.}
 }
 \value{
 A list of class \code{merger_rules}.
@@ -35,5 +52,5 @@ stricter or broader definitions.
 }
 \examples{
 merger_rules()
-merger_rules(leader = "sn")
+merger_rules(leader = "sn", promote = FALSE)
 }

@@ -9,7 +9,7 @@
 sched_n_table <- function(classified) {
   x <- as.data.table(classified)
   keep <- c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "HAS_P1", "HAS_P2", "LEADER_SN",
-            "LEADER_P7", "LEADER", "N_RECIP", "N_NP_RECIP", "TOP_RECIP_EIN", "TOP_SHARE",
+            "LEADER_P7", "LEADER", "N_CORROBORATE", "BASIS", "N_RECIP", "N_NP_RECIP", "TOP_RECIP_EIN", "TOP_SHARE",
             "FMV_TOTAL", "FMV_NP", "N_DONORS", "R_NEW")
   x[, intersect(keep, names(x)), with = FALSE][order(TAX_YEAR, EIN2)]
 }

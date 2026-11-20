@@ -28,6 +28,24 @@ test_that("leader rule switches evidence channel", {
   expect_identical(out$TYPE[truth$case == "merger2_sn"], "asset_transfer")
 })
 
+test_that("corroborating signals promote asset transfers", {
+  tr <- truth[case == "transfer"][rep(1, 3)]
+  tr[, `:=`(SO_MERGER_TEXT_DONOR = c(TRUE, TRUE, TRUE),
+            SO_MERGER_TEXT_RECIP = c(FALSE, TRUE, TRUE),
+            GOV_DOC_CHANGE_RECIP = c(FALSE, FALSE, TRUE))]
+  out <- classify_transactions(tr)
+  expect_identical(out$TYPE, c("asset_transfer", "merger2", "merger2"))
+  expect_identical(out$N_CORROBORATE, 1:3)
+  expect_identical(out$BASIS, c(NA, "corroborated", "corroborated"))
+  expect_identical(classify_transactions(tr, merger_rules(promote = FALSE))$TYPE, rep("asset_transfer", 3))
+  expect_identical(classify_transactions(tr, merger_rules(min_corroborate = 1))$TYPE, rep("merger2", 3))
+  # leadership evidence takes precedence in BASIS
+  expect_identical(classify_transactions(truth)$BASIS[truth$case == "merger2_sn"], "leader")
+  # corroboration never rescues a dispersed closure
+  cl <- truth[case == "dispersed"][, `:=`(LEADER_SN = FALSE, SO_MERGER_TEXT_DONOR = TRUE, SO_MERGER_TEXT_RECIP = TRUE)]
+  expect_identical(classify_transactions(cl)$TYPE, "closure")
+})
+
 test_that("optional columns default sensibly", {
   expect_warning(out <- classify_transactions(truth[, !c("LEADER_P7", "N_DONORS", "R_NEW")]), "LEADER_P7")
   expect_identical(out$TYPE[truth$case == "mergerN"], "merger2")
