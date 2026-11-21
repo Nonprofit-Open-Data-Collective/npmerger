@@ -2,6 +2,18 @@
 
 ## npmerger 0.0.0.9000
 
+- Classifier inspection tables:
+  [`sn_labeled()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_labeled.md)
+  stacks Schedule N Part I and Part II asset lines into one tidy table,
+  with each part’s checkbox answers
+  ([`sn_checkboxes()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_checkboxes.md)),
+  the Part III text, the filing’s label and evidence, and
+  `IS_MERGER_RECIPIENT` on lines to the merger recipient.
+  [`sn_inspection()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_inspection.md)
+  draws `num` non-overlapping samples stratified by label, with blank
+  review columns. `dev/build-inspection.R` saves one 100-case table to
+  `data-dev/`.
+
 - Matched comparison samples
   ([`vignette("matching")`](https://nonprofit-open-data-collective.github.io/npmerger/articles/matching.md)):
 

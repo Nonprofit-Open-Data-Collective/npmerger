@@ -72,6 +72,12 @@ reference:
   - merger_rules
   - transaction_types
   - sched_n_table
+- title: Inspect the classifier
+  desc: A tidy, labeled table of every Schedule N asset line with its checkboxes, and stratified samples of it for review by hand.
+  contents:
+  - sn_labeled
+  - sn_inspection
+  - sn_checkboxes
 - title: Build merger cases
   desc: Donor-recipient pairs with merger IDs, each organization's merger year, and the value of assets transferred.
   contents:

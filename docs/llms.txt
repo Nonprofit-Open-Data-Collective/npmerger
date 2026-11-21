@@ -166,6 +166,18 @@ reorganization, using rules you can change.
 - [`sched_n_table()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sched_n_table.md)
   : Schedule N transaction table
 
+## Inspect the classifier
+
+A tidy, labeled table of every Schedule N asset line with its
+checkboxes, and stratified samples of it for review by hand.
+
+- [`sn_labeled()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_labeled.md)
+  : Labeled Schedule N table for inspection
+- [`sn_inspection()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_inspection.md)
+  : Draw inspection samples from the labeled Schedule N table
+- [`sn_checkboxes()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_checkboxes.md)
+  : Schedule N checkbox fields
+
 ## Build merger cases
 
 Donor-recipient pairs with merger IDs, each organization’s merger year,

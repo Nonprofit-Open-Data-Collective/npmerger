@@ -44,7 +44,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.0.9000" id="npmerger-0009000">npmerger 0.0.0.9000<a class="anchor" aria-label="anchor" href="#npmerger-0009000"></a></h2>
-<ul><li>
+<ul><li><p>Classifier inspection tables: <code><a href="../reference/sn_labeled.html">sn_labeled()</a></code> stacks Schedule N Part I and Part II asset lines into one tidy table, with each part’s checkbox answers (<code><a href="../reference/sn_checkboxes.html">sn_checkboxes()</a></code>), the Part III text, the filing’s label and evidence, and <code>IS_MERGER_RECIPIENT</code> on lines to the merger recipient. <code><a href="../reference/sn_inspection.html">sn_inspection()</a></code> draws <code>num</code> non-overlapping samples stratified by label, with blank review columns. <code>dev/build-inspection.R</code> saves one 100-case table to <code>data-dev/</code>.</p></li>
+<li>
 <p>Matched comparison samples (<code><a href="../articles/matching.html">vignette("matching")</a></code>):</p>
 <ul><li>
 <code><a href="../reference/build_match_data.html">build_match_data()</a></code> runs every matching step in one call and returns the sample, pool, candidates for each specification, balance, and coverage (<code><a href="../reference/match_coverage.html">match_coverage()</a></code>).</li>

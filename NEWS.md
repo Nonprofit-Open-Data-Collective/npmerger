@@ -1,5 +1,13 @@
 # npmerger 0.0.0.9000
 
+* Classifier inspection tables: `sn_labeled()` stacks Schedule N Part I and
+  Part II asset lines into one tidy table, with each part's checkbox answers
+  (`sn_checkboxes()`), the Part III text, the filing's label and evidence,
+  and `IS_MERGER_RECIPIENT` on lines to the merger recipient.
+  `sn_inspection()` draws `num` non-overlapping samples stratified by label,
+  with blank review columns. `dev/build-inspection.R` saves one 100-case
+  table to `data-dev/`.
+
 * Matched comparison samples (`vignette("matching")`):
   - `build_match_data()` runs every matching step in one call and returns
     the sample, pool, candidates for each specification, balance, and
