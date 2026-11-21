@@ -33,10 +33,14 @@ panel_columns <- function() {
 #' @param bmf Add NTEE codes from the BMF ([get_bmf()]): `TRUE`, `FALSE`, or a
 #'   BMF table you already have.
 #' @param base_year Year of the dollars in the `REAL_*` columns.
+#' @param ntee_legacy Fill NTEE codes the current BMF lacks from the NCCS
+#'   legacy BMF ([legacy_ntee()], [fill_ntee()]): `TRUE`, `FALSE`, or a table
+#'   from [legacy_ntee()].
 #' @return A data.table keyed by `EIN2`, `TAX_YEAR`; see [panel_measures()].
+#'   With `ntee_legacy`, also `NTEE_SOURCE`.
 #' @export
 get_panel <- function(years = efile_years(), path = "PANEL990", source = panel990::data_source(),
-                      verbose = TRUE, bmf = TRUE, base_year = 2024L) {
+                      verbose = TRUE, bmf = TRUE, base_year = 2024L, ntee_legacy = TRUE) {
   spec <- core_tables()[c("header", "summary", "expenses", "balance")]
   cols <- panel_columns()
   core <- lapply(names(spec), function(nm) {
@@ -53,7 +57,75 @@ get_panel <- function(years = efile_years(), path = "PANEL990", source = panel99
   oy <- org_years(structure(core, class = c("merger_core", "list")))
   rm(core); gc()
   b <- if (isTRUE(bmf)) get_bmf(unique(oy$EIN2), path = path, verbose = verbose) else if (is.data.frame(bmf)) bmf else NULL
-  panel_measures(oy, bmf = b, base_year = base_year)
+  out <- panel_measures(oy, bmf = b, base_year = base_year)
+  if (isTRUE(ntee_legacy)) out <- fill_ntee(out, legacy_ntee(path = path, eins = out$EIN2[is.na(out$NTEE2)], verbose = verbose))
+  else if (is.data.frame(ntee_legacy)) out <- fill_ntee(out, ntee_legacy)
+  out
+}
+
+#' NTEE codes from NCCS legacy BMF files
+#'
+#' The current IRS Business Master File has no usable NTEE code for about a
+#' quarter of 990 filers (`"UNDEFINED"`), including many large charities. The
+#' NCCS legacy BMF extracts carry the NTEE code NCCS assigned (`NTEEFINAL`),
+#' which covers most of them. This function downloads the extracts (once)
+#' into `path/bmf_legacy/` and returns one code per organization, taking the
+#' first vintage in `vintages` that has a valid code.
+#'
+#' @param vintages Legacy BMF vintages (`"YYYY-MM"`), most preferred first.
+#' @param path panel990 cache folder.
+#' @param eins Optional EINs to keep.
+#' @param base_url Location of the NCCS legacy BMF files.
+#' @param verbose Print progress.
+#' @return A data.table with `EIN2`, `NTEE_LEGACY`, and `NTEE_LEGACY_VINTAGE`.
+#' @seealso [fill_ntee()]
+#' @export
+legacy_ntee <- function(vintages = c("2022-08", "2019-08"), path = "PANEL990", eins = NULL,
+                        base_url = "https://nccsdata.s3.us-east-1.amazonaws.com/legacy/bmf", verbose = TRUE) {
+  dir <- file.path(path, "bmf_legacy")
+  dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+  keep <- if (is.null(eins)) NULL else unique(stats::na.omit(as_ein2(eins)))
+  out <- rbindlist(lapply(seq_along(vintages), function(i) {
+    f <- file.path(dir, sprintf("BMF-%s-501CX-NONPROFIT-PX.csv", vintages[i]))
+    if (!file.exists(f)) {
+      if (verbose) message("Downloading NCCS legacy BMF ", vintages[i])
+      old <- options(timeout = max(3600, getOption("timeout"))); on.exit(options(old), add = TRUE)
+      utils::download.file(paste0(base_url, "/", basename(f)), f, mode = "wb", quiet = !verbose)
+    }
+    d <- data.table::fread(f, select = c("EIN", "NTEEFINAL"), colClasses = "character", showProgress = FALSE)
+    d <- d[, list(EIN2 = as_ein2(EIN), NTEE_LEGACY = toupper(trimws(NTEEFINAL)), NTEE_LEGACY_VINTAGE = vintages[i], ORDER_ = i)]
+    d <- d[!is.na(ntee_level(NTEE_LEGACY, 2L))]
+    if (!is.null(keep)) d <- d[EIN2 %in% keep]
+    d
+  }))
+  if (!nrow(out)) return(data.table(EIN2 = character(), NTEE_LEGACY = character(), NTEE_LEGACY_VINTAGE = character()))
+  data.table::setorderv(out, c("EIN2", "ORDER_"))
+  out <- out[!duplicated(EIN2)][, ORDER_ := NULL]
+  out[]
+}
+
+#' Fill missing NTEE codes from another source
+#'
+#' Replaces `NTEE` where the panel has no valid two-character code, and
+#' records where each code came from in `NTEE_SOURCE` (`"bmf"`,
+#' `"legacy_bmf_<vintage>"`, or `NA`). Codes the current BMF does have are
+#' never replaced.
+#'
+#' @param panel A panel from [panel_measures()] or [get_panel()].
+#' @param legacy A table from [legacy_ntee()].
+#' @return `panel` with `NTEE`, `NTEE2`, `NTEE_MAJOR` updated and `NTEE_SOURCE`.
+#' @export
+fill_ntee <- function(panel, legacy) {
+  p <- data.table::copy(as.data.table(panel))
+  if (!"NTEE_SOURCE" %in% names(p)) p[, NTEE_SOURCE := fifelse(is.na(ntee_level(NTEE, 2L)), NA_character_, "bmf")]
+  i <- which(is.na(p$NTEE_SOURCE))
+  m <- match(p$EIN2[i], legacy$EIN2)
+  ok <- !is.na(m)
+  data.table::set(p, i[ok], "NTEE", legacy$NTEE_LEGACY[m[ok]])
+  data.table::set(p, i[ok], "NTEE_SOURCE", paste0("legacy_bmf_", legacy$NTEE_LEGACY_VINTAGE[m[ok]]))
+  p[, `:=`(NTEE2 = ntee_level(NTEE, 2L), NTEE_MAJOR = ntee_level(NTEE, 1L))]
+  if (data.table::haskey(panel)) data.table::setkeyv(p, data.table::key(panel))
+  p[]
 }
 
 #' Consumer price index (CPI-U, annual average)
@@ -412,7 +484,7 @@ match_balance <- function(treated, pool, candidates, k = 1L,
   }))
 }
 
-utils::globalVariables(c("NTEE", "NTEE2", "NTEE_MAJOR", "REAL_REVENUE", "REAL_EXPENSES", "REAL_ASSETS", "MARGIN",
+utils::globalVariables(c("NTEE", "NTEE2", "NTEE_MAJOR", "NTEE_SOURCE", "NTEE_LEGACY", "NTEE_LEGACY_VINTAGE", "ORDER_", "EIN", "NTEEFINAL", "REAL_REVENUE", "REAL_EXPENSES", "REAL_ASSETS", "MARGIN",
                          "EQUITY_RATIO", "MONTHS_CASH", "CASH", "NET_ASSETS", "ASSETS", "YEAR", "BACK", "N_BASE",
                          "HAS_FIRST", "RY", "R_WINDOW_OK", "DONOR_PRE_OK", "RECIP_EIN2", "DONOR_EIN2", "MERGER_YEAR",
                          "RECIP_MERGER_YEAR", "MERGER_ID", "MERGER_ID_O", "Y", "R_OTHER_EVENTS", "R_NTEE", "R_NTEE2",

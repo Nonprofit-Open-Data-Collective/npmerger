@@ -104,6 +104,8 @@ reference:
   - match_candidates
   - match_balance
   - ntee_level
+  - legacy_ntee
+  - fill_ntee
   - real_dollars
   - cpi_u
 - title: Package

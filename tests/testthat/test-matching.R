@@ -74,3 +74,15 @@ test_that("match_candidates applies NTEE, size, and health calipers across years
   b <- match_balance(ms$treated, pool, m, k = 1)
   expect_true(all(c("SMD_MATCHED", "SMD_POOL") %in% names(b)))
 })
+
+test_that("fill_ntee fills only missing codes and records the source", {
+  p <- data.table::data.table(EIN2 = c("A", "B", "C", "D"), TAX_YEAR = 2015L,
+                              NTEE = c("E21", "UNDEFINED", NA, "INVALID"))
+  p[, `:=`(NTEE2 = ntee_level(NTEE, 2), NTEE_MAJOR = ntee_level(NTEE, 1))]
+  leg <- data.table::data.table(EIN2 = c("A", "B", "D"), NTEE_LEGACY = c("B82", "P20", "S41"),
+                                NTEE_LEGACY_VINTAGE = c("2022-08", "2022-08", "2019-08"))
+  f <- fill_ntee(p, leg)
+  expect_identical(f$NTEE2, c("E2", "P2", NA, "S4"))
+  expect_identical(f$NTEE_SOURCE, c("bmf", "legacy_bmf_2022-08", NA, "legacy_bmf_2019-08"))
+  expect_identical(fill_ntee(f, leg)$NTEE2, f$NTEE2)   # idempotent
+})

@@ -18,7 +18,8 @@ get_panel(
   source = panel990::data_source(),
   verbose = TRUE,
   bmf = TRUE,
-  base_year = 2024L
+  base_year = 2024L,
+  ntee_legacy = TRUE
 )
 ```
 
@@ -43,7 +44,16 @@ get_panel(
 
   Year of the dollars in the `REAL_*` columns.
 
+- ntee_legacy:
+
+  Fill NTEE codes the current BMF lacks from the NCCS legacy BMF
+  ([`legacy_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/legacy_ntee.md),
+  [`fill_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/fill_ntee.md)):
+  `TRUE`, `FALSE`, or a table from
+  [`legacy_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/legacy_ntee.md).
+
 ## Value
 
 A data.table keyed by `EIN2`, `TAX_YEAR`; see
 [`panel_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_measures.md).
+With `ntee_legacy`, also `NTEE_SOURCE`.

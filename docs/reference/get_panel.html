@@ -66,7 +66,8 @@ merger recipients are matched against.</p>
 <span>  source <span class="op">=</span> <span class="fu">panel990</span><span class="fu">::</span><span class="fu"><a href="https://nonprofit-open-data-collective.github.io/panel990/reference/data_source.html" class="external-link">data_source</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  bmf <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  base_year <span class="op">=</span> <span class="fl">2024L</span></span>
+<span>  base_year <span class="op">=</span> <span class="fl">2024L</span>,</span>
+<span>  ntee_legacy <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -90,10 +91,17 @@ BMF table you already have.</p></dd>
 <dt id="arg-base-year">base_year<a class="anchor" aria-label="anchor" href="#arg-base-year"></a></dt>
 <dd><p>Year of the dollars in the <code>REAL_*</code> columns.</p></dd>
 
+
+<dt id="arg-ntee-legacy">ntee_legacy<a class="anchor" aria-label="anchor" href="#arg-ntee-legacy"></a></dt>
+<dd><p>Fill NTEE codes the current BMF lacks from the NCCS
+legacy BMF (<code><a href="legacy_ntee.html">legacy_ntee()</a></code>, <code><a href="fill_ntee.html">fill_ntee()</a></code>): <code>TRUE</code>, <code>FALSE</code>, or a table
+from <code><a href="legacy_ntee.html">legacy_ntee()</a></code>.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data.table keyed by <code>EIN2</code>, <code>TAX_YEAR</code>; see <code><a href="panel_measures.html">panel_measures()</a></code>.</p>
+    <p>A data.table keyed by <code>EIN2</code>, <code>TAX_YEAR</code>; see <code><a href="panel_measures.html">panel_measures()</a></code>.
+With <code>ntee_legacy</code>, also <code>NTEE_SOURCE</code>.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

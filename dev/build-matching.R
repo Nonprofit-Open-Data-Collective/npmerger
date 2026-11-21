@@ -6,6 +6,8 @@
 #   ROOT       database folder (default ~/Documents/NPMERGER)
 #   CACHE      panel990 cache (default ROOT/PANEL990)
 #   PANEL_RDS  optional saved panel (.rds) to reuse instead of rebuilding
+#              (NTEE codes missing from the current BMF are filled from the
+#              NCCS legacy BMF if the saved panel predates that step)
 #
 # Tables added to ROOT/npmerger.duckdb (and ROOT/parquet/):
 #   panel_990                 every 990/990-EZ organization-year, 2009-2025
@@ -27,7 +29,12 @@ lap <- function(msg) cat(sprintf("[%5.1f min] %s\n", as.numeric(difftime(Sys.tim
 
 prds <- Sys.getenv("PANEL_RDS")
 panel <- if (nzchar(prds)) readRDS(prds) else get_panel(efile_years(), path = cache, verbose = FALSE)
-if (!nzchar(prds)) saveRDS(panel, file.path(root, "panel_990.rds"))
+if (!"NTEE_SOURCE" %in% names(panel)) {   # panel saved before the legacy NTEE fill
+  panel <- fill_ntee(panel, legacy_ntee(path = cache, eins = panel$EIN2[is.na(panel$NTEE2)]))
+  saveRDS(panel, file.path(root, "panel_990.rds"))
+} else if (!nzchar(prds)) saveRDS(panel, file.path(root, "panel_990.rds"))
+nt <- unique(panel[, list(EIN2, NTEE_SOURCE)], by = "EIN2")
+lap(sprintf("NTEE source by organization: %s", paste(names(table(nt$NTEE_SOURCE, useNA = "ifany")), table(nt$NTEE_SOURCE, useNA = "ifany"), sep = " = ", collapse = ", ")))
 lap(sprintf("panel: %s org-years, %s organizations", format(nrow(panel), big.mark = ","), format(uniqueN(panel$EIN2), big.mark = ",")))
 
 md <- readRDS(file.path(root, "merger_data.rds"))
@@ -56,9 +63,9 @@ cov <- rbindlist(lapply(names(cands), function(nm) {
 }))
 print(cov)
 st <- attr(cands$margin, "settings")
-settings <- data.table(item = c("ntee_chars", "size", "size_caliper_log", "margin_caliper", "equity_caliper",
+settings <- data.table(item = c("ntee_source", "ntee_chars", "size", "size_caliper_log", "margin_caliper", "equity_caliper",
                                 "window", "baseline_years", "pool_exclusion", "dollars", "built"),
-                       value = c(st$ntee_chars, paste(st$size, collapse = ", "), round(st$size_caliper, 4),
+                       value = c("current BMF; missing codes from NCCS legacy BMF 2022-08, then 2019-08", st$ntee_chars, paste(st$size, collapse = ", "), round(st$size_caliper, 4),
                                  attr(cands$margin, "settings")$health_caliper, attr(cands$equity, "settings")$health_caliper,
                                  "returns in every year t-2..t+2", "mean of t-3 and t-2 (t-2 required)",
                                  "any Schedule N filing or named recipient in years Y-3..Y+2",

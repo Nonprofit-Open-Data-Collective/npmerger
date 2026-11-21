@@ -237,6 +237,10 @@ recipients.
   : Covariate balance of a matched sample
 - [`ntee_level()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/ntee_level.md)
   : Clean NTEE code to a given number of characters
+- [`legacy_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/legacy_ntee.md)
+  : NTEE codes from NCCS legacy BMF files
+- [`fill_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/fill_ntee.md)
+  : Fill missing NTEE codes from another source
 - [`real_dollars()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/real_dollars.md)
   : Convert nominal dollars to constant dollars
 - [`cpi_u()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/cpi_u.md)

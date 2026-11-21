@@ -14,6 +14,10 @@
     size and profitability (or fiscal-health) calipers, across any years,
     ranked by distance. `match_balance()` reports standardized differences.
   - `dev/build-matching.R` adds these tables to the database.
+  - NTEE codes the current BMF lacks (`"UNDEFINED"`, about a quarter of
+    filers) are filled from the NCCS legacy BMF (`legacy_ntee()`,
+    `fill_ntee()`, `get_panel(ntee_legacy = TRUE)`). `NTEE_SOURCE` records
+    where each code came from.
 
 * Classifier rules revised after hand validation on 300 filings
   (`dev/validation/`; PLAN.md section 9). Agreement with hand labels rose

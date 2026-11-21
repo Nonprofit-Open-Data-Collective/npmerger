@@ -26,6 +26,12 @@
     [`match_balance()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_balance.md)
     reports standardized differences.
   - `dev/build-matching.R` adds these tables to the database.
+  - NTEE codes the current BMF lacks (`"UNDEFINED"`, about a quarter of
+    filers) are filled from the NCCS legacy BMF
+    ([`legacy_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/legacy_ntee.md),
+    [`fill_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/fill_ntee.md),
+    `get_panel(ntee_legacy = TRUE)`). `NTEE_SOURCE` records where each
+    code came from.
 
 - Classifier rules revised after hand validation on 300 filings
   (`dev/validation/`; PLAN.md section 9). Agreement with hand labels

@@ -10,7 +10,8 @@ get_panel(
   source = panel990::data_source(),
   verbose = TRUE,
   bmf = TRUE,
-  base_year = 2024L
+  base_year = 2024L,
+  ntee_legacy = TRUE
 )
 }
 \arguments{
@@ -22,9 +23,14 @@ get_panel(
 BMF table you already have.}
 
 \item{base_year}{Year of the dollars in the \verb{REAL_*} columns.}
+
+\item{ntee_legacy}{Fill NTEE codes the current BMF lacks from the NCCS
+legacy BMF (\code{\link[=legacy_ntee]{legacy_ntee()}}, \code{\link[=fill_ntee]{fill_ntee()}}): \code{TRUE}, \code{FALSE}, or a table
+from \code{\link[=legacy_ntee]{legacy_ntee()}}.}
 }
 \value{
 A data.table keyed by \code{EIN2}, \code{TAX_YEAR}; see \code{\link[=panel_measures]{panel_measures()}}.
+With \code{ntee_legacy}, also \code{NTEE_SOURCE}.
 }
 \description{
 Reads the header, summary, expenses, and balance-sheet tables for \strong{every}

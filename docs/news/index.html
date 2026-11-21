@@ -55,6 +55,7 @@
 <code><a href="../reference/match_candidates.html">match_candidates()</a></code> finds every candidate in the same NTEE group within size and profitability (or fiscal-health) calipers, across any years, ranked by distance. <code><a href="../reference/match_balance.html">match_balance()</a></code> reports standardized differences.</li>
 <li>
 <code>dev/build-matching.R</code> adds these tables to the database.</li>
+<li>NTEE codes the current BMF lacks (<code>"UNDEFINED"</code>, about a quarter of filers) are filled from the NCCS legacy BMF (<code><a href="../reference/legacy_ntee.html">legacy_ntee()</a></code>, <code><a href="../reference/fill_ntee.html">fill_ntee()</a></code>, <code>get_panel(ntee_legacy = TRUE)</code>). <code>NTEE_SOURCE</code> records where each code came from.</li>
 </ul></li>
 <li>
 <p>Classifier rules revised after hand validation on 300 filings (<code>dev/validation/</code>; PLAN.md section 9). Agreement with hand labels rose from 62% to 70%, and merger recall from 51% to 71%.</p>

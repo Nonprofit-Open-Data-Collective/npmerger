@@ -568,19 +568,33 @@ expenses each within a factor of 2, in logs; - either operating margin
 within ±0.10 or equity ratio within ±0.15. - All candidates are kept,
 ranked by standardized distance.
 
-**Results.** - **Margin spec:** 3,112 of 4,507 treated units (69%) have
-candidates. Mean 819 per matched unit, median 324, p10 16, p90 2,440.
-3,008 units have at least 5 candidates and 2,697 at least 25. -
-**Equity-ratio spec:** 3,094 matched (69%), median 353 per unit. -
-**Balance** is very close. With k = 1 or 5, every \|SMD\| ≤ 0.04,
-against SMDs of 1.1–1.2 on size versus the unmatched pool. - **Why 1,395
-treated units are unmatched:** - 1,305 have no usable NTEE code: BMF
-`ntee_code_clean` is “UNDEFINED” or “INVALID”. Many are 501(c)(3)s
-(YMCAs, VNAs, health centers); the rest are 501(c)(6) chambers, lodges,
-and credit unions. - 68 have no candidate within the calipers. They are
-very large (median assets \$112m). - 22 are missing a baseline value. -
-29% of panel org-years have no NTEE code (16% among 501(c)(3)s).
+**NTEE codes.** The current BMF has no usable NTEE code (“UNDEFINED” or
+“INVALID”) for 196,390 of the 809,497 panel organizations (24%),
+including many 501(c)(3)s such as YMCAs, VNAs and health centers.
+[`legacy_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/legacy_ntee.md)
+fills them from the NCCS-assigned code (`NTEEFINAL`) in the NCCS legacy
+BMF extracts, 2022-08 first and then 2019-08;
+[`fill_ntee()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/fill_ntee.md)
+records `NTEE_SOURCE`. - 170,214 organizations filled (169,524 from
+2022-08, 690 from 2019-08); 26,176 remain missing. - Org-years without
+NTEE fell from 29% to 1.7% (0.5% among 501(c)(3)s). - Where both sources
+have a code, they agree on 75% at two characters and 84% at the major
+group, so codes do drift between vintages. Current-BMF codes are never
+replaced.
 
-**Next.** Fill missing NTEE codes from another source (IRS EO BMF
-`NTEE_CD`, or older NCCS BMF vintages). That would add up to 1,305
-treated units.
+**Results** (with filled NTEE codes). - **Margin spec:** 4,399 of 4,507
+treated units (98%) have candidates, up from 3,112 (69%) before the
+fill. Mean 1,110 per matched unit, median 476, p10 24, p90 2,968. 4,295
+units have at least 5 candidates and 3,954 at least 25. 1,277 of the
+matched units use a legacy NTEE code. - **Equity-ratio spec:** 4,394
+matched (97%), median 498 per unit. - **Balance** is very close. With k
+= 1 or 5, every \|SMD\| ≤ 0.03, against SMDs of 1.1 on size versus the
+unmatched pool. - **Why 108 treated units are unmatched (margin
+spec):** - 69 have no candidate within the calipers. They are very large
+(median assets \$149m). - 25 are missing a baseline value. - 14 still
+have no NTEE code. - Before the fill: 3,112 matched; 1,305 unmatched for
+lack of NTEE (`matching_before_ntee_fill.log` in the database folder).
+
+**Next.** Consider a wider size caliper (or a size-only fallback) for
+the 69 very large recipients, and a sensitivity check restricted to
+units whose NTEE comes from the current BMF.

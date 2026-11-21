@@ -37,4 +37,4 @@ A data.table with `EIN2`, `TAX_YEAR`, `OBJECTID`, `RETURN_TYPE`, `EZ`,
 fiscal-health ratios (`MARGIN` = surplus / revenue, `EQUITY_RATIO` = net
 assets / assets, `MONTHS_CASH` = cash and savings / monthly expenses),
 `NTEE`, `NTEE2`, `NTEE_MAJOR`, and `SUBSECTION` (IRC 501(c) subsection,
-from the BMF). Ratios are bounded to -1, 1 (months of cash to 0, 120).
+from the BMF). Ratios are bounded to -1..1 (months of cash to 0..120).
