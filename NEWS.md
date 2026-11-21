@@ -1,5 +1,20 @@
 # npmerger 0.0.0.9000
 
+* Matched comparison samples:
+  - `get_panel()` builds the full 990 / 990-EZ organization-year panel for
+    every filer, with constant-dollar size, margin, equity ratio, months of
+    cash, NTEE, and subsection (`panel_measures()`, `real_dollars()`,
+    `cpi_u()`, `ntee_level()`).
+  - `merger_sample()` keeps merger cases whose recipient filed in every
+    year t-2..t+2, with t-3/t-2 baselines for donor and recipient.
+  - `match_pool()` builds eligible comparison org-years: a full t-2..t+2
+    window around any year, and no Schedule N involvement nearby
+    (`schedule_n_events()`).
+  - `match_candidates()` finds every candidate in the same NTEE group within
+    size and profitability (or fiscal-health) calipers, across any years,
+    ranked by distance. `match_balance()` reports standardized differences.
+  - `dev/build-matching.R` adds these tables to the database.
+
 * Classifier rules revised after hand validation on 300 filings
   (`dev/validation/`; PLAN.md section 9). Agreement with hand labels rose
   from 62% to 70%, and merger recall from 51% to 71%.

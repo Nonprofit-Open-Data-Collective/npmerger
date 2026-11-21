@@ -92,6 +92,20 @@ reference:
   - merger_part7
   - merger_fiscal_panel
   - smooth_trailing
+- title: Matched comparison samples
+  desc: Build the full 990 panel, a research sample of mergers with a full observation window, and candidate comparison organizations for merger recipients.
+  contents:
+  - get_panel
+  - panel_columns
+  - panel_measures
+  - merger_sample
+  - schedule_n_events
+  - match_pool
+  - match_candidates
+  - match_balance
+  - ntee_level
+  - real_dollars
+  - cpi_u
 - title: Package
   contents:
   - npmerger-package
