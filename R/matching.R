@@ -116,8 +116,8 @@ ntee_level <- function(x, n = 2L) {
 #'   fiscal-health ratios (`MARGIN` = surplus / revenue, `EQUITY_RATIO` = net
 #'   assets / assets, `MONTHS_CASH` = cash and savings / monthly expenses),
 #'   `NTEE`, `NTEE2`, `NTEE_MAJOR`, and `SUBSECTION` (IRC 501(c) subsection,
-#'   from the BMF). Ratios are bounded to [-1, 1]
-#'   (months of cash to [0, 120]).
+#'   from the BMF). Ratios are bounded to -1..1
+#'   (months of cash to 0..120).
 #' @export
 panel_measures <- function(oy, bmf = NULL, base_year = 2024L) {
   x <- as.data.table(oy)

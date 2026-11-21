@@ -23,8 +23,8 @@ A data.table with \code{EIN2}, \code{TAX_YEAR}, \code{OBJECTID}, \code{RETURN_TY
 fiscal-health ratios (\code{MARGIN} = surplus / revenue, \code{EQUITY_RATIO} = net
 assets / assets, \code{MONTHS_CASH} = cash and savings / monthly expenses),
 \code{NTEE}, \code{NTEE2}, \code{NTEE_MAJOR}, and \code{SUBSECTION} (IRC 501(c) subsection,
-from the BMF). Ratios are bounded to \link{-1, 1}
-(months of cash to \link{0, 120}).
+from the BMF). Ratios are bounded to -1..1
+(months of cash to 0..120).
 }
 \description{
 Slim matching measures for an organization-year table
