@@ -46,7 +46,8 @@ sn_transactions <- function(sn) {
 #'   `HAS_P1`, `HAS_P2`, `DIR`, `EMP`, `OWN`, `COMP` (lines 2a-2d, either
 #'   part), `LEADER_SN` (any of 2a-2c), `N_RECIP`, `N_NP_RECIP`, `FMV_TOTAL`,
 #'   `FMV_NP`, `TOP_RECIP_EIN` and `TOP_SHARE` (largest nonprofit
-#'   recipient's share of total FMV).
+#'   recipient's share of total FMV), and `SN_MERGER_TEXT` (Schedule N's
+#'   own text mentions a merger; see [sn_merger_pattern()]).
 #' @export
 sn_filings <- function(sn, tx = sn_transactions(sn)) {
   hdr <- function(x, p, part1) {
@@ -80,7 +81,25 @@ sn_filings <- function(sn, tx = sn_transactions(sn)) {
   tx[, RK := NULL]
   fl <- merge(fl, agg, by = "OBJECTID", all.x = TRUE)
   fl[is.na(N_RECIP), `:=`(N_RECIP = 0L, N_NP_RECIP = 0L, FMV_TOTAL = 0, FMV_NP = 0)]
+  pat <- sn_merger_pattern()
+  hit <- function(v) !is.na(v) & grepl(pat, v, ignore.case = TRUE, perl = TRUE)
+  ids_tx <- tx[hit(ASSET_DESC) | hit(FMV_METHOD), unique(OBJECTID)]
+  p3 <- sn$p3_text
+  ids_p3 <- if (!is.null(p3) && "SN_03_EXPLANATION_TEXT" %in% names(p3))
+    unique(p3$OBJECTID[hit(p3$SN_03_EXPLANATION_TEXT)]) else character()
+  fl[, SN_MERGER_TEXT := OBJECTID %in% c(ids_tx, ids_p3)]
   fl[]
 }
 
-utils::globalVariables(c("TOP_FMV"))
+#' Merger language in Schedule N's own text
+#'
+#' Regular expression matched against the asset descriptions, valuation
+#' methods, and Part III explanations on Schedule N to set `SN_MERGER_TEXT`
+#' in [sn_filings()]. Narrower than [merger_text_pattern()], which is used
+#' on the much longer Schedule O: in hand validation every terminated filing
+#' with one successor and a match was read as a merger.
+#' @return A character string (a Perl-compatible regex, case-insensitive).
+#' @export
+sn_merger_pattern <- function() "merg|consolidat|amalgamat"
+
+utils::globalVariables(c("TOP_FMV", "SN_MERGER_TEXT", "ASSET_DESC", "FMV_METHOD"))

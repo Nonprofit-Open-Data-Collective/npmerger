@@ -37,3 +37,12 @@ test_that("sn_filings unions header and asset tables", {
   cl <- classify_transactions(fl, merger_rules(leader = "sn"))
   expect_identical(cl[order(OBJECTID)]$TYPE, c("merger2", "closure", "closure", "asset_disposition"))
 })
+
+test_that("sn_filings flags merger language in Schedule N text", {
+  sn <- fake_sn()
+  sn$p3_text <- data.table::data.table(OBJECTID = "OID-3", SN_03_EXPLANATION_TEXT = "Assets transferred due to the MERGER")
+  sn$p2_assets[, SN_02_DOA_ASSET_DIST_DESC := "Consolidation of programs"]
+  fl <- sn_filings(sn)
+  expect_identical(fl[order(OBJECTID)]$SN_MERGER_TEXT, c(FALSE, FALSE, TRUE, TRUE))
+  expect_false(any(sn_filings(fake_sn())$SN_MERGER_TEXT))
+})

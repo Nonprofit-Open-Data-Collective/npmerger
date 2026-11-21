@@ -90,8 +90,9 @@ merger_features <- function(fl, evidence, rules = merger_rules(), donor_window =
   ev <- evidence
   fl <- .with_recip_ein2(fl)
   if (!is.null(ev$p7)) fl <- leader_overlap(fl, ev$p7)
-  fl <- add_donor_counts(fl, window = donor_window, min_top_share = rules$min_top_share)
   if (!is.null(ev$header)) fl <- add_filing_history(fl, ev$header, new_entity_years = rules$new_entity_years)
+  fl <- add_donor_counts(fl, window = donor_window, min_top_share = rules$min_top_share,
+                         final_as_termination = rules$final_as_termination %||% TRUE)
   if (!is.null(ev$so) || !is.null(ev$p6)) fl <- add_corroboration(fl, so = ev$so, p6 = ev$p6)
   fl <- add_affiliation(fl, sr = ev$sr, sa = ev$sa, header = ev$header)
   if (!is.null(ev$mission)) fl <- add_mission_similarity(fl, ev$mission)

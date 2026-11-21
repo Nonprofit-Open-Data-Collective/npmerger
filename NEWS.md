@@ -1,5 +1,18 @@
 # npmerger 0.0.0.9000
 
+* Classifier rules revised after hand validation on 300 filings
+  (`dev/validation/`; PLAN.md section 9). Agreement with hand labels rose
+  from 62% to 70%, and merger recall from 51% to 71%.
+  - `merger_rules(min_top_share = 0.75)`: the default was 0.5. The share
+    test now always applies, not only when there are several nonprofit
+    recipients.
+  - `merger_rules(final_as_termination = TRUE)`: Part-II-only filings with
+    the final-return box are treated as terminations. New `TERMINATED`
+    column.
+  - `merger_rules(sn_text = TRUE)`: merger language in Schedule N's own text
+    (`SN_MERGER_TEXT` from `sn_filings()`, pattern `sn_merger_pattern()`)
+    is merger evidence on its own, with `BASIS = "sn_text"`.
+
 * `build_merger_data()` runs the whole pipeline and returns every table. It
   accepts pre-fetched inputs, so `npmerger_example()` runs offline.
 * Merger cases: `build_merger_cases()` (merger IDs, groups, and the merger

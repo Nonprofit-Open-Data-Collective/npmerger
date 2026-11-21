@@ -8,13 +8,15 @@ Override any element to run stricter or broader definitions.
 
 ``` r
 merger_rules(
-  min_top_share = 0.5,
+  min_top_share = 0.75,
   leader = c("either", "sn", "p7"),
   min_donors_n = 2L,
   new_entity_years = 1L,
+  sn_text = TRUE,
   promote = TRUE,
   min_corroborate = 2L,
-  corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP")
+  corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP"),
+  final_as_termination = TRUE
 )
 ```
 
@@ -24,7 +26,10 @@ merger_rules(
 
   Minimum share of transferred FMV going to the dominant nonprofit
   recipient for a dissolution to count as a transfer to one successor
-  (rather than a dispersed closure).
+  (rather than a dispersed closure). When FMV is missing, a single
+  nonprofit recipient counts as one successor. The default of 0.75 comes
+  from hand validation: every sampled dissolution with a top share
+  between 0.5 and 0.75 was read as a dispersed closure.
 
 - leader:
 
@@ -41,6 +46,13 @@ merger_rules(
 
   A recipient formed within this many years before the merger year
   counts as a new entity (consolidation).
+
+- sn_text:
+
+  If `TRUE` (default), merger language in Schedule N's own text
+  (`SN_MERGER_TEXT`, see
+  [`sn_merger_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_merger_pattern.md))
+  counts as merger evidence on its own, like leadership continuity.
 
 - promote:
 
@@ -62,6 +74,14 @@ merger_rules(
   Part VI line 4 governing-document change at the recipient in year t or
   t+1.
 
+- final_as_termination:
+
+  If `TRUE` (default), a filing with only Part II (disposition of more
+  than 25% of assets) but the final-return box checked is treated as a
+  termination, like a Part I filing. In hand validation none of these
+  were ongoing dispositions; most were mergers or transfers at
+  dissolution reported on the wrong part.
+
 ## Value
 
 A list of class `merger_rules`.
@@ -71,10 +91,16 @@ A list of class `merger_rules`.
 ``` r
 merger_rules()
 #> $min_top_share
-#> [1] 0.5
+#> [1] 0.75
 #> 
 #> $leader
 #> [1] "either"
+#> 
+#> $final_as_termination
+#> [1] TRUE
+#> 
+#> $sn_text
+#> [1] TRUE
 #> 
 #> $min_donors_n
 #> [1] 2
@@ -95,10 +121,16 @@ merger_rules()
 #> [1] "merger_rules"
 merger_rules(leader = "sn", promote = FALSE)
 #> $min_top_share
-#> [1] 0.5
+#> [1] 0.75
 #> 
 #> $leader
 #> [1] "sn"
+#> 
+#> $final_as_termination
+#> [1] TRUE
+#> 
+#> $sn_text
+#> [1] TRUE
 #> 
 #> $min_donors_n
 #> [1] 2

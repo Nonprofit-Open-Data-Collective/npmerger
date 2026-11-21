@@ -5,7 +5,15 @@
 #'
 #' @param min_top_share Minimum share of transferred FMV going to the dominant
 #'   nonprofit recipient for a dissolution to count as a transfer to one
-#'   successor (rather than a dispersed closure).
+#'   successor (rather than a dispersed closure). When FMV is missing, a
+#'   single nonprofit recipient counts as one successor. The default of 0.75
+#'   comes from hand validation: every sampled dissolution with a top share
+#'   between 0.5 and 0.75 was read as a dispersed closure.
+#' @param final_as_termination If `TRUE` (default), a filing with only Part II
+#'   (disposition of more than 25% of assets) but the final-return box
+#'   checked is treated as a termination, like a Part I filing. In hand
+#'   validation none of these were ongoing dispositions; most were mergers
+#'   or transfers at dissolution reported on the wrong part.
 #' @param leader Leadership-continuity evidence: `"either"` (Schedule N lines
 #'   2a-2c **or** Part VII overlap, the default), `"sn"` (Schedule N flags
 #'   only), or `"p7"` (Part VII overlap only).
@@ -13,6 +21,9 @@
 #'   window that makes a merger `mergerN`.
 #' @param new_entity_years A recipient formed within this many years before the
 #'   merger year counts as a new entity (consolidation).
+#' @param sn_text If `TRUE` (default), merger language in Schedule N's own
+#'   text (`SN_MERGER_TEXT`, see [sn_merger_pattern()]) counts as merger
+#'   evidence on its own, like leadership continuity.
 #' @param promote If `TRUE` (default), a dissolution to one nonprofit successor
 #'   with no leadership evidence is promoted from `asset_transfer` to a merger
 #'   label when at least `min_corroborate` corroborating signals agree.
@@ -29,12 +40,14 @@
 #' @examples
 #' merger_rules()
 #' merger_rules(leader = "sn", promote = FALSE)
-merger_rules <- function(min_top_share = 0.5, leader = c("either", "sn", "p7"),
-                         min_donors_n = 2L, new_entity_years = 1L,
+merger_rules <- function(min_top_share = 0.75, leader = c("either", "sn", "p7"),
+                         min_donors_n = 2L, new_entity_years = 1L, sn_text = TRUE,
                          promote = TRUE, min_corroborate = 2L,
                          corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP",
-                                         "GOV_DOC_CHANGE_RECIP")) {
+                                         "GOV_DOC_CHANGE_RECIP"),
+                         final_as_termination = TRUE) {
   structure(list(min_top_share = min_top_share, leader = match.arg(leader),
+                 final_as_termination = isTRUE(final_as_termination), sn_text = isTRUE(sn_text),
                  min_donors_n = as.integer(min_donors_n),
                  new_entity_years = as.integer(new_entity_years),
                  promote = isTRUE(promote), min_corroborate = as.integer(min_corroborate),
@@ -60,13 +73,14 @@ transaction_types <- function() {
 #'   columns: `HAS_P1`, `HAS_P2`, `LEADER_SN`, `N_NP_RECIP`, `TOP_SHARE`,
 #'   `TOP_RECIP_EIN`, and `EIN2`. Optional columns: `LEADER_P7` (Part VII
 #'   overlap), `N_DONORS` (dissolving donors to the same recipient in the
-#'   window), `R_NEW` (recipient newly formed), and the corroborating-signal
+#'   window), `R_NEW` (recipient newly formed), `FINAL_RETURN`, and the corroborating-signal
 #'   columns named in `rules$corroborate`. Missing optional columns are
 #'   treated as `FALSE` (or 1 donor).
 #' @param rules A [merger_rules()] object.
-#' @return `x` (as a data.table) with added columns `LEADER` (leadership
+#' @return `x` (as a data.table) with added columns `TERMINATED` (the filer
+#'   ended; see `final_as_termination` in [merger_rules()]), `LEADER` (leadership
 #'   evidence), `N_CORROBORATE` (number of corroborating signals present),
-#'   `BASIS` (`"leader"`, `"corroborated"`, or `NA` for non-mergers), and
+#'   `BASIS` (`"leader"`, `"sn_text"`, `"corroborated"`, or `NA` for non-mergers), and
 #'   `TYPE`.
 #' @export
 classify_transactions <- function(x, rules = merger_rules()) {
@@ -80,23 +94,41 @@ classify_transactions <- function(x, rules = merger_rules()) {
   ncorr <- if (length(rules$corroborate)) Reduce(`+`, lapply(rules$corroborate, lg)) else rep(0L, nrow(x))
   x[, N_CORROBORATE := as.integer(ncorr)]
   self <- !is.na(x$TOP_RECIP_EIN) & x$TOP_RECIP_EIN == clean_ein(x$EIN2)
-  one_successor <- x$N_NP_RECIP >= 1 & (x$N_NP_RECIP == 1 | fcoalesce(x$TOP_SHARE, 0) >= rules$min_top_share)
+  term <- .terminated(x, rules$final_as_termination)
+  one_successor <- .one_successor(x, rules$min_top_share)
   multi <- fcoalesce(as.integer(col("N_DONORS", 1L)), 1L) >= rules$min_donors_n
   newent <- lg("R_NEW")
-  promoted <- rules$promote & !x$LEADER & ncorr >= rules$min_corroborate
-  merger_ev <- x$LEADER | promoted
+  sntext <- isTRUE(rules$sn_text) & lg("SN_MERGER_TEXT")
+  promoted <- rules$promote & !x$LEADER & !sntext & ncorr >= rules$min_corroborate
+  merger_ev <- x$LEADER | sntext | promoted
+  x[, TERMINATED := term]
   x[, TYPE := fcase(
-    !HAS_P1 & HAS_P2, "asset_disposition",
+    !term & HAS_P2, "asset_disposition",
     self, "reorganization",
-    HAS_P1 & !one_successor, "closure",
-    HAS_P1 & merger_ev & multi & newent, "consolidation",
-    HAS_P1 & merger_ev & multi, "mergerN",
-    HAS_P1 & merger_ev, "merger2",
-    HAS_P1, "asset_transfer",
+    term & !one_successor, "closure",
+    term & merger_ev & multi & newent, "consolidation",
+    term & merger_ev & multi, "mergerN",
+    term & merger_ev, "merger2",
+    term, "asset_transfer",
     default = "other")]
   x[, BASIS := fcase(!TYPE %in% c("merger2", "mergerN", "consolidation"), NA_character_,
-                     LEADER, "leader", default = "corroborated")]
+                     LEADER, "leader", sntext, "sn_text", default = "corroborated")]
   x[]
 }
 
-utils::globalVariables(c("N_CORROBORATE", "BASIS"))
+# The filer ended: Part I, or (optionally) Part II with the final-return box.
+.terminated <- function(x, final = TRUE) {
+  p1 <- fcoalesce(as.logical(x$HAS_P1), FALSE)
+  if (!final || !"FINAL_RETURN" %in% names(x)) return(p1)
+  p1 | (fcoalesce(as.logical(x$HAS_P2), FALSE) & fcoalesce(as.logical(x$FINAL_RETURN), FALSE))
+}
+
+# One dominant nonprofit successor: top share of FMV at or above the
+# threshold, or (when FMV is missing) a single nonprofit recipient.
+.one_successor <- function(x, min_top_share) {
+  n <- fcoalesce(as.integer(x$N_NP_RECIP), 0L)
+  s <- as.numeric(x$TOP_SHARE)
+  n >= 1L & fifelse(is.na(s), n == 1L, s >= min_top_share)
+}
+
+utils::globalVariables(c("N_CORROBORATE", "BASIS", "TERMINATED"))

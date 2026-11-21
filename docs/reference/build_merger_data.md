@@ -106,11 +106,11 @@ md
 #> <merger_data>
 #> Schedule N filings by type:
 #>   merger2                  9
+#>   closure                  6
 #>   asset_transfer           5
 #>   mergerN                  4
-#>   closure                  4
 #>   consolidation            4
-#>   asset_disposition        3
+#>   asset_disposition        1
 #> Tables:
 #>   cases            17 rows
 #>   transfers        17 rows

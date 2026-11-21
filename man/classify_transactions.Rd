@@ -11,16 +11,17 @@ classify_transactions(x, rules = merger_rules())
 columns: \code{HAS_P1}, \code{HAS_P2}, \code{LEADER_SN}, \code{N_NP_RECIP}, \code{TOP_SHARE},
 \code{TOP_RECIP_EIN}, and \code{EIN2}. Optional columns: \code{LEADER_P7} (Part VII
 overlap), \code{N_DONORS} (dissolving donors to the same recipient in the
-window), \code{R_NEW} (recipient newly formed), and the corroborating-signal
+window), \code{R_NEW} (recipient newly formed), \code{FINAL_RETURN}, and the corroborating-signal
 columns named in \code{rules$corroborate}. Missing optional columns are
 treated as \code{FALSE} (or 1 donor).}
 
 \item{rules}{A \code{\link[=merger_rules]{merger_rules()}} object.}
 }
 \value{
-\code{x} (as a data.table) with added columns \code{LEADER} (leadership
+\code{x} (as a data.table) with added columns \code{TERMINATED} (the filer
+ended; see \code{final_as_termination} in \code{\link[=merger_rules]{merger_rules()}}), \code{LEADER} (leadership
 evidence), \code{N_CORROBORATE} (number of corroborating signals present),
-\code{BASIS} (\code{"leader"}, \code{"corroborated"}, or \code{NA} for non-mergers), and
+\code{BASIS} (\code{"leader"}, \code{"sn_text"}, \code{"corroborated"}, or \code{NA} for non-mergers), and
 \code{TYPE}.
 }
 \description{

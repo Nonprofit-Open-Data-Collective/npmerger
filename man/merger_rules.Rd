@@ -5,19 +5,24 @@
 \title{Default transaction classification rules}
 \usage{
 merger_rules(
-  min_top_share = 0.5,
+  min_top_share = 0.75,
   leader = c("either", "sn", "p7"),
   min_donors_n = 2L,
   new_entity_years = 1L,
+  sn_text = TRUE,
   promote = TRUE,
   min_corroborate = 2L,
-  corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP")
+  corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP"),
+  final_as_termination = TRUE
 )
 }
 \arguments{
 \item{min_top_share}{Minimum share of transferred FMV going to the dominant
 nonprofit recipient for a dissolution to count as a transfer to one
-successor (rather than a dispersed closure).}
+successor (rather than a dispersed closure). When FMV is missing, a
+single nonprofit recipient counts as one successor. The default of 0.75
+comes from hand validation: every sampled dissolution with a top share
+between 0.5 and 0.75 was read as a dispersed closure.}
 
 \item{leader}{Leadership-continuity evidence: \code{"either"} (Schedule N lines
 2a-2c \strong{or} Part VII overlap, the default), \code{"sn"} (Schedule N flags
@@ -28,6 +33,10 @@ window that makes a merger \code{mergerN}.}
 
 \item{new_entity_years}{A recipient formed within this many years before the
 merger year counts as a new entity (consolidation).}
+
+\item{sn_text}{If \code{TRUE} (default), merger language in Schedule N's own
+text (\code{SN_MERGER_TEXT}, see \code{\link[=sn_merger_pattern]{sn_merger_pattern()}}) counts as merger
+evidence on its own, like leadership continuity.}
 
 \item{promote}{If \code{TRUE} (default), a dissolution to one nonprofit successor
 with no leadership evidence is promoted from \code{asset_transfer} to a merger
@@ -42,6 +51,12 @@ the rule does not use.}
 signals: Schedule O merger language on the donor's and the recipient's
 return, and a Part VI line 4 governing-document change at the recipient
 in year t or t+1.}
+
+\item{final_as_termination}{If \code{TRUE} (default), a filing with only Part II
+(disposition of more than 25\% of assets) but the final-return box
+checked is treated as a termination, like a Part I filing. In hand
+validation none of these were ongoing dispositions; most were mergers
+or transfers at dissolution reported on the wrong part.}
 }
 \value{
 A list of class \code{merger_rules}.

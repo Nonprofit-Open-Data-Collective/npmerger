@@ -58,6 +58,7 @@ reference:
   - add_mission_similarity
   - person_key
   - merger_text_pattern
+  - sn_merger_pattern
 - title: Classify transactions
   desc: Label each filing as a merger, asset transfer, closure, disposition, or reorganization, using rules you can change.
   contents:

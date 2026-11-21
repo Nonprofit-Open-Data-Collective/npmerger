@@ -65,7 +65,7 @@ pipeline.</p>
 columns: <code>HAS_P1</code>, <code>HAS_P2</code>, <code>LEADER_SN</code>, <code>N_NP_RECIP</code>, <code>TOP_SHARE</code>,
 <code>TOP_RECIP_EIN</code>, and <code>EIN2</code>. Optional columns: <code>LEADER_P7</code> (Part VII
 overlap), <code>N_DONORS</code> (dissolving donors to the same recipient in the
-window), <code>R_NEW</code> (recipient newly formed), and the corroborating-signal
+window), <code>R_NEW</code> (recipient newly formed), <code>FINAL_RETURN</code>, and the corroborating-signal
 columns named in <code>rules$corroborate</code>. Missing optional columns are
 treated as <code>FALSE</code> (or 1 donor).</p></dd>
 
@@ -76,9 +76,10 @@ treated as <code>FALSE</code> (or 1 donor).</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p><code>x</code> (as a data.table) with added columns <code>LEADER</code> (leadership
+    <p><code>x</code> (as a data.table) with added columns <code>TERMINATED</code> (the filer
+ended; see <code>final_as_termination</code> in <code><a href="merger_rules.html">merger_rules()</a></code>), <code>LEADER</code> (leadership
 evidence), <code>N_CORROBORATE</code> (number of corroborating signals present),
-<code>BASIS</code> (<code>"leader"</code>, <code>"corroborated"</code>, or <code>NA</code> for non-mergers), and
+<code>BASIS</code> (<code>"leader"</code>, <code>"sn_text"</code>, <code>"corroborated"</code>, or <code>NA</code> for non-mergers), and
 <code>TYPE</code>.</p>
     </div>
 

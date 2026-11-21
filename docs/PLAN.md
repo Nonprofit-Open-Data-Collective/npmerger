@@ -178,8 +178,8 @@ Org age = tax year − min(formation year, ruling year).
     `sn_transactions`, flag/IRC/EIN parsers) with tests.
 2.  ✅ **Filing features + classifier** (rules from section 2) and
     [`sched_n_table()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sched_n_table.md).
-    *Still to do:* check by hand-reading about 50 Part III narratives
-    per label, and report a confusion matrix against the hand labels.
+    Hand-validated on 300 filings, with three rule changes as a result;
+    see section 9.
 3.  ✅ **Merger evidence wired into the classifier**
     ([`get_evidence_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_evidence_tables.md),
     [`merger_features()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_features.md)):
@@ -430,6 +430,103 @@ full year before the merger):
     transfers are under 1%, 24% are 10–50%, and 17% are 50% or more.
     Consolidations are the high end (median 16–39%), since the recipient
     is new.
+
+Section 8 figures use the v1 rules. Section 9 changes the rules, so the
+full run needs re-running before these figures are quoted.
+
+------------------------------------------------------------------------
+
+## 9. Classifier validation (step 2; 2026-11-20, `dev/validation/`)
+
+**Design.** - 300 Schedule N filings from 2010–2024: 50 drawn at random
+from each v1 label (merger2, mergerN, consolidation, asset_transfer,
+closure, asset_disposition). - Drawn only from filings with some
+narrative: Schedule N Part III text, or Schedule O sentences about
+dissolution, merger, or transfer. The share with narrative is 36% of
+closures, 46% of asset transfers, 65% of dispositions, and 84–95% of the
+merger types. - Each case is a text packet: form header, asset lines,
+Part III, and Schedule O excerpts. The classifier label is not shown.
+Packets are labeled blind against `codebook.md` (merger, asset transfer,
+closure, asset disposition, reorganization, unclear), with flags for
+multi-party, new entity, people moving, and programs continuing. -
+Labeling was done by model readers, not people. A human spot-check of
+`hand-labels.csv` is still worthwhile, especially the low-confidence
+rows (55 of 300). - “Weighted” figures reweight each stratum to its
+population size.
+
+**v1 results.** - Agreement: 62% (60% weighted). - Precision: merger 66%
+(56% weighted), asset transfer 52%, closure 66%, disposition 58%. - Main
+errors: 1. **Part-II-only filers that ended.** All 12 with the
+final-return box checked were terminations (7 mergers, 4 transfers, 1
+closure), not dispositions. 2. **Asset transfer → closure.** 10 of the
+11 dissolutions with a top-recipient share between 0.5 and 0.75 read as
+dispersed closures, and none as mergers. The v1 rule also skipped the
+share test whenever there was only one *nonprofit* recipient, even if
+most value went to vendors or individuals. 3. **Merger language on
+Schedule N itself.** Some filings say “transfer due to merger”, “plan
+merger”, “lodge merged” and so on in the asset description or Part III,
+but have no leadership evidence. Every such terminated filing with one
+successor (51 of 51) was read as a merger. This is partly circular,
+since the readers saw that text, but it is the filer’s own statement. 4.
+**Promotion by corroboration.** Only 1 of 8 promoted cases read as a
+merger. 5. **Leadership-based mergers read as residual transfers (43
+cases).** This is the main remaining gap. It is mostly chapters, union
+locals, auxiliaries, and plans sending their remaining assets to a
+parent or sister organization where officers *already* sat. Schedule N
+line 2 is answered yes, and Part VII shows overlap, but the overlap
+predates the transfer. - Part VII joiners (people new to the recipient
+after the merger) are more precise than overlap: 78% with a Schedule N
+flag, 55% without. Interlock-only cases without a flag score 45%. -
+Readers could not see Part VII, so this channel is not cleanly tested
+here.
+
+**Rule changes (v2, now the defaults).** 1. `min_top_share = 0.75`,
+applied to the share of *total* FMV. It falls back to “one nonprofit
+recipient” only when FMV is missing. 2. `final_as_termination = TRUE`: a
+Part-II-only filing with the final-return box checked is treated as a
+termination. The new `TERMINATED` column records this. 3.
+`sn_text = TRUE`: `SN_MERGER_TEXT`
+([`sn_merger_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_merger_pattern.md)
+matched against asset descriptions, valuation methods, and Part III)
+counts as merger evidence on its own. `BASIS = "sn_text"`.
+
+**v2 results (same sample).**
+
+| classifier  hand  | merger | transfer | closure | disposition | reorg |
+|-------------------|--------|----------|---------|-------------|-------|
+| merger            | 109    | 43       | 1       | 1           | 5     |
+| asset_transfer    | 6      | 26       | 5       | 0           | 2     |
+| closure           | 3      | 14       | 45      | 1           | 3     |
+| asset_disposition | 4      | 1        | 2       | 29          | 0     |
+
+- Agreement: 70% (68% weighted).
+- Precision: merger 69% (62% weighted), asset transfer 67%, closure 68%,
+  disposition 81%.
+- Merger recall rises from 51% to 71% (weighted).
+- Merger precision by basis: leader 70% (n = 149), sn_text 5/5,
+  corroborated 0/5.
+- Population effect on 2010–2024: mergers go from 12,059 to 12,827.
+  - asset_disposition: 15,018 → 12,320.
+  - asset_transfer: 10,180 → 9,067.
+  - closure: 22,978 → 26,021.
+  - With `promote = FALSE`: 12,346 mergers.
+
+**Other findings.** - **Closure → asset transfer (14).** These are
+mostly single recipients with no EIN or name, such as “unnamed
+orphanage” or “another nonprofit”. They cannot become merger cases
+either way, so this mainly affects closure vs. transfer counts. -
+**mergerN.** Readers saw multi-party language in only 6% of mergerN
+cases. The label comes from other donors sending assets to the same
+recipient within a year. That is real, but it is usually a recipient
+absorbing several affiliates, not one multi-party deal; the text of a
+single filing rarely shows it. - **consolidation.** 54% of hand-read
+consolidations mention a new entity. - **Reorganization.** Readers found
+10 (conversions, new EINs, PTA→PTO). The self-transfer rule catches none
+of them, because the new entity has a different EIN.
+
+**Still open.** - Whether to keep promotion on by default (0 of 5 under
+v2). - Whether to define the Part VII channel as joiners rather than any
+overlap. - A human pass over the low-confidence labels.
 
 ------------------------------------------------------------------------
 

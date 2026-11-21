@@ -16,7 +16,8 @@ A data.table, one row per \code{OBJECTID}, with \code{EIN2}, \code{TAX_YEAR},
 \code{HAS_P1}, \code{HAS_P2}, \code{DIR}, \code{EMP}, \code{OWN}, \code{COMP} (lines 2a-2d, either
 part), \code{LEADER_SN} (any of 2a-2c), \code{N_RECIP}, \code{N_NP_RECIP}, \code{FMV_TOTAL},
 \code{FMV_NP}, \code{TOP_RECIP_EIN} and \code{TOP_SHARE} (largest nonprofit
-recipient's share of total FMV).
+recipient's share of total FMV), and \code{SN_MERGER_TEXT} (Schedule N's
+own text mentions a merger; see \code{\link[=sn_merger_pattern]{sn_merger_pattern()}}).
 }
 \description{
 The Schedule N header (T00) and asset (T01) tables do not line up: some

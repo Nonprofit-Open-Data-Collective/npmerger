@@ -51,3 +51,30 @@ test_that("optional columns default sensibly", {
   expect_identical(out$TYPE[truth$case == "mergerN"], "merger2")
   expect_false(any(c("LEADER_P7", "N_DONORS", "R_NEW") %in% names(out)))
 })
+
+test_that("top share threshold applies even with one nonprofit recipient", {
+  x <- truth[case == "transfer"][rep(1, 3)]
+  x[, TOP_SHARE := c(0.6, 0.8, NA)]
+  out <- classify_transactions(x)
+  expect_identical(out$TYPE, c("closure", "asset_transfer", "asset_transfer"))
+  expect_identical(classify_transactions(x, merger_rules(min_top_share = 0.5))$TYPE, rep("asset_transfer", 3))
+})
+
+test_that("Part II filings with a final return are terminations", {
+  x <- truth[case == "disposition"][rep(1, 3)]
+  x[, `:=`(FINAL_RETURN = c(FALSE, TRUE, TRUE), LEADER_SN = c(FALSE, FALSE, TRUE))]
+  out <- classify_transactions(x)
+  expect_identical(out$TYPE, c("asset_disposition", "asset_transfer", "merger2"))
+  expect_identical(out$TERMINATED, c(FALSE, TRUE, TRUE))
+  expect_identical(classify_transactions(x, merger_rules(final_as_termination = FALSE))$TYPE,
+                   rep("asset_disposition", 3))
+})
+
+test_that("Schedule N merger text is merger evidence on its own", {
+  x <- truth[case %in% c("transfer", "dispersed")]
+  x[, `:=`(LEADER_SN = FALSE, SN_MERGER_TEXT = TRUE)]
+  out <- classify_transactions(x)
+  expect_identical(out$TYPE, c("closure", "merger2"))
+  expect_identical(out$BASIS, c(NA, "sn_text"))
+  expect_identical(classify_transactions(x, merger_rules(sn_text = FALSE))$TYPE, c("closure", "asset_transfer"))
+})

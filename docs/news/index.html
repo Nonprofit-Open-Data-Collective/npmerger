@@ -42,7 +42,16 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.0.9000" id="npmerger-0009000">npmerger 0.0.0.9000<a class="anchor" aria-label="anchor" href="#npmerger-0009000"></a></h2>
-<ul><li><p><code><a href="../reference/build_merger_data.html">build_merger_data()</a></code> runs the whole pipeline and returns every table. It accepts pre-fetched inputs, so <code><a href="../reference/npmerger_example.html">npmerger_example()</a></code> runs offline.</p></li>
+<ul><li>
+<p>Classifier rules revised after hand validation on 300 filings (<code>dev/validation/</code>; PLAN.md section 9). Agreement with hand labels rose from 62% to 70%, and merger recall from 51% to 71%.</p>
+<ul><li>
+<code>merger_rules(min_top_share = 0.75)</code>: the default was 0.5. The share test now always applies, not only when there are several nonprofit recipients.</li>
+<li>
+<code>merger_rules(final_as_termination = TRUE)</code>: Part-II-only filings with the final-return box are treated as terminations. New <code>TERMINATED</code> column.</li>
+<li>
+<code>merger_rules(sn_text = TRUE)</code>: merger language in Schedule N’s own text (<code>SN_MERGER_TEXT</code> from <code><a href="../reference/sn_filings.html">sn_filings()</a></code>, pattern <code><a href="../reference/sn_merger_pattern.html">sn_merger_pattern()</a></code>) is merger evidence on its own, with <code>BASIS = "sn_text"</code>.</li>
+</ul></li>
+<li><p><code><a href="../reference/build_merger_data.html">build_merger_data()</a></code> runs the whole pipeline and returns every table. It accepts pre-fetched inputs, so <code><a href="../reference/npmerger_example.html">npmerger_example()</a></code> runs offline.</p></li>
 <li><p>Merger cases: <code><a href="../reference/build_merger_cases.html">build_merger_cases()</a></code> (merger IDs, groups, and the merger year on each organization’s fiscal calendar), <code><a href="../reference/merger_roles.html">merger_roles()</a></code>, <code><a href="../reference/transfer_value.html">transfer_value()</a></code> (FMV by asset class, coverage of the donor’s assets, outlier flags), and <code><a href="../reference/asset_class.html">asset_class()</a></code>.</p></li>
 <li><p>Core data: <code><a href="../reference/get_core.html">get_core()</a></code>, <code><a href="../reference/org_years.html">org_years()</a></code> (one return per organization-year), and <code><a href="../reference/merger_measures.html">merger_measures()</a></code> (harmonized 990 / 990-EZ revenue, expenses, assets, debt, staff costs, executive pay, grants, and overhead). <code><a href="../reference/get_bmf.html">get_bmf()</a></code> adds NTEE codes and ruling years.</p></li>
 <li><p>Analysis tables: <code><a href="../reference/merger_attributes.html">merger_attributes()</a></code> (donor and recipient attributes with five years of size history), <code><a href="../reference/merger_part7.html">merger_part7()</a></code> (Part VII rosters from t-2 to t+2 with <code>IN_BOTH</code>), and <code><a href="../reference/merger_fiscal_panel.html">merger_fiscal_panel()</a></code> (measures, ‘fiscal’ ratios, an optional fixed-calibration index, and optional trailing smoothing via <code><a href="../reference/smooth_trailing.html">smooth_trailing()</a></code>).</p></li>

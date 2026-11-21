@@ -51,13 +51,15 @@ stricter or broader definitions.</p>
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">merger_rules</span><span class="op">(</span></span>
-<span>  min_top_share <span class="op">=</span> <span class="fl">0.5</span>,</span>
+<span>  min_top_share <span class="op">=</span> <span class="fl">0.75</span>,</span>
 <span>  leader <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"either"</span>, <span class="st">"sn"</span>, <span class="st">"p7"</span><span class="op">)</span>,</span>
 <span>  min_donors_n <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  new_entity_years <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  sn_text <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  promote <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  min_corroborate <span class="op">=</span> <span class="fl">2L</span>,</span>
-<span>  corroborate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SO_MERGER_TEXT_DONOR"</span>, <span class="st">"SO_MERGER_TEXT_RECIP"</span>, <span class="st">"GOV_DOC_CHANGE_RECIP"</span><span class="op">)</span></span>
+<span>  corroborate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SO_MERGER_TEXT_DONOR"</span>, <span class="st">"SO_MERGER_TEXT_RECIP"</span>, <span class="st">"GOV_DOC_CHANGE_RECIP"</span><span class="op">)</span>,</span>
+<span>  final_as_termination <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -68,7 +70,10 @@ stricter or broader definitions.</p>
 <dl><dt id="arg-min-top-share">min_top_share<a class="anchor" aria-label="anchor" href="#arg-min-top-share"></a></dt>
 <dd><p>Minimum share of transferred FMV going to the dominant
 nonprofit recipient for a dissolution to count as a transfer to one
-successor (rather than a dispersed closure).</p></dd>
+successor (rather than a dispersed closure). When FMV is missing, a
+single nonprofit recipient counts as one successor. The default of 0.75
+comes from hand validation: every sampled dissolution with a top share
+between 0.5 and 0.75 was read as a dispersed closure.</p></dd>
 
 
 <dt id="arg-leader">leader<a class="anchor" aria-label="anchor" href="#arg-leader"></a></dt>
@@ -85,6 +90,12 @@ window that makes a merger <code>mergerN</code>.</p></dd>
 <dt id="arg-new-entity-years">new_entity_years<a class="anchor" aria-label="anchor" href="#arg-new-entity-years"></a></dt>
 <dd><p>A recipient formed within this many years before the
 merger year counts as a new entity (consolidation).</p></dd>
+
+
+<dt id="arg-sn-text">sn_text<a class="anchor" aria-label="anchor" href="#arg-sn-text"></a></dt>
+<dd><p>If <code>TRUE</code> (default), merger language in Schedule N's own
+text (<code>SN_MERGER_TEXT</code>, see <code><a href="sn_merger_pattern.html">sn_merger_pattern()</a></code>) counts as merger
+evidence on its own, like leadership continuity.</p></dd>
 
 
 <dt id="arg-promote">promote<a class="anchor" aria-label="anchor" href="#arg-promote"></a></dt>
@@ -106,6 +117,14 @@ signals: Schedule O merger language on the donor's and the recipient's
 return, and a Part VI line 4 governing-document change at the recipient
 in year t or t+1.</p></dd>
 
+
+<dt id="arg-final-as-termination">final_as_termination<a class="anchor" aria-label="anchor" href="#arg-final-as-termination"></a></dt>
+<dd><p>If <code>TRUE</code> (default), a filing with only Part II
+(disposition of more than 25% of assets) but the final-return box
+checked is treated as a termination, like a Part I filing. In hand
+validation none of these were ongoing dispositions; most were mergers
+or transfers at dissolution reported on the wrong part.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -116,10 +135,16 @@ in year t or t+1.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">merger_rules</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min_top_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.75</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $leader</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "either"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $final_as_termination</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $sn_text</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min_donors_n</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
@@ -140,10 +165,16 @@ in year t or t+1.</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "merger_rules"</span>
 <span class="r-in"><span><span class="fu">merger_rules</span><span class="op">(</span>leader <span class="op">=</span> <span class="st">"sn"</span>, promote <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min_top_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.75</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $leader</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "sn"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $final_as_termination</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $sn_text</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $min_donors_n</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>

@@ -132,6 +132,11 @@ t-1 and t) against the recipient’s Part VII (years t and t+1). In
 at least one person, against 9% for closures. About 40% of asset
 transfers with no box checked shared people too. Leadership continuity
 counts when either source shows it.</p>
+<p><strong>Schedule N’s own text.</strong> When the asset descriptions
+or Part III explanation say the transfer is part of a merger or
+consolidation (<code><a href="../reference/sn_merger_pattern.html">sn_merger_pattern()</a></code>), that counts as merger
+evidence on its own. In hand validation every terminated filing with one
+successor and such text read as a merger.</p>
 <p><strong>Corroborating disclosures.</strong> A dissolution to one
 nonprofit successor with no leadership evidence is promoted to a merger
 when at least two of these agree:</p>
@@ -389,10 +394,14 @@ Schedule N boxes and turns off promotion:</p>
 <span><span class="co">#&gt; 4        part7           merger2    asset_transfer</span></span>
 <span><span class="co">#&gt; 5 corroborated           merger2    asset_transfer</span></span>
 <span><span class="co">#&gt; 6  no evidence    asset_transfer    asset_transfer</span></span></code></pre></div>
-<p><code><a href="../reference/merger_rules.html">merger_rules()</a></code> also sets three thresholds:</p>
+<p><code><a href="../reference/merger_rules.html">merger_rules()</a></code> also sets these thresholds and
+switches:</p>
 <ul>
 <li>the minimum share of transferred value going to the dominant
-recipient (<code>min_top_share</code>, default 0.5);</li>
+recipient (<code>min_top_share</code>, default 0.75);</li>
+<li>whether a Part-II-only filing with the final-return box counts as a
+termination (<code>final_as_termination</code>, default
+<code>TRUE</code>);</li>
 <li>how many dissolving donors make a merger multi-party
 (<code>min_donors_n</code>);</li>
 <li>how recently a recipient must have been formed to count as a new
@@ -428,11 +437,11 @@ pipeline can run offline. Here it is run without the
 <span><span class="co">#&gt; &lt;merger_data&gt;</span></span>
 <span><span class="co">#&gt; Schedule N filings by type:</span></span>
 <span><span class="co">#&gt;   merger2                  9</span></span>
+<span><span class="co">#&gt;   closure                  6</span></span>
 <span><span class="co">#&gt;   asset_transfer           5</span></span>
 <span><span class="co">#&gt;   mergerN                  4</span></span>
-<span><span class="co">#&gt;   closure                  4</span></span>
 <span><span class="co">#&gt;   consolidation            4</span></span>
-<span><span class="co">#&gt;   asset_disposition        3</span></span>
+<span><span class="co">#&gt;   asset_disposition        1</span></span>
 <span><span class="co">#&gt; Tables:</span></span>
 <span><span class="co">#&gt;   cases            17 rows</span></span>
 <span><span class="co">#&gt;   transfers        17 rows</span></span>

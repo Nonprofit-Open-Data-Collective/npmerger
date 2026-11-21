@@ -114,14 +114,17 @@ leader_overlap <- function(fl, p7, donor_window = -1:0, recip_window = 0:1,
 #'   least this share of its transferred value (or is its only nonprofit
 #'   recipient). Keeps large charities that collect small residual gifts
 #'   from many closures from looking like serial acquirers.
+#' @param final_as_termination Count Part-II-only filings with the
+#'   final-return box (`FINAL_RETURN`, from [add_filing_history()]) as
+#'   dissolving donors. See [merger_rules()].
 #' @return `fl` with `N_DONORS` (`NA` for filings without a dominant
 #'   successor).
 #' @export
-add_donor_counts <- function(fl, window = 1L, min_top_share = 0.5) {
+add_donor_counts <- function(fl, window = 1L, min_top_share = 0.75, final_as_termination = TRUE) {
   fl <- .with_recip_ein2(fl)
   if ("N_DONORS" %in% names(fl)) fl[, N_DONORS := NULL]
-  fl[, .DOM := HAS_P1 & !is.na(TOP_RECIP_EIN) & TOP_RECIP_EIN != clean_ein(EIN2) &
-       (N_NP_RECIP == 1L | fcoalesce(TOP_SHARE, 0) >= min_top_share)]
+  fl[, .DOM := .terminated(fl, final_as_termination) & !is.na(TOP_RECIP_EIN) &
+       TOP_RECIP_EIN != clean_ein(EIN2) & .one_successor(fl, min_top_share)]
   d <- unique(fl[.DOM == TRUE, list(R = TOP_RECIP_EIN, D = EIN2, Y = TAX_YEAR)])
   pairs <- merge(d, d, by = "R", allow.cartesian = TRUE, suffixes = c("", "2"))
   pairs <- pairs[abs(Y - Y2) <= window]

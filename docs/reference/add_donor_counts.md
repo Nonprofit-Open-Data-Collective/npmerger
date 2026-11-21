@@ -9,7 +9,12 @@ consolidation.
 ## Usage
 
 ``` r
-add_donor_counts(fl, window = 1L, min_top_share = 0.5)
+add_donor_counts(
+  fl,
+  window = 1L,
+  min_top_share = 0.75,
+  final_as_termination = TRUE
+)
 ```
 
 ## Arguments
@@ -29,6 +34,14 @@ add_donor_counts(fl, window = 1L, min_top_share = 0.5)
   its transferred value (or is its only nonprofit recipient). Keeps
   large charities that collect small residual gifts from many closures
   from looking like serial acquirers.
+
+- final_as_termination:
+
+  Count Part-II-only filings with the final-return box (`FINAL_RETURN`,
+  from
+  [`add_filing_history()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_filing_history.md))
+  as dissolving donors. See
+  [`merger_rules()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_rules.md).
 
 ## Value
 

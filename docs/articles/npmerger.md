@@ -60,6 +60,12 @@ person, against 9% for closures. About 40% of asset transfers with no
 box checked shared people too. Leadership continuity counts when either
 source shows it.
 
+**Schedule N’s own text.** When the asset descriptions or Part III
+explanation say the transfer is part of a merger or consolidation
+([`sn_merger_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_merger_pattern.md)),
+that counts as merger evidence on its own. In hand validation every
+terminated filing with one successor and such text read as a merger.
+
 **Corroborating disclosures.** A dissolution to one nonprofit successor
 with no leadership evidence is promoted to a merger when at least two of
 these agree:
@@ -241,10 +247,12 @@ data.frame(case = filings$case, default = out$TYPE, strict = strict$TYPE)
 ```
 
 [`merger_rules()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_rules.md)
-also sets three thresholds:
+also sets these thresholds and switches:
 
 - the minimum share of transferred value going to the dominant recipient
-  (`min_top_share`, default 0.5);
+  (`min_top_share`, default 0.75);
+- whether a Part-II-only filing with the final-return box counts as a
+  termination (`final_as_termination`, default `TRUE`);
 - how many dissolving donors make a merger multi-party (`min_donors_n`);
 - how recently a recipient must have been formed to count as a new
   entity (`new_entity_years`).
@@ -279,11 +287,11 @@ md
 #> <merger_data>
 #> Schedule N filings by type:
 #>   merger2                  9
+#>   closure                  6
 #>   asset_transfer           5
 #>   mergerN                  4
-#>   closure                  4
 #>   consolidation            4
-#>   asset_disposition        3
+#>   asset_disposition        1
 #> Tables:
 #>   cases            17 rows
 #>   transfers        17 rows

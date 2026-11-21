@@ -149,6 +149,8 @@ evidence to each filing.
   : Normalize person names for matching
 - [`merger_text_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_text_pattern.md)
   : Pattern for merger language in narrative text
+- [`sn_merger_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_merger_pattern.md)
+  : Merger language in Schedule N's own text
 
 ## Classify transactions
 

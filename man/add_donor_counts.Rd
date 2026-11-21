@@ -4,7 +4,12 @@
 \alias{add_donor_counts}
 \title{Count dissolving donors that share a successor}
 \usage{
-add_donor_counts(fl, window = 1L, min_top_share = 0.5)
+add_donor_counts(
+  fl,
+  window = 1L,
+  min_top_share = 0.75,
+  final_as_termination = TRUE
+)
 }
 \arguments{
 \item{fl}{Filing table from \code{\link[=sn_filings]{sn_filings()}}.}
@@ -15,6 +20,10 @@ add_donor_counts(fl, window = 1L, min_top_share = 0.5)
 least this share of its transferred value (or is its only nonprofit
 recipient). Keeps large charities that collect small residual gifts
 from many closures from looking like serial acquirers.}
+
+\item{final_as_termination}{Count Part-II-only filings with the
+final-return box (\code{FINAL_RETURN}, from \code{\link[=add_filing_history]{add_filing_history()}}) as
+dissolving donors. See \code{\link[=merger_rules]{merger_rules()}}.}
 }
 \value{
 \code{fl} with \code{N_DONORS} (\code{NA} for filings without a dominant

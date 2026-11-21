@@ -1,0 +1,301 @@
+CASE,OBJECTID,EIN2,TAX_YEAR,TYPE_V1,TYPE_V2,BASIS_V2,HAND_LABEL,CONFIDENCE,MULTI,NEW_ENTITY,PEOPLE_MOVE,CONTINUES,NOTE
+C001,OID-202230909349200723,EIN-52-6048306,2021,asset_transfer,merger2,sn_text,MERGER,high,FALSE,FALSE,FALSE,,Union local assets transferred due to merger; merger funds transfer
+C002,OID-202220359349300202,EIN-75-6012110,2020,asset_disposition,merger2,leader,MERGER,high,FALSE,FALSE,,,Plan merged into Texas Pipe Trades plan which assumed all assets and liabilities
+C003,OID-202102929349200105,EIN-01-0536553,2020,merger2,merger2,leader,ASSET_TRANSFER,low,FALSE,FALSE,FALSE,,Cash to unnamed org; shared board with Washington County ARC already
+C004,OID-202401979349301900,EIN-68-0026713,2022,asset_disposition,merger2,leader,REORGANIZATION,high,FALSE,TRUE,TRUE,,Assets moved to newly formed corporation with new EIN; same board
+C005,OID-202210259349301706,EIN-45-1734923,2021,asset_disposition,closure,"",ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Final return; board cleared debts and transferred remaining assets to Cru Foundation
+C006,OID-202321319349306537,EIN-13-3819603,2021,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Transfer due to merger; same board serves both HDFCs
+C007,OID-201831169349200908,EIN-46-1777306,2017,merger2,merger2,leader,ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Single asset transfer at termination; combined is generic mission text
+C008,OID-202413189349304926,EIN-14-1981651,2023,closure,closure,"",ASSET_TRANSFER,low,FALSE,FALSE,,,Affiliate dissolved; recipient parent HMH with zero FMV; no merger language
+C009,OID-201820789349200312,EIN-30-0300419,2016,consolidation,consolidation,leader,ASSET_TRANSFER,low,FALSE,,,,All liabilities to Upstate Affiliate Organization; equity transfer; no narrative
+C010,OID-201942469349300049,EIN-34-1223955,2018,closure,closure,"",CLOSURE,high,FALSE,,FALSE,FALSE,Ceased operating homes; cash split among six unrelated charities
+C011,OID-201911069349200421,EIN-20-2582339,2018,asset_disposition,closure,"",ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Final return; all funds distributed to St Bernards Parish
+C012,OID-201900439349200230,EIN-56-1853324,2017,consolidation,consolidation,leader,ASSET_TRANSFER,low,FALSE,FALSE,FALSE,,Dissolving assets to similar-mission 501c3; officers already on recipient board
+C013,OID-201102429349300215,EIN-58-1989537,2010,asset_disposition,asset_disposition,"",MERGER,medium,FALSE,FALSE,TRUE,TRUE,Key employees join successor organization; players list and all assets transferred
+C014,OID-201623129349201162,EIN-06-1048804,2015,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,Cash split among three unrelated organizations at termination
+C015,OID-202423199349206417,EIN-36-2991373,2023,asset_disposition,consolidation,leader,MERGER,medium,FALSE,FALSE,,,Transferred as part of a consolidation of two APICS chapters
+C016,OID-201142509349300214,EIN-38-3464662,2010,closure,closure,"",CLOSURE,low,FALSE,,,,Final return with Part I but no distributions or narrative
+C017,OID-202423199349309247,EIN-99-0271794,2023,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,,FALSE,FALSE,Not final; Lahaina wildfire destroyed buildings and equipment; club continues
+C018,OID-201931339349301408,EIN-45-0404126,2017,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Entity merged into Sanford Health Foundation North; trustees at successor
+C019,OID-201722929349301857,EIN-31-0889657,2016,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,FALSE,FALSE,Part II transfer of land and building to housing partnership
+C020,OID-201903199349312745,EIN-31-0494690,2018,merger2,merger2,leader,REORGANIZATION,medium,FALSE,TRUE,,TRUE,Set up own 501c3 to move all assets and operate as a 501c3
+C021,OID-201232059349300518,EIN-38-6070178,2011,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Liquidation; securities to Hospitallers Committee; no integration evidence
+C022,OID-202521329349302747,EIN-47-4230040,2024,closure,closure,"",CLOSURE,low,FALSE,,,,Small cash distribution to unnamed stockholder recipient; no successor
+C023,OID-201503169349301035,EIN-39-1459276,2014,consolidation,consolidation,leader,MERGER,medium,,,TRUE,,President director and ED became directors of ThedaCare Family of Foundations
+C024,OID-202302339349300725,EIN-37-0347593,2022,consolidation,consolidation,leader,ASSET_TRANSFER,low,FALSE,FALSE,,,All assets to Downstate Illinois Laborers DC; council transfer no narrative
+C025,OID-202503459349300910,EIN-06-0540675,2024,asset_transfer,closure,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Ceased operating; cash split among many unrelated recipients
+C026,OID-201441349349302784,EIN-41-0706118,2012,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,TRUE,Merged into Allina; employees continue; programs conducted by Allina
+C027,OID-201641419349300214,EIN-54-1280847,2015,asset_transfer,asset_transfer,"",ASSET_TRANSFER,low,FALSE,FALSE,,,Facility sold to PATHS; termination of organization to PATHS
+C028,OID-201543139349301989,EIN-26-3603653,2014,closure,closure,"",CLOSURE,medium,FALSE,,,,Liquidated assets of 1569; no recipient listed
+C029,OID-201322059349300602,EIN-20-0613885,2012,consolidation,consolidation,leader,ASSET_TRANSFER,low,FALSE,FALSE,,,Union council final return; net transfer to District Council 1M; no narrative
+C030,OID-202013169349306001,EIN-84-0878221,2019,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Transfer of assets on merger; board continues in successor
+C031,OID-201612359349200511,EIN-20-1221368,2015,mergerN,mergerN,leader,MERGER,low,FALSE,FALSE,FALSE,,Assets and liabilities transferred to parent company
+C032,OID-202431369349205983,EIN-75-1874992,2022,closure,closure,"",MERGER,medium,FALSE,FALSE,,,Final distribution of assets to successor plan
+C033,OID-202512829349300411,EIN-45-4292522,2024,closure,closure,"",CLOSURE,medium,FALSE,,,,Dissolution filed with Florida; no asset distributions listed
+C034,OID-201442279349302554,EIN-38-2445613,2012,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,TRUE,TRUE,All operating assets to related McLaren Northern Michigan; shared board and key employees
+C035,OID-201410709349301001,EIN-95-1953757,2013,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,TRUE,Merged into Credit Union of Southern California; former CEO now employed there
+C036,OID-202502039349200635,EIN-74-2422896,2023,asset_disposition,closure,"",ASSET_TRANSFER,low,FALSE,FALSE,,,Final return liquidation; golf equipment to Town of Akron
+C037,OID-201402259349200210,EIN-45-1450662,2013,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Remaining assets transferred to one mission fiduciary
+C038,OID-201931209349301503,EIN-95-2040876,2017,asset_transfer,asset_transfer,"",MERGER,medium,FALSE,FALSE,TRUE,TRUE,Service participants and staff transferred to YMCA of Orange County
+C039,OID-202001979349303490,EIN-53-0180650,2018,mergerN,mergerN,leader,MERGER,low,FALSE,FALSE,,,Net assets to IDFA; MIF membership tied to IDFA membership
+C040,OID-202522249349300242,EIN-68-0491256,2023,closure,closure,"",ASSET_TRANSFER,medium,FALSE,FALSE,,FALSE,Sold property then transferred all cash to Mary E Bivins Foundation
+C041,OID-201102329349200100,EIN-43-1325359,2010,consolidation,consolidation,leader,MERGER,medium,FALSE,TRUE,,,International mandated dissolution; assets to newly formed Carpenters Local 32
+C042,OID-201212019349200306,EIN-02-0695760,2011,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Final meeting approved transfer of remaining assets to Bell Museum
+C043,OID-202410509349300411,EIN-31-1597699,2022,closure,closure,"",CLOSURE,low,FALSE,FALSE,FALSE,FALSE,Final return with no recipients or assets listed
+C044,OID-201132289349200548,EIN-43-6039257,2010,consolidation,consolidation,leader,MERGER,medium,FALSE,TRUE,,,International mandated dissolution with assets to newly formed Local 97
+C045,OID-201741449349300744,EIN-23-6411869,2015,asset_disposition,asset_disposition,"",MERGER,high,FALSE,FALSE,TRUE,,Merged into PHMC; associate CEO became PHMC employee
+C046,OID-202322059349200902,EIN-68-0043269,2022,asset_transfer,asset_transfer,"",ASSET_TRANSFER,high,FALSE,FALSE,,FALSE,Upon dissolution funds donated to Your Future is Our Business
+C047,OID-201811209349301551,EIN-48-1105047,2016,merger2,merger2,leader,ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Employee benefit trust terminated; cash transferred to hospital sponsor
+C048,OID-201702009349200515,EIN-46-5719074,2016,closure,closure,"",ASSET_TRANSFER,low,FALSE,FALSE,,,Final return; small cash balance to Youthworks
+C049,OID-201812279349301146,EIN-04-2801797,2016,mergerN,mergerN,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Property sold ceased operation remaining cash to Infirmary; officers already there
+C050,OID-202511269349202141,EIN-95-3430341,2023,closure,closure,"",CLOSURE,low,,,,,All assets distributed in prior year; no recipient info
+C051,OID-201220769349300402,EIN-61-1110781,2011,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,TRUE,,Union local assets to Regional Council of Carpenters; officers listed line 2e
+C052,OID-202233189349306278,EIN-92-0121326,2021,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,,,Land and community building given to Community Assoc; chamber continues
+C053,OID-201943169349303319,EIN-01-0411788,2018,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Merger with MaineHealth 1/1/2019; trustee joined board; staff became employees
+C054,OID-201643199349305849,EIN-20-0703238,2015,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,,,TRUE,Org continues; transferred SIF program restricted net assets to Social Innovation Forum
+C055,OID-201740699349300719,EIN-36-2167094,2015,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,TRUE,Plan of merger; JCFS surviving corporation; director joined JCFS
+C056,OID-201430629349300613,EIN-94-2363944,2012,asset_transfer,asset_transfer,"",MERGER,high,FALSE,FALSE,,,Plan merger transfer to NECA/IBEW Family Medical Care Trust
+C057,OID-202313329349300716,EIN-75-1285930,2021,merger2,merger2,leader,ASSET_TRANSFER,low,FALSE,FALSE,FALSE,,Net assets to related ICUT Foundation; officers already hold same positions
+C058,OID-201313099349301161,EIN-35-1063993,2012,closure,closure,"",REORGANIZATION,high,FALSE,TRUE,,TRUE,Reorganized as Indiana LLC subsidiary; LLC continues operations and services
+C059,OID-202101389349201355,EIN-83-4077016,2020,consolidation,consolidation,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Wind-down/close account; cash to Schwab Charitable Fund; board member link
+C060,OID-201611329349201571,EIN-30-0055826,2014,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,,,Org continues; intercompany payable to Housing Works written off
+C061,OID-201420589349300032,EIN-32-0177441,2013,closure,closure,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Debts exceeded assets; no assets transferred upon dissolution
+C062,OID-201610289349301011,EIN-41-0517419,2015,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Credit union merged; board and president join St Cloud FCU
+C063,OID-201822559349301152,EIN-26-2221180,2017,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Remaining bank balance and fixed assets to Covenant House NJ
+C064,OID-201202979349300610,EIN-20-6851365,2011,closure,closure,"",CLOSURE,high,FALSE,,FALSE,FALSE,Trust wound down; remaining assets paid claims and expenses
+C065,OID-202640209349200229,EIN-75-2241873,2024,asset_transfer,asset_transfer,"",REORGANIZATION,medium,FALSE,TRUE,,TRUE,PTA ceased; assets to newly formed PTO supporting same school
+C066,OID-202013169349203156,EIN-84-6036557,2019,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Transfer of assets at merger; board continues in successor
+C067,OID-202311999349200321,EIN-26-3525744,2022,consolidation,consolidation,leader,MERGER,medium,FALSE,FALSE,TRUE,,Board members join board of Quincy Service Club Foundation
+C068,OID-201701949349301500,EIN-36-4167541,2016,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,Merged with 3 other orgs into new org; trustees continued
+C069,OID-201122599349200007,EIN-37-6032521,2010,consolidation,consolidation,leader,MERGER,high,,TRUE,,,Transfer of assets upon merger with newly formed Carpenters Local 664
+C070,OID-201802489349200950,EIN-36-3928353,2017,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,low,FALSE,FALSE,,,Part II transfer of net assets to related organization; not final return
+C071,OID-201712919349300236,EIN-58-0833281,2016,closure,closure,"",ASSET_TRANSFER,low,FALSE,,,,Club dissolved; golf course and clubhouse to LLC; Form 4797 suggests sale
+C072,OID-202300589349200925,EIN-35-1567120,2021,asset_transfer,asset_transfer,"",REORGANIZATION,low,FALSE,TRUE,,,Money transferred to new organization Indiana Deaf Children Foundation
+C073,OID-202441429349200824,EIN-81-0477757,2023,closure,closure,"",ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Dissolved for inactivity; all assets to Montana Trout Unlimited
+C074,OID-201502269349303195,EIN-42-0725207,2014,merger2,merger2,leader,ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Remaining cash returned to founding Sisters of St Francis
+C075,OID-202621359349203907,EIN-34-0714360,2024,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,low,FALSE,FALSE,,,Part II intercompany write-off to affiliate Menorah Park; org continues
+C076,OID-202201109349301110,EIN-47-0588533,2020,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,Radio and TV foundations merged into Nebraska Public Media Foundation; board retained
+C077,OID-201311349349203736,EIN-63-0909071,2011,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into St Vincents Foundation; officers remain employees or became directors
+C078,OID-202330699349300908,EIN-20-1459415,2021,asset_transfer,asset_transfer,"",MERGER,high,FALSE,FALSE,,TRUE,All operations transferred; clinical services now performed by hospital
+C079,OID-201720389349300712,EIN-58-2585416,2016,asset_transfer,closure,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Ceased operations; property split between two unrelated recipients
+C080,OID-201731949349301118,EIN-37-0895316,2016,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,Merged with 3 other orgs into new org; trustees continued
+C081,OID-201912989349300146,EIN-94-3148590,2018,mergerN,mergerN,leader,CLOSURE,low,,,,,Final return; cash and pledges to unnamed recipients; no narrative
+C082,OID-202122319349300907,EIN-42-1512708,2020,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,Merged with Child and Family Policy Center; directors and ED joined Common Good Iowa
+C083,OID-201333059349200403,EIN-59-0651088,2012,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Articles of merger into Intracoastal Health Systems; officers continue
+C084,OID-202443109349302119,EIN-31-1190239,2023,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Articles of merger into Parkview Health Foundation; officer is director there
+C085,OID-201540439349302454,EIN-58-1371546,2013,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,FALSE,FALSE,Arts council sold building to LLC and continues
+C086,OID-202223199349308907,EIN-06-1501542,2021,merger2,merger2,leader,MERGER,medium,FALSE,FALSE,TRUE,,Parent dissolved; its board became Southside board; successor organization
+C087,OID-201212569349300541,EIN-30-0303117,2011,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,TRUE,All operations and employees integrated into University of Western Ontario
+C088,OID-201401279349200540,EIN-84-1226568,2012,merger2,merger2,corroborated,ASSET_TRANSFER,medium,FALSE,FALSE,,,Endowment fund transferred cash and investments to affiliate The Gathering Place
+C089,OID-202213199349211746,EIN-85-2459715,2021,asset_transfer,asset_transfer,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Political committee paid final legal and compliance fees; no successor
+C090,OID-201630429349300408,EIN-31-1359859,2014,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Daycare dissolved; all cash to Community Action Commission
+C091,OID-201223129349200922,EIN-23-2166251,2011,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Final return; cash transferred to Biomedical Engineering Society
+C092,OID-202520949349301407,EIN-23-7163058,2023,merger2,merger2,leader,MERGER,high,FALSE,FALSE,,,Plan merged with SW Trust as surviving trust
+C093,OID-201643199349202249,EIN-33-1058642,2015,consolidation,consolidation,leader,ASSET_TRANSFER,low,FALSE,,,,All assets given to similar organization NAHREP Subsidiary
+C094,OID-202211469349301041,EIN-47-2619552,2020,mergerN,closure,"",CLOSURE,high,FALSE,FALSE,,FALSE,Surplus cash split between IU Health and Health Hospital Corp
+C095,OID-201122929349200507,EIN-43-0287350,2010,consolidation,consolidation,leader,MERGER,medium,FALSE,TRUE,,,International mandated dissolution; assets to newly formed Carpenters Local 97
+C096,OID-202313249349300846,EIN-47-5303771,2022,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Dissolved; all property and assets to YMCA of Youngstown
+C097,OID-201612889349301551,EIN-36-3911066,2015,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Termination pursuant to merger; director continues role after merger
+C098,OID-202241929349301329,EIN-76-0281980,2020,consolidation,consolidation,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Dissolved and transferred all net assets to Together For Good
+C099,OID-201112699349200201,EIN-43-6043410,2010,consolidation,consolidation,leader,MERGER,medium,,TRUE,,,International mandated dissolution; assets to newly formed Carpenters Local 92
+C100,OID-201413219349302741,EIN-37-1133429,2013,merger2,closure,"",ASSET_DISPOSITION,low,FALSE,FALSE,TRUE,,Not final; assets to Methodist Foundation and Services; directors and employees moved
+C101,OID-201513389349300136,EIN-35-1790106,2014,asset_transfer,asset_transfer,"",MERGER,medium,FALSE,FALSE,,TRUE,Dissolved; child care programs taken over by Franklin Community School Corp
+C102,OID-201941259349300259,EIN-26-0879472,2018,asset_transfer,asset_transfer,"",CLOSURE,medium,FALSE,FALSE,,,Sold assets paid debts distributed remaining proceeds to stockholder
+C103,OID-202533449349300718,EIN-30-0044478,2024,asset_transfer,closure,"",CLOSURE,medium,FALSE,FALSE,FALSE,FALSE,Liquidation; assets split among three funders
+C104,OID-201913189349204076,EIN-74-0575755,2018,mergerN,mergerN,leader,MERGER,medium,FALSE,TRUE,,TRUE,Membership recognition and asset purchase; all assets and activities transferred
+C105,OID-202143199349317944,EIN-13-5668120,2020,consolidation,consolidation,leader,MERGER,medium,FALSE,FALSE,TRUE,,Net assets to related successor organization; officer transferred to Coalition
+C106,OID-201721159349200412,EIN-45-3603767,2016,consolidation,consolidation,leader,MERGER,medium,FALSE,FALSE,TRUE,,Union local assets to TWU Local 548; officers listed as involved
+C107,OID-202542509349200309,EIN-42-1591811,2024,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,low,FALSE,FALSE,FALSE,,Not final Part II; $500 cash transferred to Kings Physicians
+C108,OID-201301349349307450,EIN-31-1570598,2012,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Terminated activities transferred all assets to Volunteer USA Foundation
+C109,OID-202321289349301702,EIN-41-6077975,2022,asset_disposition,asset_disposition,"",CLOSURE,low,FALSE,FALSE,FALSE,FALSE,Paid out all member benefits intending to dissolve
+C110,OID-202611359349305086,EIN-59-0589990,2024,consolidation,consolidation,leader,MERGER,low,FALSE,FALSE,FALSE,TRUE,Transfer to foundation to ensure charity's work continues; shared board
+C111,OID-201740879349200209,EIN-44-0613436,2016,mergerN,mergerN,leader,MERGER,high,TRUE,FALSE,TRUE,,Chapter consolidated into single Society entity; president employed by transferee
+C112,OID-201521249349301027,EIN-31-1818706,2013,asset_disposition,asset_disposition,"",CLOSURE,low,FALSE,FALSE,FALSE,,Charter not renewed; school closed; leasehold abandoned; assets to Buffalo Public Schools
+C113,OID-202433409349301013,EIN-47-5538183,2023,asset_transfer,asset_transfer,"",ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Dissolved; investments to Community Foundation for Greater Atlanta
+C114,OID-201621349349301302,EIN-58-2644615,2015,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Building sold to county; remaining assets to Rabun Paws 4 Life
+C115,OID-202302579349201250,EIN-51-0198301,2022,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Final return; funds transferred to OJEFA only
+C116,OID-202431229349200218,EIN-91-1575108,2023,closure,closure,"",CLOSURE,low,,,,,Foundation dissolution with no recipient or asset detail
+C117,OID-202401699349301465,EIN-59-0876282,2022,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,,,Club facilities destroyed by Hurricane Ian; insurance reinvested; club continues
+C118,OID-202600139349302675,EIN-45-5513977,2024,closure,closure,"",CLOSURE,high,FALSE,,FALSE,FALSE,Board voted to dissolve; repay loan and donate remainder to other 501c3s
+C119,OID-201821349349306977,EIN-46-1378910,2016,closure,closure,"",CLOSURE,medium,FALSE,FALSE,FALSE,FALSE,Charter school assets liquidated and returned to school district
+C120,OID-201502799349200040,EIN-22-1512872,2014,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,,,Local merged into Local 1000 with locals 1010 1012 1022 1023
+C121,OID-201641379349204844,EIN-65-0449338,2014,closure,closure,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,No assets to distribute at dissolution
+C122,OID-201300649349300300,EIN-45-3780596,2011,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Event org dissolved; small residual to Billy Graham Evangelistic Association
+C123,OID-202242309349301909,EIN-13-3322100,2020,closure,closure,"",MERGER,high,FALSE,FALSE,TRUE,TRUE,Merged with Cornerstone Family Healthcare; HVCS division; staff and board joined
+C124,OID-201433029349300113,EIN-34-1897312,2013,merger2,merger2,leader,MERGER,high,FALSE,FALSE,,,Dissolved and merged into related Community Services; assets absorbed
+C125,OID-202411169349301716,EIN-02-0681536,2023,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,FALSE,,Sold assets; distributed proceeds to pension stockholder; liquidation later
+C126,OID-201142729349300334,EIN-23-7421796,2010,merger2,merger2,leader,MERGER,medium,FALSE,FALSE,TRUE,,Plan terminated assets to successor trust; former trustees are successor trustees
+C127,OID-201440459349200029,EIN-04-3428075,2012,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,FALSE,,Distribution described as merger of unrestricted net assets
+C128,OID-201900569349301010,EIN-25-1549226,2017,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,Liquidating distributions split across nine organizations
+C129,OID-201423179349305097,EIN-39-1539117,2013,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,New ThedaCare foundation formed to consolidate multiple foundations; directors joined
+C130,OID-201341669349300904,EIN-59-1932549,2012,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,,,Merged into ACTS Retirement-Life Communities; liabilities and bonds transferred
+C131,OID-201320319349301457,EIN-11-1018985,2011,closure,closure,"",MERGER,medium,FALSE,FALSE,TRUE,TRUE,Asset purchase by SUNY Downstate; essentially all staff hired by SUNY
+C132,OID-202221739349300212,EIN-27-4236054,2021,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,,Cash to Ten Talents; secretary long involved there before liquidation
+C133,OID-201521259349300807,EIN-38-0679253,2014,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Union local assets and liabilities transferred; officers join Local 243
+C134,OID-202023219349205522,EIN-01-0544274,2019,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into HospitalityMaine Education Foundation; officers joined its board
+C135,OID-201941149349300339,EIN-20-2629063,2017,merger2,merger2,leader,ASSET_TRANSFER,low,FALSE,FALSE,,,Sold all assets to affiliated Stepping Stones; ceased operations; $258 transferred
+C136,OID-202501359349205945,EIN-23-1352003,2023,asset_disposition,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Board members became board of merged United Way of Southern Alleghenies
+C137,OID-201600609349300425,EIN-41-1731275,2014,merger2,merger2,leader,MERGER,high,FALSE,FALSE,FALSE,,Dissolved and merged into Intercultural Student Experiences
+C138,OID-202012979349200101,EIN-57-0517776,2019,asset_disposition,merger2,leader,MERGER,high,FALSE,FALSE,,,Laurens YMCA merged with Lakelands YMCA transferring all assets
+C139,OID-202521349349206357,EIN-31-1739273,2024,asset_transfer,asset_transfer,"",ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Dissolved; remaining cash to Scioto Foundation
+C140,OID-201703189349308895,EIN-38-1399934,2016,consolidation,consolidation,leader,MERGER,high,FALSE,TRUE,TRUE,TRUE,Assets and membership to newly formed Local 851; representative moves
+C141,OID-202113139349303826,EIN-16-1364106,2020,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into Helio Health; directors and employee joined Helio
+C142,OID-201623209349202087,EIN-44-0546280,2015,mergerN,mergerN,leader,MERGER,low,FALSE,FALSE,,TRUE,Operations and assets transferred to SURHC which continues Cabot operations
+C143,OID-201910299349300106,EIN-47-1334302,2017,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,,TRUE,Assets and operations assumed by Wellmont Foundation; merged into Wellmont
+C144,OID-201732419349200908,EIN-20-0963557,2016,merger2,merger2,leader,ASSET_TRANSFER,high,FALSE,FALSE,,,Transfer of funds upon dissolution to PTA
+C145,OID-202403169349301315,EIN-43-1937607,2023,closure,closure,"",ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Insolvent dissolution; district assumed liabilities and took fixed assets
+C146,OID-202231329349301433,EIN-42-1103940,2021,mergerN,mergerN,sn_text,MERGER,high,FALSE,FALSE,,,Credit union assets merged into Community 1st Credit Union
+C147,OID-201841309349202099,EIN-06-0907232,2016,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Chapter assets to national NASW; executive director became NASW employee
+C148,OID-202540309349300124,EIN-30-0948336,2023,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,,,NMTC unwind; real property transferred to food bank parent; QALICB continues
+C149,OID-202422229349300712,EIN-39-1570877,2023,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into Ascension Wisconsin Foundation; directors join its board
+C150,OID-202212579349301036,EIN-84-0405244,2021,merger2,merger2,leader,MERGER,high,TRUE,TRUE,,,Merged with Pikes Peak Council into new entity Pathway to the Rockies
+C151,OID-201711879349200706,EIN-41-2117260,2016,asset_transfer,asset_transfer,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Only professional and dissolution fees paid; no successor
+C152,OID-201702099349300040,EIN-73-1093885,2016,merger2,merger2,leader,MERGER,high,FALSE,FALSE,,TRUE,Court ordered trust combined and administered as single trust
+C153,OID-201212099349300436,EIN-82-0138750,2011,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Dissolved and merged with Lewis Clark Valley Chamber; board joined governing board
+C154,OID-201811589349200806,EIN-58-2040138,2017,mergerN,mergerN,corroborated,ASSET_TRANSFER,high,FALSE,FALSE,,FALSE,Dissolved; all cash to Georgia Alabama Land Trust
+C155,OID-201222289349301022,EIN-90-0656139,2010,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,FALSE,,Partners continues; sale of purchased assets to Hospice of the North Shore
+C156,OID-201821209349301302,EIN-36-1556530,2017,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,Sold facility closed programs granted proceeds to many nonprofits
+C157,OID-201303199349307245,EIN-76-0486730,2012,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,FALSE,FALSE,Sold operating property; plans to close later
+C158,OID-202221939349300737,EIN-20-5298662,2021,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,,TRUE,Programs merged with Siouxland Soccer Foundation by board vote
+C159,OID-202641469349200714,EIN-72-6031176,2024,asset_transfer,asset_transfer,"",CLOSURE,low,FALSE,,,,Final return; property sold to an individual
+C160,OID-202130559349300108,EIN-16-1310011,2020,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Transfer due to merger; officers and employees became Local 81 staff
+C161,OID-202441449349301034,EIN-94-3141023,2023,asset_disposition,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,,Winding down; transferred remaining $12714 to Chevron Retirees Association
+C162,OID-201711239349200701,EIN-31-1144079,2015,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Endowment funds transferred to Blue Grass Community Foundation
+C163,OID-202312299349301601,EIN-47-3008706,2022,closure,closure,"",ASSET_TRANSFER,low,FALSE,FALSE,FALSE,FALSE,Cash distributed to affiliate Transit Authority of Lexington-Fayette
+C164,OID-201500269349300600,EIN-23-1714363,2013,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,Closed for lack of funding; no assets remained
+C165,OID-202031979349304213,EIN-36-3926044,2019,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into sole member Midwest Health Foundation; board members continue
+C166,OID-201522519349300522,EIN-20-1502727,2013,closure,closure,"",CLOSURE,medium,FALSE,,,,Dissolution with essentially no assets ($1 cash)
+C167,OID-202520939349301222,EIN-81-5386793,2024,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Ceased operations and dissolved; cash grant to a public charity
+C168,OID-202243419349301429,EIN-66-0217490,2021,asset_transfer,merger2,sn_text,MERGER,medium,TRUE,FALSE,,,Credit union merged with four other credit unions via regulator
+C169,OID-201233139349302063,EIN-38-3407009,2011,asset_transfer,asset_transfer,"",ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Ceased operations; donated remaining funds to EWTN
+C170,OID-202503189349309335,EIN-81-4191272,2024,mergerN,mergerN,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Subsidiary dissolved; parent assumed intercompany balances; no merger language
+C171,OID-202503039349300640,EIN-36-1877640,2024,asset_transfer,closure,"",CLOSURE,medium,FALSE,,,,Dissolution; cash split among three recipients
+C172,OID-201613159349201596,EIN-46-2153728,2015,consolidation,consolidation,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Chapter gave all assets to similar NAHREP organization at year end
+C173,OID-201532299349301793,EIN-04-2140688,2013,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,FALSE,FALSE,Not final; sold real property and equipment to buyers
+C174,OID-202501419349200000,EIN-85-2997098,2024,merger2,closure,"",CLOSURE,high,FALSE,FALSE,,,Ceased; returned donations split between two partner organizations
+C175,OID-202022299349300807,EIN-23-7032779,2018,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Certificate of merger; merged into McLean Affiliates; directors continue
+C176,OID-201633089349301748,EIN-20-4115716,2015,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,Merged with California Healthcare Institute to form CLSA; directors and employees moved
+C177,OID-202541269349201274,EIN-83-3263066,2024,merger2,merger2,leader,ASSET_TRANSFER,low,FALSE,FALSE,FALSE,,Remaining assets to related BOMI Institute; boards already overlapping
+C178,OID-201943199349320314,EIN-55-0668245,2018,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,TRUE,TRUE,Per PLR becomes component part of Greater Kanawha Valley Foundation; board continues
+C179,OID-201710549349301101,EIN-94-1506588,2016,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into Financial Partners Credit Union; former CEO consulted there
+C180,OID-202202239349301715,EIN-06-1492533,2021,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,TRUE,,Dissolved all assets to sole member VNA of Ridgefield successor
+C181,OID-201341559349300504,EIN-25-1184946,2012,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,TRUE,FALSE,FALSE,Mineral rights sold to newly formed LLC; association continues
+C182,OID-202121359349301667,EIN-84-3323988,2020,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,Land sold and cash split among many individuals
+C183,OID-202332619349301553,EIN-88-0387136,2021,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,,,Organization acquired by Multispecialty Group Practice South; articles amended
+C184,OID-202400539349200825,EIN-26-2489485,2023,closure,closure,"",CLOSURE,high,FALSE,,FALSE,FALSE,Supplies and equipment split among several schools and agencies
+C185,OID-202522739349302252,EIN-94-1702821,2023,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,FALSE,FALSE,Not final; sold facility to unrelated party to fund operations
+C186,OID-202143169349308389,EIN-73-1444324,2020,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,,,Org continues; 4.3M cash transferred to parent CAP Tulsa
+C187,OID-201832749349300203,EIN-31-1673922,2017,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Final return; all assets to New Castle Christian Academy
+C188,OID-201742449349300314,EIN-36-6132795,2016,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,,Assets to MCA fund; board overlap only
+C189,OID-201712289349300011,EIN-59-3219250,2015,merger2,merger2,leader,ASSET_TRANSFER,low,FALSE,FALSE,,,Cash to Florida Hospital New Smyrna Foundation; recipient officers listed
+C190,OID-201133159349302233,EIN-34-1848574,2010,asset_disposition,mergerN,sn_text,MERGER,high,TRUE,FALSE,,,Merged with nine other related corporations into LHS Family and Youth Services
+C191,OID-202233009349301713,EIN-41-1907818,2021,closure,closure,"",CLOSURE,low,FALSE,,,,Final return; no distributions listed; officers also officers of AEON
+C192,OID-201502819349200310,EIN-22-6108804,2014,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,Merged into Local 1000; officers become officers of successor
+C193,OID-201210709349200701,EIN-39-0715740,2011,merger2,merger2,leader,MERGER,medium,FALSE,FALSE,TRUE,,Directors became directors of recipient education foundation
+C194,OID-202443059349302249,EIN-04-3625680,2023,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Terminated operations; assets to Decatur Hospital Authority
+C195,OID-201621899349300027,EIN-35-2050228,2015,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,,,Sold towers and transmission equipment; organization continues
+C196,OID-201842279349300734,EIN-81-1705811,2017,consolidation,consolidation,leader,MERGER,medium,FALSE,FALSE,,TRUE,Dissolved and transferred operations and assets to Upstate Affiliate Organization
+C197,OID-201411059349200246,EIN-26-1469712,2013,asset_transfer,asset_transfer,"",ASSET_TRANSFER,low,FALSE,,,,Dissolved; house and cash to unnamed nonprofit association
+C198,OID-202411779349200531,EIN-57-6151938,2023,consolidation,consolidation,leader,MERGER,high,FALSE,TRUE,TRUE,,After coop merger assets to newly formed MPD Electric Trust; same directors
+C199,OID-201942259349300639,EIN-22-1863337,2018,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Preschool program ended; remaining cash to YMCA sole member
+C200,OID-202120089349300627,EIN-20-8896901,2019,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,Charter school closed with insufficient assets
+C201,OID-201103119349300235,EIN-20-7514597,2010,closure,closure,"",CLOSURE,high,FALSE,,,,Trust distributed benefits to beneficiaries and ceased operations
+C202,OID-202442229349200204,EIN-85-2396361,2023,asset_disposition,closure,"",CLOSURE,medium,FALSE,,,FALSE,Final return; remaining cash used to pay all expenses
+C203,OID-201331969349300863,EIN-94-1170350,2011,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,California division merged into American Cancer Society Inc; staff became employees
+C204,OID-202143159349201859,EIN-23-2242854,2020,merger2,merger2,leader,MERGER,high,FALSE,FALSE,FALSE,,GBHCC merged into Geisinger-Bloomsburg Hospital affiliate
+C205,OID-201612889349301146,EIN-36-2166984,2015,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Transfer pursuant to merger; president becomes director
+C206,OID-201902219349301000,EIN-22-2757446,2017,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into VNAH its sole member; officers continued
+C207,OID-202441359349312384,EIN-04-3515341,2022,asset_transfer,closure,"",CLOSURE,medium,FALSE,,,,Dissolution; cash split between TPL and Third Sector New England
+C208,OID-202400759349201095,EIN-92-2834134,2023,closure,closure,"",REORGANIZATION,high,FALSE,TRUE,,,Wrong entity type dissolved without activity; new corporation formed
+C209,OID-201843199349312504,EIN-37-0613374,2017,asset_transfer,asset_transfer,"",MERGER,low,FALSE,TRUE,,,Transfer of net assets to new organization Illinois FBFM
+C210,OID-202411769349200931,EIN-61-1478428,2023,closure,closure,"",ASSET_TRANSFER,low,FALSE,FALSE,,,All funds transferred to another nonprofit; no details
+C211,OID-202540719349201779,EIN-42-6099912,2023,mergerN,mergerN,corroborated,ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Guild terminated; closing allocation to Mercy Hospital
+C212,OID-202333199349331453,EIN-87-1789296,2022,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Remaining funds to Southern Leadership Coalition then dissolved
+C213,OID-202601359349309885,EIN-36-3991390,2024,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Dissolution; all assets to Kansas Local Area I Workforce Board
+C214,OID-201242279349300014,EIN-42-0864127,2011,consolidation,consolidation,leader,MERGER,high,TRUE,FALSE,TRUE,TRUE,Merged with Siouxland Community Blood Bank into LifeServe; shared directors and staff
+C215,OID-202023089349302227,EIN-47-5261222,2019,merger2,merger2,leader,ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Dissolved; assets transferred to IIIT at dissolution
+C216,OID-201531289349301013,EIN-43-1916878,2014,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Net assets to Boys and Girls Club then dissolved
+C217,OID-202143169349307634,EIN-34-0943526,2020,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged with Jewish Federation; past president becomes executive director
+C218,OID-201833199349308958,EIN-26-3714861,2017,closure,closure,"",CLOSURE,low,,,,,Filed for dissolution; assets to be distributed; no recipients listed
+C219,OID-202033189349205243,EIN-91-1996498,2019,mergerN,mergerN,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Foundation securities to Seattle Foundation; no integration evidence
+C220,OID-202501679349200635,EIN-47-5452325,2024,closure,closure,"",ASSET_TRANSFER,medium,FALSE,FALSE,,FALSE,Facility sold; ceased services; remaining assets to affiliate Avinity Services
+C221,OID-202531299349304318,EIN-73-1609200,2023,mergerN,mergerN,leader,ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Family foundation dissolved; assets to Oklahoma City Community Foundation
+C222,OID-201612309349300616,EIN-30-0408702,2015,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Dissolved; nearly all assets chapel property to Cass County Historical Society
+C223,OID-201612229349200906,EIN-55-0859147,2015,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Articles of merger; two directors join Open Door board
+C224,OID-201300919349300600,EIN-35-0446263,2012,asset_disposition,merger2,leader,REORGANIZATION,high,FALSE,TRUE,,TRUE,Separate ID number needed; all assets transferred to new EIN
+C225,OID-201823199349311527,EIN-34-1433612,2017,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,low,FALSE,FALSE,FALSE,,Contraction of operations; no change in entity; staff retained
+C226,OID-201821359349308897,EIN-63-0362347,2017,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,TRUE,Merged into Alabama Credit Union; members get shares; officers join
+C227,OID-201621259349200342,EIN-26-2681962,2015,merger2,merger2,leader,MERGER,high,FALSE,FALSE,,,Organization merged into Michael Fux Foundation Inc
+C228,OID-202103169349306775,EIN-04-3219159,2020,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,TRUE,,Dissolved into parent Ascendus; officers transferred to Ascendus
+C229,OID-202033169349202438,EIN-41-1875763,2019,asset_disposition,merger2,leader,MERGER,high,TRUE,TRUE,FALSE,,Merged with food shelf to form new organization Community Pathways
+C230,OID-202310699349200411,EIN-27-3339264,2021,asset_disposition,merger2,leader,MERGER,high,FALSE,FALSE,,TRUE,Decision to merge CMLA into CMS for unified structure
+C231,OID-202110569349200406,EIN-37-1364980,2020,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Cash transferred to Helping Hands of Springfield
+C232,OID-201803139349302075,EIN-83-0371265,2017,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,low,FALSE,,,,Part II not final; equipment and net assets disposed; recipient unnamed
+C233,OID-201942899349300224,EIN-22-3643620,2018,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,FALSE,TRUE,Not final; cash to successor trustees for employees moved to purchaser
+C234,OID-201621359349300332,EIN-47-0809865,2015,merger2,merger2,leader,MERGER,medium,FALSE,FALSE,TRUE,,Assets to My Bridge in restructuring; officers continue as employees
+C235,OID-202311319349303056,EIN-20-8295721,2021,asset_transfer,merger2,sn_text,MERGER,low,FALSE,FALSE,FALSE,,Subordinate entity Tioga merged out of existence; group continues
+C236,OID-201402169349300980,EIN-59-1968743,2013,asset_transfer,asset_transfer,"",ASSET_TRANSFER,low,FALSE,FALSE,,,Land and building to WE HELP; tiny cash to second org
+C237,OID-202041359349300549,EIN-23-2249569,2018,mergerN,mergerN,leader,MERGER,low,FALSE,FALSE,,,Transfer to affiliate KenCrest; liabilities assumed by KenCrest
+C238,OID-202411529349300736,EIN-83-0551795,2022,closure,closure,"",CLOSURE,low,FALSE,,,,Final return with no distributions or narrative
+C239,OID-201203209349308235,EIN-04-2258467,2011,closure,closure,"",CLOSURE,medium,FALSE,FALSE,FALSE,FALSE,Nursing home ceased; assets required to be returned to trust
+C240,OID-202042169349301179,EIN-91-1015893,2018,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,,,Transfer of assets to Catholic Housing Services of Eastern WA
+C241,OID-201503159349300425,EIN-41-1444129,2014,merger2,merger2,leader,MERGER,high,FALSE,FALSE,FALSE,,Articles of merger; foundation merged into MCHS-St James
+C242,OID-201312009349200766,EIN-23-7146540,2012,asset_transfer,asset_transfer,"",MERGER,high,FALSE,FALSE,,,Merger of lodge into Rising Star Lodge
+C243,OID-201423079349302162,EIN-31-1217563,2013,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,TRUE,,All assets and liabilities to CHP Foundation; board become market trustees
+C244,OID-201502409349300715,EIN-43-0903057,2013,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,All assets and liabilities merged into Alternative Opportunities; ED retained
+C245,OID-201401059349301030,EIN-84-6110106,2012,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,FALSE,FALSE,Sold building; explicitly not dissolving or liquidating
+C246,OID-201911139349200016,EIN-27-1329340,2018,consolidation,closure,"",CLOSURE,high,FALSE,FALSE,,,Dissolved after distributing assets to several charities
+C247,OID-202141259349202059,EIN-65-0735838,2019,mergerN,mergerN,leader,ASSET_TRANSFER,high,FALSE,FALSE,FALSE,FALSE,Final liquidating payment to supported organization
+C248,OID-202013229349300501,EIN-83-3600705,2019,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,Ceased operations; assets granted to nine charities
+C249,OID-202431779349200643,EIN-57-0966373,2023,consolidation,consolidation,leader,MERGER,medium,,TRUE,TRUE,,After coop merger assets to newly formed MPD Electric Trust; directors continue
+C250,OID-201741319349305064,EIN-94-2697297,2015,asset_disposition,asset_disposition,"",ASSET_TRANSFER,low,FALSE,FALSE,FALSE,FALSE,Shelter sold and ceased; intends dissolve with remainder to Kings View
+C251,OID-201313169349304606,EIN-62-1660663,2012,asset_transfer,asset_transfer,"",ASSET_TRANSFER,low,FALSE,FALSE,,,Final; fund balance transfer to related Mercy Health Partners; no narrative
+C252,OID-201702169349200015,EIN-74-2179875,2016,consolidation,consolidation,leader,REORGANIZATION,medium,FALSE,TRUE,TRUE,,Foundation net assets to new same-name 501c3; entire board moves
+C253,OID-201630849349301103,EIN-20-2769496,2015,closure,closure,"",CLOSURE,medium,FALSE,FALSE,FALSE,FALSE,Dissolved; essentially no assets distributed
+C254,OID-202231949349201258,EIN-85-0655855,2021,closure,closure,"",CLOSURE,high,FALSE,FALSE,,,No assets to distribute; dissolution
+C255,OID-202531229349200933,EIN-24-6022688,2024,closure,closure,"",CLOSURE,high,FALSE,,,,Liquidation contributions split among many unrelated charities
+C256,OID-202433109349302118,EIN-23-7220589,2023,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Articles of merger into Parkview Health Foundation; officer is recipient director
+C257,OID-202443039349302454,EIN-34-4434205,2023,mergerN,mergerN,leader,MERGER,high,FALSE,FALSE,FALSE,,JSS merged into Jewish Federation of Greater Toledo
+C258,OID-202103149349303125,EIN-94-3267369,2020,mergerN,merger2,corroborated,ASSET_TRANSFER,medium,FALSE,FALSE,,,Ceased and dissolved; cash to Silicon Valley Community Foundation
+C259,OID-201603199349205170,EIN-91-0984541,2015,asset_transfer,closure,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Terminated; cash split among several legal charities
+C260,OID-202013239349200736,EIN-77-0485689,2019,asset_transfer,closure,"",CLOSURE,medium,FALSE,FALSE,,,Dissolved; small assets split among multiple unnamed recipients
+C261,OID-202611419349200016,EIN-27-3802796,2024,closure,closure,"",CLOSURE,high,FALSE,,,,Assets distributed as 170 grants; remainder donated
+C262,OID-201342919349200509,EIN-20-2860063,2012,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Dissolved; small cash balance transferred to SC Senior Sports Classic
+C263,OID-201423149349302617,EIN-39-1511977,2013,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,New ThedaCare foundation formed to consolidate multiple foundations; officers became directors
+C264,OID-202031889349302048,EIN-04-2501711,2018,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,FALSE,TRUE,Transfer of net assets and operations to affiliate Mercy Hospital
+C265,OID-202610219349300001,EIN-57-0324912,2024,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,high,FALSE,FALSE,FALSE,FALSE,Endowment transferred to related foundation; association continues
+C266,OID-202541339349306989,EIN-84-1059678,2023,asset_disposition,asset_disposition,"",MERGER,medium,FALSE,FALSE,TRUE,,Ceased operations transferred all assets to AMHR; executive director joined AMHR
+C267,OID-202302979349301035,EIN-95-2104867,2022,mergerN,mergerN,leader,ASSET_TRANSFER,low,FALSE,FALSE,,,Final return; dividends of $1.58M to Grand Lodge of CA
+C268,OID-202540709349301814,EIN-91-0153620,2022,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,,,Bremerton chamber merged with Greater Kitsap Chamber; all assets transferred
+C269,OID-202130719349300313,EIN-31-1208148,2019,consolidation,consolidation,leader,ASSET_TRANSFER,low,FALSE,FALSE,,,Final; all assets to Bill Mitchel Retirement Villages; directors listed only
+C270,OID-202022789349300602,EIN-25-6083710,2019,merger2,merger2,leader,MERGER,high,FALSE,FALSE,,,Articles of merger with Elizabeth Township Fire Department
+C271,OID-202530459349300918,EIN-56-0862112,2024,merger2,merger2,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Auxiliary dissolved; assets to medical center foundation
+C272,OID-201913189349307296,EIN-73-0444415,2018,consolidation,consolidation,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged into Shawnee Forward; treasurer and CEO roles there
+C273,OID-201500519349300915,EIN-36-1265010,2014,consolidation,consolidation,leader,MERGER,high,FALSE,TRUE,TRUE,TRUE,Members and officers moved to newly formed LIUNA Local 1
+C274,OID-202523179349303687,EIN-74-2552150,2024,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,,,Assets to related Buckner Foundation; RGCH Foundation not dissolved
+C275,OID-201422279349200632,EIN-23-7617017,2013,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,,,Local chapter terminated; assets contributed to state chapter
+C276,OID-201543209349313909,EIN-36-2893936,2014,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,,,Org continues; Rainbow Hospice deconsolidated after acquiring remaining interest
+C277,OID-202521219349303307,EIN-51-0605682,2023,mergerN,mergerN,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,FALSE,Sold nursing home; dissolved to parent; board already shared
+C278,OID-201940579349200224,EIN-54-1295679,2017,mergerN,mergerN,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,,Net assets transferred upon dissolution; officers shared not moving
+C279,OID-201403169349201095,EIN-20-1346393,2013,closure,closure,"",ASSET_TRANSFER,low,FALSE,FALSE,,,All assets distributed to unnamed orphanage; dissolution
+C280,OID-201441749349300779,EIN-75-2834707,2013,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,,TRUE,Five locals merged into newly created Local 591; members became members
+C281,OID-201420459349200957,EIN-04-2745312,2012,mergerN,mergerN,leader,MERGER,medium,FALSE,FALSE,,,Distribution described as merger of unrestricted net assets
+C282,OID-201242069349300729,EIN-94-1497687,2011,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,low,FALSE,FALSE,,,Part II transfer to Bishop; org still operating dissolution pending
+C283,OID-202102289349302920,EIN-81-0661609,2020,asset_transfer,closure,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Closing distributions to six unrelated recipients
+C284,OID-201641369349300919,EIN-63-0934712,2014,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,low,FALSE,FALSE,,,No disposition; accounting change removed subsidiaries; org continues
+C285,OID-201842429349301164,EIN-90-0239307,2017,merger2,merger2,leader,MERGER,high,FALSE,FALSE,,,875 Building LLC merged with PPB LLC disregarded entity of Pet Partners
+C286,OID-202132819339305903,EIN-04-3653864,2017,mergerN,mergerN,leader,ASSET_TRANSFER,medium,FALSE,FALSE,FALSE,,Chapter net assets transferred upon dissolution to housing corporation; shared officers
+C287,OID-201941649349300924,EIN-23-2460278,2018,consolidation,consolidation,leader,MERGER,high,TRUE,TRUE,TRUE,,Merger with Citizens Hose Company creating Northern York County Fire Rescue
+C288,OID-202511279349303446,EIN-27-2792483,2024,merger2,merger2,leader,ASSET_TRANSFER,low,FALSE,FALSE,FALSE,,Cash to Idaho Dairymen's Association; shared executive officer
+C289,OID-202443059349201879,EIN-26-2084792,2023,closure,closure,"",ASSET_TRANSFER,low,FALSE,FALSE,FALSE,FALSE,Small transfer to unnamed 501c3
+C290,OID-202533389349300848,EIN-46-0106838,2024,consolidation,consolidation,leader,REORGANIZATION,medium,FALSE,TRUE,,,All assets transferred to new AGC of South Dakota
+C291,OID-202141209349301319,EIN-36-4467468,2020,asset_transfer,asset_transfer,"",CLOSURE,medium,FALSE,,,,Sold assets; paid debts; distributed proceeds in liquidation
+C292,OID-202630419349301838,EIN-36-4461669,2024,merger2,merger2,leader,MERGER,high,FALSE,FALSE,TRUE,,Merged with Community Nutrition Network; directors become CNNSSA directors
+C293,OID-202402409349301580,EIN-13-3975534,2023,closure,closure,"",CLOSURE,high,FALSE,FALSE,FALSE,FALSE,Dissolved by bankruptcy court; cash to liquidation plan administrator
+C294,OID-202233189349310758,EIN-48-1048442,2021,consolidation,consolidation,leader,MERGER,medium,FALSE,,TRUE,,Net assets to Grow Hays; ED and board serve Grow Hays
+C295,OID-201211259349200201,EIN-38-3257749,2011,asset_disposition,asset_disposition,"",MERGER,medium,FALSE,FALSE,TRUE,,Program director moves to successor 501c3; remaining cash transferred
+C296,OID-202531629349200043,EIN-27-1763356,2024,asset_transfer,asset_transfer,"",ASSET_TRANSFER,medium,FALSE,FALSE,,,Liquidation transfer of checking account to Neighborhoods USA
+C297,OID-201603079349300990,EIN-43-0962200,2015,asset_disposition,asset_disposition,"",ASSET_DISPOSITION,medium,FALSE,FALSE,,,Sold Heritage House apartments to LLC; not final return
+C298,OID-201712289349200541,EIN-46-4707659,2016,closure,closure,"",CLOSURE,high,FALSE,,,FALSE,Only dissolution expenses; no recipient
+C299,OID-201440489349300449,EIN-47-0733774,2012,mergerN,mergerN,corroborated,ASSET_DISPOSITION,medium,FALSE,FALSE,FALSE,FALSE,Not final; terminated JOA interest with CHI for payment
+C300,OID-201410249349300011,EIN-13-2739938,2012,closure,closure,"",REORGANIZATION,low,FALSE,,,,Annuities transferred to Create Inc itself; thin text

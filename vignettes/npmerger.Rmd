@@ -68,6 +68,12 @@ against 9% for closures. About 40% of asset transfers with no box checked
 shared people too. Leadership continuity counts when either source shows
 it.
 
+**Schedule N's own text.** When the asset descriptions or Part III
+explanation say the transfer is part of a merger or consolidation
+(`sn_merger_pattern()`), that counts as merger evidence on its own. In hand
+validation every terminated filing with one successor and such text read as
+a merger.
+
 **Corroborating disclosures.** A dissolution to one nonprofit successor
 with no leadership evidence is promoted to a merger when at least two of
 these agree:
@@ -212,10 +218,12 @@ strict <- classify_transactions(filings, merger_rules(leader = "sn", promote = F
 data.frame(case = filings$case, default = out$TYPE, strict = strict$TYPE)
 ```
 
-`merger_rules()` also sets three thresholds:
+`merger_rules()` also sets these thresholds and switches:
 
 * the minimum share of transferred value going to the dominant recipient
-  (`min_top_share`, default 0.5);
+  (`min_top_share`, default 0.75);
+* whether a Part-II-only filing with the final-return box counts as a
+  termination (`final_as_termination`, default `TRUE`);
 * how many dissolving donors make a merger multi-party (`min_donors_n`);
 * how recently a recipient must have been formed to count as a new
   entity (`new_entity_years`).

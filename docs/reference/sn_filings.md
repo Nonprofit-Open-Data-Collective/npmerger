@@ -29,4 +29,6 @@ A data.table, one row per `OBJECTID`, with `EIN2`, `TAX_YEAR`, `HAS_P1`,
 `HAS_P2`, `DIR`, `EMP`, `OWN`, `COMP` (lines 2a-2d, either part),
 `LEADER_SN` (any of 2a-2c), `N_RECIP`, `N_NP_RECIP`, `FMV_TOTAL`,
 `FMV_NP`, `TOP_RECIP_EIN` and `TOP_SHARE` (largest nonprofit recipient's
-share of total FMV).
+share of total FMV), and `SN_MERGER_TEXT` (Schedule N's own text
+mentions a merger; see
+[`sn_merger_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_merger_pattern.md)).

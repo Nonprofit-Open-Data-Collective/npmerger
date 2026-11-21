@@ -56,7 +56,12 @@ multi-party merger (<code>mergerN</code>) or, with a new recipient, a consolidat
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_donor_counts</span><span class="op">(</span><span class="va">fl</span>, window <span class="op">=</span> <span class="fl">1L</span>, min_top_share <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">add_donor_counts</span><span class="op">(</span></span>
+<span>  <span class="va">fl</span>,</span>
+<span>  window <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  min_top_share <span class="op">=</span> <span class="fl">0.75</span>,</span>
+<span>  final_as_termination <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -76,6 +81,12 @@ multi-party merger (<code>mergerN</code>) or, with a new recipient, a consolidat
 least this share of its transferred value (or is its only nonprofit
 recipient). Keeps large charities that collect small residual gifts
 from many closures from looking like serial acquirers.</p></dd>
+
+
+<dt id="arg-final-as-termination">final_as_termination<a class="anchor" aria-label="anchor" href="#arg-final-as-termination"></a></dt>
+<dd><p>Count Part-II-only filings with the
+final-return box (<code>FINAL_RETURN</code>, from <code><a href="add_filing_history.html">add_filing_history()</a></code>) as
+dissolving donors. See <code><a href="merger_rules.html">merger_rules()</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
