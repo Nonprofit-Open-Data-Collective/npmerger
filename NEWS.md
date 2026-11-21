@@ -1,5 +1,24 @@
 # npmerger 0.0.0.9000
 
+* Outcome measures from the merger and financial-vulnerability literatures:
+  - `merger_measures()` adds investment and other revenue, `REVENUE_HHI`
+    (Part I revenue concentration, via `revenue_hhi()`), `ADMIN_RATIO`,
+    revenue, expenses, and compensation per employee, and `DEFICIT` /
+    `NEG_NET_ASSETS` flags. `panel_measures()` carries `ADMIN_RATIO` and
+    `REVENUE_HHI`, and `panel_columns()` now reads Part I investment and
+    other revenue.
+  - `trend_measures()`: symmetric year-over-year growth (revenue,
+    expenses, contributions, program revenue, net assets), trailing revenue
+    coefficient of variation, and deficit-year counts. Windows never use
+    future years or bridge filing gaps. `merger_fiscal_panel(trends = TRUE)`
+    adds them by default.
+  - `tuckman_chang()`: Tuckman-Chang (1991) vulnerability flags (bottom
+    quintile on equity, margin, and admin costs, top quintile on revenue
+    concentration), with cutoffs from a reference panel.
+  - `merger_proforma()`: combined donor + recipient series that sums the
+    organizations before the merger and uses the recipient alone after it,
+    with ratios recomputed.
+
 * Classifier inspection tables: `sn_labeled()` stacks Schedule N Part I and
   Part II asset lines into one tidy table, with each part's checkbox answers
   (`sn_checkboxes()`), the Part III text, the filing's label and evidence,

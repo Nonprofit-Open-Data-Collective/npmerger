@@ -13,7 +13,8 @@ merger_fiscal_panel(
   fit = NULL,
   weights = NULL,
   smooth = c("none", "trailing"),
-  k = 3L
+  k = 3L,
+  trends = TRUE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ only through their merger year.}
 \item{smooth}{\code{"none"} or \code{"trailing"}.}
 
 \item{k}{Trailing window length in years.}
+
+\item{trends}{Add \code{\link[=trend_measures]{trend_measures()}} columns.}
 }
 \value{
 A data.table, one row per merger, role, and year, with
@@ -63,5 +66,15 @@ organization-year is then scored with the same fixed parameters.
 computed. Use smoothed values for matching and baselines. Use raw values
 (\code{smooth = "none"}) for event-time outcome estimates, because a trailing
 window spreads a real post-merger change over \code{k} years.
+}
+
+\section{Trends}{
+
+With \code{trends = TRUE}, growth, revenue volatility, and deficit-year
+columns from \code{\link[=trend_measures]{trend_measures()}} are computed on the full (unsmoothed)
+organization-year history before the window is cut, so the first window
+year still has its prior-year growth. Use \code{\link[=merger_proforma]{merger_proforma()}} on the
+result for a combined donor + recipient pre-merger baseline, and
+\code{\link[=tuckman_chang]{tuckman_chang()}} for vulnerability flags.
 }
 

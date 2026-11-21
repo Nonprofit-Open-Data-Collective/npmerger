@@ -112,7 +112,16 @@ smooth_trailing <- function(x, vars, k = 3L, id = "EIN2", time = "TAX_YEAR") {
 #' @param oy Organization-year table from [org_years()].
 #' @param pre,post Years before and after the merger year. Donors are kept
 #'   only through their merger year.
+#' @section Trends:
+#' With `trends = TRUE`, growth, revenue volatility, and deficit-year
+#' columns from [trend_measures()] are computed on the full (unsmoothed)
+#' organization-year history before the window is cut, so the first window
+#' year still has its prior-year growth. Use [merger_proforma()] on the
+#' result for a combined donor + recipient pre-merger baseline, and
+#' [tuckman_chang()] for vulnerability flags.
+#'
 #' @param ratios Compute 'fiscal' ratios (requires the 'fiscal' package).
+#' @param trends Add [trend_measures()] columns.
 #' @param fit,weights Optional fitted 'fiscal' model and weights; adds
 #'   `fh_*` dimension scores and the `fiscal_health` index.
 #' @param smooth `"none"` or `"trailing"`.
@@ -123,9 +132,11 @@ smooth_trailing <- function(x, vars, k = 3L, id = "EIN2", time = "TAX_YEAR") {
 #'   columns.
 #' @export
 merger_fiscal_panel <- function(cases, oy, pre = 5L, post = 5L, ratios = TRUE, fit = NULL, weights = NULL,
-                                smooth = c("none", "trailing"), k = 3L) {
+                                smooth = c("none", "trailing"), k = 3L, trends = TRUE) {
   smooth <- match.arg(smooth)
   oy <- as.data.table(oy)
+  if (!"REVENUE_HHI" %in% names(oy)) oy <- merger_measures(oy)
+  if (trends) oy <- trend_measures(oy)
   r <- merger_roles(cases)
   if (smooth == "trailing") {
     num <- names(oy)[vapply(oy, is.numeric, logical(1L))]
@@ -137,7 +148,7 @@ merger_fiscal_panel <- function(cases, oy, pre = 5L, post = 5L, ratios = TRUE, f
     r[, list(MERGER_ID, MERGER_GROUP_ID, ROLE, EIN2, TAX_YEAR = EVENT_YEAR + o, TIME_FROM_MERGER = as.integer(o))]))
   w <- w[!(ROLE == "donor" & TIME_FROM_MERGER > 0L)]
   sub <- oy[unique(w[, list(EIN2, TAX_YEAR)]), on = c("EIN2", "TAX_YEAR"), nomatch = NULL]
-  keep <- c("EIN2", "TAX_YEAR", "OBJECTID", "RETURN_TYPE", "EZ", intersect(.measure_cols, names(sub)))
+  keep <- c("EIN2", "TAX_YEAR", "OBJECTID", "RETURN_TYPE", "EZ", intersect(c(.measure_cols, .trend_cols), names(sub)))
   out <- merge(w, sub[, keep, with = FALSE], by = c("EIN2", "TAX_YEAR"))
   if (ratios && nrow(sub)) {
     if (!requireNamespace("fiscal", quietly = TRUE)) stop("`ratios = TRUE` needs the 'fiscal' package.", call. = FALSE)

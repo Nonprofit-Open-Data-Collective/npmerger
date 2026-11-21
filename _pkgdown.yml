@@ -101,6 +101,13 @@ reference:
   - merger_part7
   - merger_fiscal_panel
   - smooth_trailing
+- title: Outcome measures
+  desc: Measures from the merger and financial-vulnerability literatures beyond the 'fiscal' ratios, such as revenue concentration, growth, volatility, deficit history, Tuckman-Chang flags, and a combined donor + recipient pre-merger baseline.
+  contents:
+  - revenue_hhi
+  - trend_measures
+  - tuckman_chang
+  - merger_proforma
 - title: Matched comparison samples
   desc: Build the full 990 panel, a research sample of mergers with a full observation window, and candidate comparison organizations for merger recipients.
   contents:

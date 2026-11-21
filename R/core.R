@@ -87,15 +87,30 @@ org_years <- function(core) {
 #' panel. Revenue, expenses, assets, liabilities, net assets, grants, and
 #' contributions are available for both 990 and 990-EZ filers. The
 #' functional-expense breakdown (overhead), executive compensation,
-#' employees, and debt detail come from the full Form 990 only and are `NA`
-#' for 990-EZ filers.
+#' employees, the revenue-source breakdown, and debt detail come from the
+#' full Form 990 only and are `NA` for 990-EZ filers.
+#'
+#' `REVENUE_HHI` is the Herfindahl-Hirschman index of revenue concentration
+#' across the four Part I sources (contributions, program service revenue,
+#' investment income, other revenue), the revenue-concentration indicator
+#' of Tuckman and Chang (1991). Negative sources count as zero. It ranges
+#' from 0.25 (equal shares) to 1 (one source). Per-employee measures are
+#' `NA` when the return reports no employees.
 #'
 #' @param x An organization-year table (from [org_years()]).
 #' @return `x` with measure columns added: `REVENUE`, `EXPENSES`, `SURPLUS`,
 #'   `ASSETS`, `ASSETS_BOY`, `LIABILITIES`, `NET_ASSETS`, `DEBT`,
-#'   `CONTRIBUTIONS`, `PROGRAM_REVENUE`, `NONCASH_CONTRIB`, `GRANTS`,
-#'   `STAFF_EXP`, `EXEC_COMP`, `PROGRAM_EXP`, `MGMT_EXP`, `FUNDR_EXP`,
-#'   `OVERHEAD_RATIO`, `EMPLOYEES`, and `EZ` (990-EZ return).
+#'   `CONTRIBUTIONS`, `PROGRAM_REVENUE`, `INVEST_INCOME`, `OTHER_REVENUE`,
+#'   `NONCASH_CONTRIB`, `GRANTS`, `STAFF_EXP`, `EXEC_COMP`, `PROGRAM_EXP`,
+#'   `MGMT_EXP`, `FUNDR_EXP`, `OVERHEAD_RATIO`, `ADMIN_RATIO` (management and
+#'   general / total expenses), `REVENUE_HHI`, `EMPLOYEES`,
+#'   `REV_PER_EMPLOYEE`, `EXP_PER_EMPLOYEE`, `COMP_PER_EMPLOYEE` (salaries
+#'   and benefits / employees), `DEFICIT` (expenses exceed revenue),
+#'   `NEG_NET_ASSETS`, and `EZ` (990-EZ return).
+#' @references Tuckman, H. P., & Chang, C. F. (1991). A methodology for
+#'   measuring the financial vulnerability of charitable nonprofit
+#'   organizations. *Nonprofit and Voluntary Sector Quarterly*, 20(4),
+#'   445-460.
 #' @export
 merger_measures <- function(x) {
   x <- as.data.table(x)
@@ -112,6 +127,8 @@ merger_measures <- function(x) {
     DEBT            = s("F9_10_LIAB_MTG_NOTE_EOY", "F9_10_LIAB_NOTE_UNSEC_EOY", "F9_10_LIAB_TAX_EXEMPT_BOND_EOY", "F9_10_LIAB_LOAN_OFF_EOY"),
     CONTRIBUTIONS   = g("F9_01_REV_CONTR_TOT_CY", "F9_08_REV_CONTR_TOT"),
     PROGRAM_REVENUE = g("F9_01_REV_PROG_TOT_CY"),
+    INVEST_INCOME   = g("F9_01_REV_INVEST_TOT_CY"),
+    OTHER_REVENUE   = g("F9_01_REV_OTH_CY"),
     NONCASH_CONTRIB = g("F9_08_REV_CONTR_NONCSH"),
     GRANTS          = g("F9_01_EXP_GRANT_SIMILAR_CY"),
     STAFF_EXP       = g("F9_01_EXP_SAL_ETC_CY"),
@@ -123,7 +140,34 @@ merger_measures <- function(x) {
   )]
   x[, SURPLUS := REVENUE - EXPENSES]
   x[, OVERHEAD_RATIO := fifelse(!is.na(MGMT_EXP) & EXPENSES > 0, (MGMT_EXP + fcoalesce(FUNDR_EXP, 0)) / EXPENSES, NA_real_)]
+  x[, ADMIN_RATIO := fifelse(!is.na(MGMT_EXP) & EXPENSES > 0, MGMT_EXP / EXPENSES, NA_real_)]
+  x[, REVENUE_HHI := revenue_hhi(CONTRIBUTIONS, PROGRAM_REVENUE, INVEST_INCOME, OTHER_REVENUE, ok = !EZ)]
+  per <- function(v, e) fifelse(!is.na(e) & e > 0, v / e, NA_real_)
+  x[, `:=`(REV_PER_EMPLOYEE = per(REVENUE, EMPLOYEES), EXP_PER_EMPLOYEE = per(EXPENSES, EMPLOYEES),
+           COMP_PER_EMPLOYEE = per(STAFF_EXP, EMPLOYEES), DEFICIT = SURPLUS < 0, NEG_NET_ASSETS = NET_ASSETS < 0)]
   x[]
+}
+
+#' Revenue concentration (Herfindahl-Hirschman index)
+#'
+#' Sum of squared shares of revenue sources. Negative amounts count as zero
+#' and missing amounts as zero when at least one source is reported.
+#'
+#' @param ... Numeric vectors of revenue by source (same length).
+#' @param ok Logical vector; rows where it is `FALSE` return `NA` (for
+#'   example 990-EZ returns, which lack the full breakdown).
+#' @return Numeric vector in 1/n..1, or `NA` when no source is positive.
+#' @export
+#' @examples
+#' revenue_hhi(c(100, 50), c(0, 50), c(0, 0), c(0, NA))   # 1 and 0.5
+revenue_hhi <- function(..., ok = TRUE) {
+  m <- do.call(cbind, lapply(list(...), as.numeric))
+  none <- rowSums(!is.na(m)) == 0
+  m[is.na(m) | m < 0] <- 0
+  tot <- rowSums(m)
+  out <- rowSums((m / tot)^2)
+  out[none | tot <= 0 | !rep_len(ok %in% TRUE, nrow(m))] <- NA_real_
+  out
 }
 
 #' @export
@@ -134,8 +178,12 @@ print.merger_core <- function(x, ...) {
 }
 
 .measure_cols <- c("REVENUE", "EXPENSES", "SURPLUS", "ASSETS", "ASSETS_BOY", "LIABILITIES", "NET_ASSETS",
-                   "DEBT", "CONTRIBUTIONS", "PROGRAM_REVENUE", "NONCASH_CONTRIB", "GRANTS", "STAFF_EXP",
-                   "EXEC_COMP", "PROGRAM_EXP", "MGMT_EXP", "FUNDR_EXP", "OVERHEAD_RATIO", "EMPLOYEES")
+                   "DEBT", "CONTRIBUTIONS", "PROGRAM_REVENUE", "INVEST_INCOME", "OTHER_REVENUE", "NONCASH_CONTRIB",
+                   "GRANTS", "STAFF_EXP", "EXEC_COMP", "PROGRAM_EXP", "MGMT_EXP", "FUNDR_EXP", "OVERHEAD_RATIO",
+                   "ADMIN_RATIO", "REVENUE_HHI", "EMPLOYEES", "REV_PER_EMPLOYEE", "EXP_PER_EMPLOYEE",
+                   "COMP_PER_EMPLOYEE", "DEFICIT", "NEG_NET_ASSETS")
 
 utils::globalVariables(c("RETURN_TYPE", "RETURN_TIME_STAMP", "EZ", "REVENUE", "EXPENSES", "SURPLUS",
-                         "MGMT_EXP", "FUNDR_EXP", "OVERHEAD_RATIO"))
+                         "MGMT_EXP", "FUNDR_EXP", "OVERHEAD_RATIO", "ADMIN_RATIO", "REVENUE_HHI", "CONTRIBUTIONS",
+                         "PROGRAM_REVENUE", "INVEST_INCOME", "OTHER_REVENUE", "EMPLOYEES", "STAFF_EXP",
+                         "REV_PER_EMPLOYEE", "EXP_PER_EMPLOYEE", "COMP_PER_EMPLOYEE", "DEFICIT", "NEG_NET_ASSETS"))

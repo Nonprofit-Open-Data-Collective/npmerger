@@ -111,7 +111,10 @@ test_that("merger_fiscal_panel stacks donor and recipient years", {
   m <- fp[MERGER_ID == "2020-010000001-090000009"]
   expect_identical(m[ROLE == "donor", TIME_FROM_MERGER], c(-2L, -1L, 0L))
   expect_identical(m[ROLE == "recipient", TIME_FROM_MERGER], c(-2L, -1L))  # recipient t0 = 2021, oy ends 2020
-  expect_true(all(c("REVENUE", "ASSETS", "OVERHEAD_RATIO") %in% names(fp)))
+  expect_true(all(c("REVENUE", "ASSETS", "OVERHEAD_RATIO", "REVENUE_GROWTH", "DEFICIT_YEARS") %in% names(fp)))
+  expect_equal(m[ROLE == "donor" & TIME_FROM_MERGER == -1L, REVENUE_GROWTH], (20 - 10) / 15)
+  pf <- merger_proforma(fp)[MERGER_ID == "2020-010000001-090000009"]
+  expect_equal(pf[TIME_FROM_MERGER == -1L, REVENUE], 20 + 1200)   # donor 2019 (its t-1) + recipient 2020 (its t-1)
 })
 
 test_that("recover_recipient_ein matches unique name + ZIP, then state", {

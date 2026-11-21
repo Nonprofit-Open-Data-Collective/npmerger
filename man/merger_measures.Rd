@@ -12,15 +12,33 @@ merger_measures(x)
 \value{
 \code{x} with measure columns added: \code{REVENUE}, \code{EXPENSES}, \code{SURPLUS},
 \code{ASSETS}, \code{ASSETS_BOY}, \code{LIABILITIES}, \code{NET_ASSETS}, \code{DEBT},
-\code{CONTRIBUTIONS}, \code{PROGRAM_REVENUE}, \code{NONCASH_CONTRIB}, \code{GRANTS},
-\code{STAFF_EXP}, \code{EXEC_COMP}, \code{PROGRAM_EXP}, \code{MGMT_EXP}, \code{FUNDR_EXP},
-\code{OVERHEAD_RATIO}, \code{EMPLOYEES}, and \code{EZ} (990-EZ return).
+\code{CONTRIBUTIONS}, \code{PROGRAM_REVENUE}, \code{INVEST_INCOME}, \code{OTHER_REVENUE},
+\code{NONCASH_CONTRIB}, \code{GRANTS}, \code{STAFF_EXP}, \code{EXEC_COMP}, \code{PROGRAM_EXP},
+\code{MGMT_EXP}, \code{FUNDR_EXP}, \code{OVERHEAD_RATIO}, \code{ADMIN_RATIO} (management and
+general / total expenses), \code{REVENUE_HHI}, \code{EMPLOYEES},
+\code{REV_PER_EMPLOYEE}, \code{EXP_PER_EMPLOYEE}, \code{COMP_PER_EMPLOYEE} (salaries
+and benefits / employees), \code{DEFICIT} (expenses exceed revenue),
+\code{NEG_NET_ASSETS}, and \code{EZ} (990-EZ return).
 }
 \description{
 Adds plain-named measures used by the attribute tables and the fiscal
 panel. Revenue, expenses, assets, liabilities, net assets, grants, and
 contributions are available for both 990 and 990-EZ filers. The
 functional-expense breakdown (overhead), executive compensation,
-employees, and debt detail come from the full Form 990 only and are \code{NA}
-for 990-EZ filers.
+employees, the revenue-source breakdown, and debt detail come from the
+full Form 990 only and are \code{NA} for 990-EZ filers.
+}
+\details{
+\code{REVENUE_HHI} is the Herfindahl-Hirschman index of revenue concentration
+across the four Part I sources (contributions, program service revenue,
+investment income, other revenue), the revenue-concentration indicator
+of Tuckman and Chang (1991). Negative sources count as zero. It ranges
+from 0.25 (equal shares) to 1 (one source). Per-employee measures are
+\code{NA} when the return reports no employees.
+}
+\references{
+Tuckman, H. P., & Chang, C. F. (1991). A methodology for
+measuring the financial vulnerability of charitable nonprofit
+organizations. \emph{Nonprofit and Voluntary Sector Quarterly}, 20(4),
+445-460.
 }

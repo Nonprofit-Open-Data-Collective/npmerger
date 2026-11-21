@@ -10,7 +10,7 @@ panel_columns <- function() {
   list(
     header   = c(base, "ORG_NAME_L1", "F9_00_ORG_ADDR_STATE", "F9_00_YEAR_FORMATION", "F9_00_RETURN_FINAL_X"),
     summary  = c(base, "F9_01_REV_TOT_CY", "F9_01_EXP_TOT_CY", "F9_01_REV_CONTR_TOT_CY", "F9_01_REV_PROG_TOT_CY",
-                 "F9_01_EXP_SAL_ETC_CY", "F9_01_ACT_GVRN_EMPL_TOT",
+                 "F9_01_REV_INVEST_TOT_CY", "F9_01_REV_OTH_CY", "F9_01_EXP_SAL_ETC_CY", "F9_01_ACT_GVRN_EMPL_TOT",
                  "F9_01_NAFB_ASSET_TOT_BOY", "F9_01_NAFB_ASSET_TOT_EOY", "F9_01_NAFB_LIAB_TOT_EOY", "F9_01_NAFB_TOT_EOY"),
     expenses = c(base, "F9_09_EXP_TOT_TOT", "F9_09_EXP_TOT_PROG", "F9_09_EXP_TOT_MGMT", "F9_09_EXP_TOT_FUNDR"),
     balance  = c(base, "F9_10_ASSET_TOT_BOY", "F9_10_ASSET_TOT_EOY", "F9_10_LIAB_TOT_EOY", "F9_10_NAFB_TOT_EOY",
@@ -187,9 +187,10 @@ ntee_level <- function(x, n = 2L) {
 #'   (`REAL_REVENUE`, `REAL_EXPENSES`, `REAL_ASSETS`), profitability and
 #'   fiscal-health ratios (`MARGIN` = surplus / revenue, `EQUITY_RATIO` = net
 #'   assets / assets, `MONTHS_CASH` = cash and savings / monthly expenses),
-#'   `NTEE`, `NTEE2`, `NTEE_MAJOR`, and `SUBSECTION` (IRC 501(c) subsection,
-#'   from the BMF). Ratios are bounded to -1..1
-#'   (months of cash to 0..120).
+#'   the Tuckman-Chang inputs `ADMIN_RATIO` and `REVENUE_HHI` (see
+#'   [merger_measures()]; full 990 only), `NTEE`, `NTEE2`, `NTEE_MAJOR`, and
+#'   `SUBSECTION` (IRC 501(c) subsection, from the BMF). Ratios are bounded
+#'   to -1..1 (months of cash to 0..120).
 #' @export
 panel_measures <- function(oy, bmf = NULL, base_year = 2024L) {
   x <- as.data.table(oy)
@@ -207,7 +208,7 @@ panel_measures <- function(oy, bmf = NULL, base_year = 2024L) {
                     FINAL_RETURN = sn_flag(chr("F9_00_RETURN_FINAL_X"), FALSE),
                     REVENUE = x$REVENUE, EXPENSES = x$EXPENSES, ASSETS = x$ASSETS, LIABILITIES = x$LIABILITIES,
                     NET_ASSETS = x$NET_ASSETS, CASH = cash, SURPLUS = x$SURPLUS, STAFF_EXP = x$STAFF_EXP,
-                    EMPLOYEES = x$EMPLOYEES)
+                    EMPLOYEES = x$EMPLOYEES, ADMIN_RATIO = x$ADMIN_RATIO, REVENUE_HHI = x$REVENUE_HHI)
   out[, `:=`(REAL_REVENUE = real_dollars(REVENUE, TAX_YEAR, base_year),
              REAL_EXPENSES = real_dollars(EXPENSES, TAX_YEAR, base_year),
              REAL_ASSETS = real_dollars(ASSETS, TAX_YEAR, base_year),
