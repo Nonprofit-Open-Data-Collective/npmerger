@@ -219,44 +219,43 @@ For merger panels this leaks post-merger information into pre-merger years. I co
 
 ---
 
-## 8. Full-years run (Schedule N 2010–2024, e-file v3_1; 2026-11-20)
+## 8. Full-years run (Schedule N 2010–2024, e-file v3_1; v2 rules, 2026-11-21)
 
-`dev/run-all-years.R` took 53 minutes on a warm cache (8.3 GB, 2009–2025).
+`dev/run-all-years.R` took 55 minutes on a warm cache (8.3 GB, 2009–2025). Rules: the v2 defaults from section 9 (`min_top_share = 0.75`, `final_as_termination`, `sn_text`, `promote = FALSE`).
 
 **Scale:**
-- 60,235 Schedule N filings; **12,059 merger filings**: merger2 9,405; mergerN 2,430; consolidation 224.
-- These become 11,943 donor→recipient cases in 10,336 merger events.
-- Mergers grew from about 330 a year (2010) to about 1,050 (2024).
-- 4% of merger2 and 9% of mergerN rest on corroboration rather than leadership evidence. 40% of merger2 and 65% of mergerN are between affiliated organizations.
+- 60,235 Schedule N filings; **12,346 merger filings**: merger2 9,690; mergerN 2,382; consolidation 274. (v1 rules: 12,059.)
+- Other labels: closure 26,021; asset_disposition 12,320; asset_transfer 9,548.
+- These become 12,228 donor→recipient cases in 10,651 merger events.
+- Mergers grew from about 360 a year (2010) to about 1,050 (2024).
+- 39% of merger2 and 63% of mergerN are between affiliated organizations.
 
 **Descriptives** (`dev/descriptives.R`; sizes are for year t-1, the last full year before the merger):
 
 | | Closing org (donor) | Recipient |
 |---|---|---|
-| Revenue: median (p25–p75) | $260k ($56k–$1.28m) | $6.3m ($0.95m–$31.8m) |
-| Assets: median | $447k | $10.3m |
-| Revenue: mean / 5%-trimmed mean | $11.7m / $1.24m | $141m / $32.6m |
+| Revenue: median (p25–p75) | $264k ($59k–$1.29m) | $5.3m ($0.82m–$26.3m) |
+| Assets: median | $443k | $8.2m |
+| Revenue: mean / 5%-trimmed mean | $26.5m / $1.24m | $105m / $24.8m |
 
-- **Size gap.** The median recipient has 11.9× the donor's revenue (p25 2.7×, p75 82×). The recipient is larger in 89% of mergers, more than 10× larger in 53%, and more than 100× larger in 23%. The ratio is smaller for consolidations (1.2–1.5×) and larger for affiliated mergers (19–25×).
+- **Size gap.** The median recipient has 10.4× the donor's revenue (p25 2.5×, p75 65×). The recipient is larger in 89% of mergers, more than 10× larger in 51%, and more than 100× larger in 21%. The ratio is smaller for consolidations (1.6–2.0×) and larger for affiliated mergers (17.5× two-party, 21× multi-party).
 - **Multi-organization mergers.**
-  - 8.2% of merger events have two or more closing donors, and those events account for 20% of all closing organizations.
-  - Group size: 2 donors in 5.6% of events, 3 in 1.5%, 4 or more in 1.1%.
-  - 92 consolidations into a new entity, involving 223 donors.
-- **Part VII joiners** (10,871 mergers with both rosters observed).
-  - On average 2.0 donor people newly appear on the recipient's Part VII after the merger (median 1). 54% of mergers have at least one joiner.
-  - About 14% of the donor's roster joins (median donor roster: 11 people).
-  - Separately, 58% of mergers already had at least one person on both rosters before the merger (mean 2.8). Affiliated mergers average 5 such people.
+  - 8.1% of merger events have two or more closing donors, and those events account for 19.6% of all closing organizations.
+  - Group size: 2 donors in 5.9% of events, 3 in 1.3%, 4 or more in 0.9%.
+  - 115 consolidations into a new entity, involving 273 donors.
+- **Part VII joiners** (11,132 mergers with both rosters observed).
+  - On average 2.2 donor people newly appear on the recipient's Part VII after the merger (median 1). 57% of mergers have at least one joiner.
+  - About 16% of the donor's roster joins (median donor roster: 11 people).
+  - Separately, 58% of mergers already had at least one person on both rosters before the merger (mean 2.9). Affiliated mergers average about 5 such people.
 - **CEO / executive director.**
-  - A donor CEO or ED can be identified in 4,755 mergers: 82% by title, the rest as the highest-paid officer. Many small donors have no paid executive.
-  - **54% of those CEOs appear at the recipient after the merger.** Of those, 73% are listed as CEO or ED there, 11% as another officer or staff, and 8% as a board member.
-  - The rate is 75% for affiliated two-party mergers, 35% for unaffiliated ones, and 61–64% for consolidations.
+  - A donor CEO or ED can be identified in 4,833 mergers: 82% by title, the rest as the highest-paid officer.
+  - **55% of those CEOs appear at the recipient after the merger.** Of those, 72% are listed as CEO or ED there, 11% as another officer or staff, and 7% as a board member.
+  - The rate is 76% for affiliated two-party mergers, 37% for unaffiliated ones, and 60–64% for consolidations.
 - **Asset transfers.**
-  - Median $308k; 5%-trimmed mean $1.9m; mean $10.9m.
-  - $116bn in total across 10,637 positive, unflagged transfers. 662 transfers are flagged as outliers.
-  - The median transfer is 91% of the donor's beginning-of-year assets.
-  - As a share of the recipient's t-1 assets: median 5.2%. 29% of transfers are under 1%, 24% are 10–50%, and 17% are 50% or more. Consolidations are the high end (median 16–39%), since the recipient is new.
-
-Section 8 figures use the v1 rules. Section 9 changes the rules, so the full run needs re-running before these figures are quoted.
+  - Median $319k; 5%-trimmed mean $1.9m; mean $10.9m.
+  - $119bn in total across 10,851 positive, unflagged transfers. 678 transfers are flagged as outliers.
+  - The median transfer is 93% of the donor's t-1 assets.
+  - As a share of the recipient's t-1 assets: median 6.4%. 26% of transfers are under 1%, 26% are 10–50%, and 18% are 50% or more. Consolidations are the high end (median 35–39%), since the recipient is new.
 
 ---
 
@@ -299,11 +298,11 @@ Section 8 figures use the v1 rules. Section 9 changes the rules, so the full run
 - Precision: merger 69% (62% weighted), asset transfer 67%, closure 68%, disposition 81%.
 - Merger recall rises from 51% to 71% (weighted).
 - Merger precision by basis: leader 70% (n = 149), sn_text 5/5, corroborated 0/5.
-- Population effect on 2010–2024: mergers go from 12,059 to 12,827.
+- Population effect on 2010–2024: mergers go from 12,059 to 12,827 with promotion on, and to 12,346 with promotion off.
   - asset_disposition: 15,018 → 12,320.
-  - asset_transfer: 10,180 → 9,067.
+  - asset_transfer: 10,180 → 9,548 (9,067 with promotion on).
   - closure: 22,978 → 26,021.
-  - With `promote = FALSE`: 12,346 mergers.
+  - Promotion is now off by default (decided 2026-11-21), so 12,346 is the current count.
 
 **Other findings.**
 - **Closure → asset transfer (14).** These are mostly single recipients with no EIN or name, such as "unnamed orphanage" or "another nonprofit". They cannot become merger cases either way, so this mainly affects closure vs. transfer counts.
@@ -312,7 +311,7 @@ Section 8 figures use the v1 rules. Section 9 changes the rules, so the full run
 - **Reorganization.** Readers found 10 (conversions, new EINs, PTA→PTO). The self-transfer rule catches none of them, because the new entity has a different EIN.
 
 **Still open.**
-- Whether to keep promotion on by default (0 of 5 under v2).
+- ~~Whether to keep promotion on by default~~: turned off (1 of 13 promoted filings read as mergers across v1 and v2).
 - Whether to define the Part VII channel as joiners rather than any overlap.
 - A human pass over the low-confidence labels.
 

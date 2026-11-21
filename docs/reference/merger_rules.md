@@ -13,7 +13,7 @@ merger_rules(
   min_donors_n = 2L,
   new_entity_years = 1L,
   sn_text = TRUE,
-  promote = TRUE,
+  promote = FALSE,
   min_corroborate = 2L,
   corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP"),
   final_as_termination = TRUE
@@ -56,9 +56,12 @@ merger_rules(
 
 - promote:
 
-  If `TRUE` (default), a dissolution to one nonprofit successor with no
-  leadership evidence is promoted from `asset_transfer` to a merger
-  label when at least `min_corroborate` corroborating signals agree.
+  If `TRUE`, a dissolution to one nonprofit successor with no leadership
+  evidence is promoted from `asset_transfer` to a merger label when at
+  least `min_corroborate` corroborating signals agree. Off by default:
+  in hand validation only 1 of 13 promoted filings read as a merger. The
+  signals are still computed, so promotion can be turned on for a broad
+  definition.
 
 - min_corroborate:
 
@@ -109,7 +112,7 @@ merger_rules()
 #> [1] 1
 #> 
 #> $promote
-#> [1] TRUE
+#> [1] FALSE
 #> 
 #> $min_corroborate
 #> [1] 2
@@ -119,12 +122,42 @@ merger_rules()
 #> 
 #> attr(,"class")
 #> [1] "merger_rules"
-merger_rules(leader = "sn", promote = FALSE)
+merger_rules(leader = "sn", sn_text = FALSE)
 #> $min_top_share
 #> [1] 0.75
 #> 
 #> $leader
 #> [1] "sn"
+#> 
+#> $final_as_termination
+#> [1] TRUE
+#> 
+#> $sn_text
+#> [1] FALSE
+#> 
+#> $min_donors_n
+#> [1] 2
+#> 
+#> $new_entity_years
+#> [1] 1
+#> 
+#> $promote
+#> [1] FALSE
+#> 
+#> $min_corroborate
+#> [1] 2
+#> 
+#> $corroborate
+#> [1] "SO_MERGER_TEXT_DONOR" "SO_MERGER_TEXT_RECIP" "GOV_DOC_CHANGE_RECIP"
+#> 
+#> attr(,"class")
+#> [1] "merger_rules"
+merger_rules(promote = TRUE)   # broad definition
+#> $min_top_share
+#> [1] 0.75
+#> 
+#> $leader
+#> [1] "either"
 #> 
 #> $final_as_termination
 #> [1] TRUE
@@ -139,7 +172,7 @@ merger_rules(leader = "sn", promote = FALSE)
 #> [1] 1
 #> 
 #> $promote
-#> [1] FALSE
+#> [1] TRUE
 #> 
 #> $min_corroborate
 #> [1] 2

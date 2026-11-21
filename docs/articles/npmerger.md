@@ -66,9 +66,11 @@ explanation say the transfer is part of a merger or consolidation
 that counts as merger evidence on its own. In hand validation every
 terminated filing with one successor and such text read as a merger.
 
-**Corroborating disclosures.** A dissolution to one nonprofit successor
-with no leadership evidence is promoted to a merger when at least two of
-these agree:
+**Corroborating disclosures.** These are recorded for every filing. With
+`merger_rules(promote = TRUE)`, a dissolution to one nonprofit successor
+with no other merger evidence is promoted to a merger when at least two
+of them agree. Promotion is off by default, because in hand validation
+few promoted filings read as mergers. The signals are:
 
 - merger language in the donor’s Schedule O narrative;
 - merger language in the recipient’s Schedule O narrative;
@@ -219,31 +221,32 @@ filings <- data.frame(
 
 out <- classify_transactions(filings)
 out[, c("case", "LEADER", "N_CORROBORATE", "BASIS", "TYPE")]
-#>            case LEADER N_CORROBORATE        BASIS              TYPE
-#>          <char> <lgcl>         <int>       <char>            <char>
-#> 1:         sale  FALSE             0         <NA> asset_disposition
-#> 2:    dispersed  FALSE             0         <NA>           closure
-#> 3:        flags   TRUE             0       leader           merger2
-#> 4:        part7   TRUE             0       leader           merger2
-#> 5: corroborated  FALSE             2 corroborated           merger2
-#> 6:  no evidence  FALSE             0         <NA>    asset_transfer
+#>            case LEADER N_CORROBORATE  BASIS              TYPE
+#>          <char> <lgcl>         <int> <char>            <char>
+#> 1:         sale  FALSE             0   <NA> asset_disposition
+#> 2:    dispersed  FALSE             0   <NA>           closure
+#> 3:        flags   TRUE             0 leader           merger2
+#> 4:        part7   TRUE             0 leader           merger2
+#> 5: corroborated  FALSE             2   <NA>    asset_transfer
+#> 6:  no evidence  FALSE             0   <NA>    asset_transfer
 ```
 
 The rules are arguments, so you can run strict and broad definitions
-side by side. For example, the strict definition counts only the
-Schedule N boxes and turns off promotion:
+side by side. For example, a strict definition counts only the Schedule
+N boxes, and a broad one turns promotion on:
 
 ``` r
 
-strict <- classify_transactions(filings, merger_rules(leader = "sn", promote = FALSE))
-data.frame(case = filings$case, default = out$TYPE, strict = strict$TYPE)
-#>           case           default            strict
-#> 1         sale asset_disposition asset_disposition
-#> 2    dispersed           closure           closure
-#> 3        flags           merger2           merger2
-#> 4        part7           merger2    asset_transfer
-#> 5 corroborated           merger2    asset_transfer
-#> 6  no evidence    asset_transfer    asset_transfer
+strict <- classify_transactions(filings, merger_rules(leader = "sn"))
+broad  <- classify_transactions(filings, merger_rules(promote = TRUE))
+data.frame(case = filings$case, strict = strict$TYPE, default = out$TYPE, broad = broad$TYPE)
+#>           case            strict           default             broad
+#> 1         sale asset_disposition asset_disposition asset_disposition
+#> 2    dispersed           closure           closure           closure
+#> 3        flags           merger2           merger2           merger2
+#> 4        part7    asset_transfer           merger2           merger2
+#> 5 corroborated    asset_transfer    asset_transfer           merger2
+#> 6  no evidence    asset_transfer    asset_transfer    asset_transfer
 ```
 
 [`merger_rules()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_rules.md)
@@ -286,19 +289,19 @@ md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
 md
 #> <merger_data>
 #> Schedule N filings by type:
-#>   merger2                  9
+#>   merger2                  8
+#>   asset_transfer           6
 #>   closure                  6
-#>   asset_transfer           5
 #>   mergerN                  4
 #>   consolidation            4
 #>   asset_disposition        1
 #> Tables:
-#>   cases            17 rows
-#>   transfers        17 rows
-#>   donors           17 rows
-#>   recipients       17 rows
-#>   part7          1786 rows
-#>   fiscal          181 rows
+#>   cases            16 rows
+#>   transfers        16 rows
+#>   donors           16 rows
+#>   recipients       16 rows
+#>   part7          1618 rows
+#>   fiscal          166 rows
 ```
 
 ### Schedule N table
@@ -309,14 +312,14 @@ evidence behind it:
 ``` r
 
 head(md$sched_n[, c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "BASIS", "AFFILIATED", "N_DONORS")])
-#>    TAX_YEAR               OBJECTID           EIN2          TYPE        BASIS
-#>       <int>                 <char>         <char>        <char>       <char>
-#> 1:     2021 OID-202440449349301959 EIN-04-2305850       merger2 corroborated
-#> 2:     2021 OID-202222529349300142 EIN-13-2890752 consolidation       leader
-#> 3:     2021 OID-202213189349309256 EIN-13-6737136       closure         <NA>
-#> 4:     2021 OID-202302299349200025 EIN-14-1732612       merger2       leader
-#> 5:     2021 OID-202331009349300123 EIN-23-2659951       merger2       leader
-#> 6:     2021 OID-202231339349309508 EIN-23-7401639       closure         <NA>
+#>    TAX_YEAR               OBJECTID           EIN2           TYPE  BASIS
+#>       <int>                 <char>         <char>         <char> <char>
+#> 1:     2021 OID-202440449349301959 EIN-04-2305850 asset_transfer   <NA>
+#> 2:     2021 OID-202222529349300142 EIN-13-2890752  consolidation leader
+#> 3:     2021 OID-202213189349309256 EIN-13-6737136        closure   <NA>
+#> 4:     2021 OID-202302299349200025 EIN-14-1732612        merger2 leader
+#> 5:     2021 OID-202331009349300123 EIN-23-2659951        merger2 leader
+#> 6:     2021 OID-202231339349309508 EIN-23-7401639        closure   <NA>
 #>    AFFILIATED N_DONORS
 #>        <lgcl>    <int>
 #> 1:      FALSE        1
@@ -343,42 +346,40 @@ head(md$sched_n[, c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "BASIS", "AFFILIATED
 md$cases[, c("MERGER_ID", "MERGER_GROUP_ID", "TYPE", "MERGER_YEAR", "RECIP_MERGER_YEAR", "N_GROUP", "FMV_TO_RECIP")]
 #>                    MERGER_ID MERGER_GROUP_ID          TYPE MERGER_YEAR
 #>                       <char>          <char>        <char>       <int>
-#>  1: 2021-042305850-041695745  2021-041695745       merger2        2021
-#>  2: 2021-132890752-861250084  2021-861250084 consolidation        2021
-#>  3: 2021-141732612-141670547  2021-141670547       merger2        2021
-#>  4: 2021-232659951-300994771  2021-300994771       merger2        2021
-#>  5: 2021-263889207-861250084  2021-861250084 consolidation        2021
-#>  6: 2021-431339285-436034533  2021-436034533       mergerN        2021
-#>  7: 2021-454035038-861250084  2021-861250084 consolidation        2021
-#>  8: 2021-463851186-880330858  2021-880330858       mergerN        2021
-#>  9: 2021-464830921-382426175  2021-382426175       merger2        2021
-#> 10: 2021-560478530-436034533  2021-436034533       mergerN        2021
-#> 11: 2021-561479296-581344392  2021-581344392       merger2        2021
-#> 12: 2021-742275383-840510404  2021-840510404       merger2        2021
-#> 13: 2021-820603982-860858401  2021-860858401       merger2        2021
-#> 14: 2021-830686168-383043861  2021-383043861       merger2        2021
-#> 15: 2021-843640492-861250084  2021-861250084 consolidation        2021
-#> 16: 2021-853056693-844965336  2021-844965336       merger2        2021
-#> 17: 2021-880387136-880330858  2021-880330858       mergerN        2021
+#>  1: 2021-132890752-861250084  2021-861250084 consolidation        2021
+#>  2: 2021-141732612-141670547  2021-141670547       merger2        2021
+#>  3: 2021-232659951-300994771  2021-300994771       merger2        2021
+#>  4: 2021-263889207-861250084  2021-861250084 consolidation        2021
+#>  5: 2021-431339285-436034533  2021-436034533       mergerN        2021
+#>  6: 2021-454035038-861250084  2021-861250084 consolidation        2021
+#>  7: 2021-463851186-880330858  2021-880330858       mergerN        2021
+#>  8: 2021-464830921-382426175  2021-382426175       merger2        2021
+#>  9: 2021-560478530-436034533  2021-436034533       mergerN        2021
+#> 10: 2021-561479296-581344392  2021-581344392       merger2        2021
+#> 11: 2021-742275383-840510404  2021-840510404       merger2        2021
+#> 12: 2021-820603982-860858401  2021-860858401       merger2        2021
+#> 13: 2021-830686168-383043861  2021-383043861       merger2        2021
+#> 14: 2021-843640492-861250084  2021-861250084 consolidation        2021
+#> 15: 2021-853056693-844965336  2021-844965336       merger2        2021
+#> 16: 2021-880387136-880330858  2021-880330858       mergerN        2021
 #>     RECIP_MERGER_YEAR N_GROUP FMV_TO_RECIP
 #>                 <int>   <int>        <num>
-#>  1:              2021       1       641776
-#>  2:              2021       4       621192
-#>  3:              2021       1        19876
-#>  4:              2020       1      3635000
-#>  5:              2021       4     28420106
-#>  6:              2021       2       364976
-#>  7:              2021       4      3809252
-#>  8:              2021       2      2244659
-#>  9:              2021       1      8462698
-#> 10:              2022       2      3763351
-#> 11:              2021       1       286110
-#> 12:              2021       1     10262017
-#> 13:              2021       1        24216
-#> 14:              2021       1     13857198
-#> 15:              2021       4     17392454
-#> 16:              2021       1         1947
-#> 17:              2021       2            0
+#>  1:              2021       4       621192
+#>  2:              2021       1        19876
+#>  3:              2020       1      3635000
+#>  4:              2021       4     28420106
+#>  5:              2021       2       364976
+#>  6:              2021       4      3809252
+#>  7:              2021       2      2244659
+#>  8:              2021       1      8462698
+#>  9:              2022       2      3763351
+#> 10:              2021       1       286110
+#> 11:              2021       1     10262017
+#> 12:              2021       1        24216
+#> 13:              2021       1     13857198
+#> 14:              2021       4     17392454
+#> 15:              2021       1         1947
+#> 16:              2021       2            0
 ```
 
 ### Value transferred
@@ -395,20 +396,20 @@ md$cases[, c("MERGER_ID", "MERGER_GROUP_ID", "TYPE", "MERGER_YEAR", "RECIP_MERGE
 head(md$transfers[, c("MERGER_ID", "FMV_TOTAL", "FMV_ASSETS", "FMV_CASH", "FMV_REAL_ESTATE", "COVERAGE", "FLAG_OUTLIER")])
 #>                   MERGER_ID FMV_TOTAL FMV_ASSETS FMV_CASH FMV_REAL_ESTATE
 #>                      <char>     <num>      <num>    <num>           <num>
-#> 1: 2021-042305850-041695745    641776     641834   317621               0
-#> 2: 2021-132890752-861250084    621192     621192        0               0
-#> 3: 2021-141732612-141670547     19876      19876    19876               0
-#> 4: 2021-232659951-300994771   3635000    3635000        0         3635000
-#> 5: 2021-263889207-861250084  28420106   28420106        0               0
-#> 6: 2021-431339285-436034533    364976     364976        0               0
+#> 1: 2021-132890752-861250084    621192     621192        0               0
+#> 2: 2021-141732612-141670547     19876      19876    19876               0
+#> 3: 2021-232659951-300994771   3635000    3635000        0         3635000
+#> 4: 2021-263889207-861250084  28420106   28420106        0               0
+#> 5: 2021-431339285-436034533    364976     364976        0               0
+#> 6: 2021-454035038-861250084   3809252    3809252        0               0
 #>      COVERAGE FLAG_OUTLIER
 #>         <num>       <lgcl>
-#> 1: 0.98035274        FALSE
-#> 2: 0.13817759        FALSE
-#> 3:         NA        FALSE
-#> 4: 1.35343088        FALSE
-#> 5: 0.63862057        FALSE
-#> 6: 0.07462893        FALSE
+#> 1: 0.13817759        FALSE
+#> 2:         NA        FALSE
+#> 3: 1.35343088        FALSE
+#> 4: 0.63862057        FALSE
+#> 5: 0.07462893        FALSE
+#> 6: 0.51346299        FALSE
 ```
 
 ### Donor and recipient attributes
@@ -428,14 +429,14 @@ d[1:3, c("MERGER_ID", "NAME", "STATE", "AGE", "NTEE", "REVENUE_TM4", "REVENUE_TM
 #> Key: <MERGER_ID>
 #>                   MERGER_ID                                     NAME  STATE
 #>                      <char>                                   <char> <char>
-#> 1: 2021-042305850-041695745  GLOUCESTER FIRE DEPARTMENT CREDIT UNION     MA
-#> 2: 2021-132890752-861250084       COUNCIL FOR ADULT AND EXPERIENTIAL     IN
-#> 3: 2021-141732612-141670547 FRIENDS OF THE WARREN-WASHINGTON SUBSTAN     NY
+#> 1: 2021-132890752-861250084       COUNCIL FOR ADULT AND EXPERIENTIAL     IN
+#> 2: 2021-141732612-141670547 FRIENDS OF THE WARREN-WASHINGTON SUBSTAN     NY
+#> 3: 2021-232659951-300994771              WEST-MONT CHRISTIAN ACADEMY     PA
 #>      AGE      NTEE REVENUE_TM4 REVENUE_TM2 REVENUE_T0 ASSETS_T0
 #>    <int>    <char>       <num>       <num>      <num>     <num>
-#> 1:    83 UNDEFINED       29734       34186      23682         0
-#> 2:    42       B60    10676822     5794883    3930537         0
-#> 3:    28 UNDEFINED          NA          NA         NA         0
+#> 1:    42       B60    10676822     5794883    3930537         0
+#> 2:    28 UNDEFINED          NA          NA         NA         0
+#> 3:    39       B20     1720367     1757887      14427   2316208
 ```
 
 ### Part VII panel
@@ -476,22 +477,22 @@ come from the full Form 990 only.
 
 f <- md$fiscal
 f[ROLE == "recipient"][1:6, c("MERGER_ID", "TIME_FROM_MERGER", "REVENUE", "EXPENSES", "ASSETS", "STAFF_EXP", "OVERHEAD_RATIO")]
-#>                   MERGER_ID TIME_FROM_MERGER   REVENUE EXPENSES     ASSETS
-#>                      <char>            <int>     <num>    <num>      <num>
-#> 1: 2021-042305850-041695745               -5  64430195 56107971 1633755224
-#> 2: 2021-042305850-041695745               -4  71469349 56395350 1682401982
-#> 3: 2021-042305850-041695745               -3  79251770 64685998 1877534257
-#> 4: 2021-042305850-041695745               -2  89211246 75756292 2092358761
-#> 5: 2021-042305850-041695745               -1 101297996 85388608 2385374276
-#> 6: 2021-042305850-041695745                0  92937477 78093785 2510941078
+#>                   MERGER_ID TIME_FROM_MERGER  REVENUE  EXPENSES   ASSETS
+#>                      <char>            <int>    <num>     <num>    <num>
+#> 1: 2021-132890752-861250084                0 36146755  17521070 87757237
+#> 2: 2021-132890752-861250084                1 76931166  79334560 58003532
+#> 3: 2021-132890752-861250084                2 74422160 127845259        0
+#> 4: 2021-141732612-141670547               -5   769134    737421   144252
+#> 5: 2021-141732612-141670547               -4  1052146   1082249   143189
+#> 6: 2021-141732612-141670547               -3  1160369   1017077   487309
 #>    STAFF_EXP OVERHEAD_RATIO
 #>        <num>          <num>
-#> 1:  22270552             NA
-#> 2:  22688647             NA
-#> 3:  25816134             NA
-#> 4:  27518061             NA
-#> 5:  33406510             NA
-#> 6:  32885525             NA
+#> 1:  12145865     0.33733910
+#> 2:  57050443     0.38829966
+#> 3:  56784484     0.19622319
+#> 4:    530126     0.08916481
+#> 5:    683892     0.10239511
+#> 6:    589851     0.11333852
 ```
 
 With `ratios = TRUE` (the default), the panel also gets the ratios from

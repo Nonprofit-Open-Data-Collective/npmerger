@@ -105,17 +105,17 @@ md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
 md
 #> <merger_data>
 #> Schedule N filings by type:
-#>   merger2                  9
+#>   merger2                  8
+#>   asset_transfer           6
 #>   closure                  6
-#>   asset_transfer           5
 #>   mergerN                  4
 #>   consolidation            4
 #>   asset_disposition        1
 #> Tables:
-#>   cases            17 rows
-#>   transfers        17 rows
-#>   donors           17 rows
-#>   recipients       17 rows
-#>   part7          1786 rows
-#>   fiscal          181 rows
+#>   cases            16 rows
+#>   transfers        16 rows
+#>   donors           16 rows
+#>   recipients       16 rows
+#>   part7          1618 rows
+#>   fiscal          166 rows
 ```

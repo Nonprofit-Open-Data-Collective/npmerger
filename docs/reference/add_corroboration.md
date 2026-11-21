@@ -2,7 +2,7 @@
 
 Flags Schedule O merger language on the donor's and the recipient's
 returns, and a significant change to the recipient's governing documents
-(Part VI line 4).
+(Part VI line 4). With `merger_rules(promote = TRUE)`,
 [`classify_transactions()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/classify_transactions.md)
 promotes an asset transfer to a merger when at least two of these agree
 (see

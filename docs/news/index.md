@@ -18,6 +18,9 @@
     pattern
     [`sn_merger_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_merger_pattern.md))
     is merger evidence on its own, with `BASIS = "sn_text"`.
+  - `merger_rules(promote = FALSE)` is now the default. Only 1 of 13
+    promoted filings read as a merger. Set `promote = TRUE` for a broad
+    definition.
 
 - [`build_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_data.md)
   runs the whole pipeline and returns every table. It accepts
@@ -80,8 +83,8 @@
   ([`add_mission_similarity()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_mission_similarity.md)).
 
 - [`classify_transactions()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/classify_transactions.md)
-  promotes an asset transfer to a merger when at least two corroborating
-  signals agree, and records `BASIS` and `N_CORROBORATE`.
+  can promote an asset transfer to a merger when at least two
+  corroborating signals agree, and records `BASIS` and `N_CORROBORATE`.
 
 - pkgdown site using the NODC `pkgstyle` template, and an overview
   vignette.

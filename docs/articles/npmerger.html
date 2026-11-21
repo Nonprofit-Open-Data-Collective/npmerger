@@ -137,9 +137,12 @@ or Part III explanation say the transfer is part of a merger or
 consolidation (<code><a href="../reference/sn_merger_pattern.html">sn_merger_pattern()</a></code>), that counts as merger
 evidence on its own. In hand validation every terminated filing with one
 successor and such text read as a merger.</p>
-<p><strong>Corroborating disclosures.</strong> A dissolution to one
-nonprofit successor with no leadership evidence is promoted to a merger
-when at least two of these agree:</p>
+<p><strong>Corroborating disclosures.</strong> These are recorded for
+every filing. With <code>merger_rules(promote = TRUE)</code>, a
+dissolution to one nonprofit successor with no other merger evidence is
+promoted to a merger when at least two of them agree. Promotion is off
+by default, because in hand validation few promoted filings read as
+mergers. The signals are:</p>
 <ul>
 <li>merger language in the donor’s Schedule O narrative;</li>
 <li>merger language in the recipient’s Schedule O narrative;</li>
@@ -373,27 +376,28 @@ made-up example with one filing of each kind:</p>
 <span></span>
 <span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">filings</span><span class="op">)</span></span>
 <span><span class="va">out</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"case"</span>, <span class="st">"LEADER"</span>, <span class="st">"N_CORROBORATE"</span>, <span class="st">"BASIS"</span>, <span class="st">"TYPE"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;            case LEADER N_CORROBORATE        BASIS              TYPE</span></span>
-<span><span class="co">#&gt;          &lt;char&gt; &lt;lgcl&gt;         &lt;int&gt;       &lt;char&gt;            &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:         sale  FALSE             0         &lt;NA&gt; asset_disposition</span></span>
-<span><span class="co">#&gt; 2:    dispersed  FALSE             0         &lt;NA&gt;           closure</span></span>
-<span><span class="co">#&gt; 3:        flags   TRUE             0       leader           merger2</span></span>
-<span><span class="co">#&gt; 4:        part7   TRUE             0       leader           merger2</span></span>
-<span><span class="co">#&gt; 5: corroborated  FALSE             2 corroborated           merger2</span></span>
-<span><span class="co">#&gt; 6:  no evidence  FALSE             0         &lt;NA&gt;    asset_transfer</span></span></code></pre></div>
+<span><span class="co">#&gt;            case LEADER N_CORROBORATE  BASIS              TYPE</span></span>
+<span><span class="co">#&gt;          &lt;char&gt; &lt;lgcl&gt;         &lt;int&gt; &lt;char&gt;            &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:         sale  FALSE             0   &lt;NA&gt; asset_disposition</span></span>
+<span><span class="co">#&gt; 2:    dispersed  FALSE             0   &lt;NA&gt;           closure</span></span>
+<span><span class="co">#&gt; 3:        flags   TRUE             0 leader           merger2</span></span>
+<span><span class="co">#&gt; 4:        part7   TRUE             0 leader           merger2</span></span>
+<span><span class="co">#&gt; 5: corroborated  FALSE             2   &lt;NA&gt;    asset_transfer</span></span>
+<span><span class="co">#&gt; 6:  no evidence  FALSE             0   &lt;NA&gt;    asset_transfer</span></span></code></pre></div>
 <p>The rules are arguments, so you can run strict and broad definitions
-side by side. For example, the strict definition counts only the
-Schedule N boxes and turns off promotion:</p>
+side by side. For example, a strict definition counts only the Schedule
+N boxes, and a broad one turns promotion on:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">strict</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">filings</span>, <span class="fu"><a href="../reference/merger_rules.html">merger_rules</a></span><span class="op">(</span>leader <span class="op">=</span> <span class="st">"sn"</span>, promote <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>case <span class="op">=</span> <span class="va">filings</span><span class="op">$</span><span class="va">case</span>, default <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">TYPE</span>, strict <span class="op">=</span> <span class="va">strict</span><span class="op">$</span><span class="va">TYPE</span><span class="op">)</span></span>
-<span><span class="co">#&gt;           case           default            strict</span></span>
-<span><span class="co">#&gt; 1         sale asset_disposition asset_disposition</span></span>
-<span><span class="co">#&gt; 2    dispersed           closure           closure</span></span>
-<span><span class="co">#&gt; 3        flags           merger2           merger2</span></span>
-<span><span class="co">#&gt; 4        part7           merger2    asset_transfer</span></span>
-<span><span class="co">#&gt; 5 corroborated           merger2    asset_transfer</span></span>
-<span><span class="co">#&gt; 6  no evidence    asset_transfer    asset_transfer</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">strict</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">filings</span>, <span class="fu"><a href="../reference/merger_rules.html">merger_rules</a></span><span class="op">(</span>leader <span class="op">=</span> <span class="st">"sn"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">broad</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">filings</span>, <span class="fu"><a href="../reference/merger_rules.html">merger_rules</a></span><span class="op">(</span>promote <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>case <span class="op">=</span> <span class="va">filings</span><span class="op">$</span><span class="va">case</span>, strict <span class="op">=</span> <span class="va">strict</span><span class="op">$</span><span class="va">TYPE</span>, default <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">TYPE</span>, broad <span class="op">=</span> <span class="va">broad</span><span class="op">$</span><span class="va">TYPE</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           case            strict           default             broad</span></span>
+<span><span class="co">#&gt; 1         sale asset_disposition asset_disposition asset_disposition</span></span>
+<span><span class="co">#&gt; 2    dispersed           closure           closure           closure</span></span>
+<span><span class="co">#&gt; 3        flags           merger2           merger2           merger2</span></span>
+<span><span class="co">#&gt; 4        part7    asset_transfer           merger2           merger2</span></span>
+<span><span class="co">#&gt; 5 corroborated    asset_transfer    asset_transfer           merger2</span></span>
+<span><span class="co">#&gt; 6  no evidence    asset_transfer    asset_transfer    asset_transfer</span></span></code></pre></div>
 <p><code><a href="../reference/merger_rules.html">merger_rules()</a></code> also sets these thresholds and
 switches:</p>
 <ul>
@@ -436,19 +440,19 @@ pipeline can run offline. Here it is run without the
 <span><span class="va">md</span></span>
 <span><span class="co">#&gt; &lt;merger_data&gt;</span></span>
 <span><span class="co">#&gt; Schedule N filings by type:</span></span>
-<span><span class="co">#&gt;   merger2                  9</span></span>
+<span><span class="co">#&gt;   merger2                  8</span></span>
+<span><span class="co">#&gt;   asset_transfer           6</span></span>
 <span><span class="co">#&gt;   closure                  6</span></span>
-<span><span class="co">#&gt;   asset_transfer           5</span></span>
 <span><span class="co">#&gt;   mergerN                  4</span></span>
 <span><span class="co">#&gt;   consolidation            4</span></span>
 <span><span class="co">#&gt;   asset_disposition        1</span></span>
 <span><span class="co">#&gt; Tables:</span></span>
-<span><span class="co">#&gt;   cases            17 rows</span></span>
-<span><span class="co">#&gt;   transfers        17 rows</span></span>
-<span><span class="co">#&gt;   donors           17 rows</span></span>
-<span><span class="co">#&gt;   recipients       17 rows</span></span>
-<span><span class="co">#&gt;   part7          1786 rows</span></span>
-<span><span class="co">#&gt;   fiscal          181 rows</span></span></code></pre></div>
+<span><span class="co">#&gt;   cases            16 rows</span></span>
+<span><span class="co">#&gt;   transfers        16 rows</span></span>
+<span><span class="co">#&gt;   donors           16 rows</span></span>
+<span><span class="co">#&gt;   recipients       16 rows</span></span>
+<span><span class="co">#&gt;   part7          1618 rows</span></span>
+<span><span class="co">#&gt;   fiscal          166 rows</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="schedule-n-table">Schedule N table<a class="anchor" aria-label="anchor" href="#schedule-n-table"></a>
 </h3>
@@ -456,14 +460,14 @@ pipeline can run offline. Here it is run without the
 label and the evidence behind it:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">md</span><span class="op">$</span><span class="va">sched_n</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TAX_YEAR"</span>, <span class="st">"OBJECTID"</span>, <span class="st">"EIN2"</span>, <span class="st">"TYPE"</span>, <span class="st">"BASIS"</span>, <span class="st">"AFFILIATED"</span>, <span class="st">"N_DONORS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    TAX_YEAR               OBJECTID           EIN2          TYPE        BASIS</span></span>
-<span><span class="co">#&gt;       &lt;int&gt;                 &lt;char&gt;         &lt;char&gt;        &lt;char&gt;       &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1:     2021 OID-202440449349301959 EIN-04-2305850       merger2 corroborated</span></span>
-<span><span class="co">#&gt; 2:     2021 OID-202222529349300142 EIN-13-2890752 consolidation       leader</span></span>
-<span><span class="co">#&gt; 3:     2021 OID-202213189349309256 EIN-13-6737136       closure         &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 4:     2021 OID-202302299349200025 EIN-14-1732612       merger2       leader</span></span>
-<span><span class="co">#&gt; 5:     2021 OID-202331009349300123 EIN-23-2659951       merger2       leader</span></span>
-<span><span class="co">#&gt; 6:     2021 OID-202231339349309508 EIN-23-7401639       closure         &lt;NA&gt;</span></span>
+<span><span class="co">#&gt;    TAX_YEAR               OBJECTID           EIN2           TYPE  BASIS</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;                 &lt;char&gt;         &lt;char&gt;         &lt;char&gt; &lt;char&gt;</span></span>
+<span><span class="co">#&gt; 1:     2021 OID-202440449349301959 EIN-04-2305850 asset_transfer   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2:     2021 OID-202222529349300142 EIN-13-2890752  consolidation leader</span></span>
+<span><span class="co">#&gt; 3:     2021 OID-202213189349309256 EIN-13-6737136        closure   &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4:     2021 OID-202302299349200025 EIN-14-1732612        merger2 leader</span></span>
+<span><span class="co">#&gt; 5:     2021 OID-202331009349300123 EIN-23-2659951        merger2 leader</span></span>
+<span><span class="co">#&gt; 6:     2021 OID-202231339349309508 EIN-23-7401639        closure   &lt;NA&gt;</span></span>
 <span><span class="co">#&gt;    AFFILIATED N_DONORS</span></span>
 <span><span class="co">#&gt;        &lt;lgcl&gt;    &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1:      FALSE        1</span></span>
@@ -493,42 +497,40 @@ the donors that fold into the same successor.</li>
 <code class="sourceCode R"><span><span class="va">md</span><span class="op">$</span><span class="va">cases</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"MERGER_GROUP_ID"</span>, <span class="st">"TYPE"</span>, <span class="st">"MERGER_YEAR"</span>, <span class="st">"RECIP_MERGER_YEAR"</span>, <span class="st">"N_GROUP"</span>, <span class="st">"FMV_TO_RECIP"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;                    MERGER_ID MERGER_GROUP_ID          TYPE MERGER_YEAR</span></span>
 <span><span class="co">#&gt;                       &lt;char&gt;          &lt;char&gt;        &lt;char&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt;  1: 2021-042305850-041695745  2021-041695745       merger2        2021</span></span>
-<span><span class="co">#&gt;  2: 2021-132890752-861250084  2021-861250084 consolidation        2021</span></span>
-<span><span class="co">#&gt;  3: 2021-141732612-141670547  2021-141670547       merger2        2021</span></span>
-<span><span class="co">#&gt;  4: 2021-232659951-300994771  2021-300994771       merger2        2021</span></span>
-<span><span class="co">#&gt;  5: 2021-263889207-861250084  2021-861250084 consolidation        2021</span></span>
-<span><span class="co">#&gt;  6: 2021-431339285-436034533  2021-436034533       mergerN        2021</span></span>
-<span><span class="co">#&gt;  7: 2021-454035038-861250084  2021-861250084 consolidation        2021</span></span>
-<span><span class="co">#&gt;  8: 2021-463851186-880330858  2021-880330858       mergerN        2021</span></span>
-<span><span class="co">#&gt;  9: 2021-464830921-382426175  2021-382426175       merger2        2021</span></span>
-<span><span class="co">#&gt; 10: 2021-560478530-436034533  2021-436034533       mergerN        2021</span></span>
-<span><span class="co">#&gt; 11: 2021-561479296-581344392  2021-581344392       merger2        2021</span></span>
-<span><span class="co">#&gt; 12: 2021-742275383-840510404  2021-840510404       merger2        2021</span></span>
-<span><span class="co">#&gt; 13: 2021-820603982-860858401  2021-860858401       merger2        2021</span></span>
-<span><span class="co">#&gt; 14: 2021-830686168-383043861  2021-383043861       merger2        2021</span></span>
-<span><span class="co">#&gt; 15: 2021-843640492-861250084  2021-861250084 consolidation        2021</span></span>
-<span><span class="co">#&gt; 16: 2021-853056693-844965336  2021-844965336       merger2        2021</span></span>
-<span><span class="co">#&gt; 17: 2021-880387136-880330858  2021-880330858       mergerN        2021</span></span>
+<span><span class="co">#&gt;  1: 2021-132890752-861250084  2021-861250084 consolidation        2021</span></span>
+<span><span class="co">#&gt;  2: 2021-141732612-141670547  2021-141670547       merger2        2021</span></span>
+<span><span class="co">#&gt;  3: 2021-232659951-300994771  2021-300994771       merger2        2021</span></span>
+<span><span class="co">#&gt;  4: 2021-263889207-861250084  2021-861250084 consolidation        2021</span></span>
+<span><span class="co">#&gt;  5: 2021-431339285-436034533  2021-436034533       mergerN        2021</span></span>
+<span><span class="co">#&gt;  6: 2021-454035038-861250084  2021-861250084 consolidation        2021</span></span>
+<span><span class="co">#&gt;  7: 2021-463851186-880330858  2021-880330858       mergerN        2021</span></span>
+<span><span class="co">#&gt;  8: 2021-464830921-382426175  2021-382426175       merger2        2021</span></span>
+<span><span class="co">#&gt;  9: 2021-560478530-436034533  2021-436034533       mergerN        2021</span></span>
+<span><span class="co">#&gt; 10: 2021-561479296-581344392  2021-581344392       merger2        2021</span></span>
+<span><span class="co">#&gt; 11: 2021-742275383-840510404  2021-840510404       merger2        2021</span></span>
+<span><span class="co">#&gt; 12: 2021-820603982-860858401  2021-860858401       merger2        2021</span></span>
+<span><span class="co">#&gt; 13: 2021-830686168-383043861  2021-383043861       merger2        2021</span></span>
+<span><span class="co">#&gt; 14: 2021-843640492-861250084  2021-861250084 consolidation        2021</span></span>
+<span><span class="co">#&gt; 15: 2021-853056693-844965336  2021-844965336       merger2        2021</span></span>
+<span><span class="co">#&gt; 16: 2021-880387136-880330858  2021-880330858       mergerN        2021</span></span>
 <span><span class="co">#&gt;     RECIP_MERGER_YEAR N_GROUP FMV_TO_RECIP</span></span>
 <span><span class="co">#&gt;                 &lt;int&gt;   &lt;int&gt;        &lt;num&gt;</span></span>
-<span><span class="co">#&gt;  1:              2021       1       641776</span></span>
-<span><span class="co">#&gt;  2:              2021       4       621192</span></span>
-<span><span class="co">#&gt;  3:              2021       1        19876</span></span>
-<span><span class="co">#&gt;  4:              2020       1      3635000</span></span>
-<span><span class="co">#&gt;  5:              2021       4     28420106</span></span>
-<span><span class="co">#&gt;  6:              2021       2       364976</span></span>
-<span><span class="co">#&gt;  7:              2021       4      3809252</span></span>
-<span><span class="co">#&gt;  8:              2021       2      2244659</span></span>
-<span><span class="co">#&gt;  9:              2021       1      8462698</span></span>
-<span><span class="co">#&gt; 10:              2022       2      3763351</span></span>
-<span><span class="co">#&gt; 11:              2021       1       286110</span></span>
-<span><span class="co">#&gt; 12:              2021       1     10262017</span></span>
-<span><span class="co">#&gt; 13:              2021       1        24216</span></span>
-<span><span class="co">#&gt; 14:              2021       1     13857198</span></span>
-<span><span class="co">#&gt; 15:              2021       4     17392454</span></span>
-<span><span class="co">#&gt; 16:              2021       1         1947</span></span>
-<span><span class="co">#&gt; 17:              2021       2            0</span></span></code></pre></div>
+<span><span class="co">#&gt;  1:              2021       4       621192</span></span>
+<span><span class="co">#&gt;  2:              2021       1        19876</span></span>
+<span><span class="co">#&gt;  3:              2020       1      3635000</span></span>
+<span><span class="co">#&gt;  4:              2021       4     28420106</span></span>
+<span><span class="co">#&gt;  5:              2021       2       364976</span></span>
+<span><span class="co">#&gt;  6:              2021       4      3809252</span></span>
+<span><span class="co">#&gt;  7:              2021       2      2244659</span></span>
+<span><span class="co">#&gt;  8:              2021       1      8462698</span></span>
+<span><span class="co">#&gt;  9:              2022       2      3763351</span></span>
+<span><span class="co">#&gt; 10:              2021       1       286110</span></span>
+<span><span class="co">#&gt; 11:              2021       1     10262017</span></span>
+<span><span class="co">#&gt; 12:              2021       1        24216</span></span>
+<span><span class="co">#&gt; 13:              2021       1     13857198</span></span>
+<span><span class="co">#&gt; 14:              2021       4     17392454</span></span>
+<span><span class="co">#&gt; 15:              2021       1         1947</span></span>
+<span><span class="co">#&gt; 16:              2021       2            0</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="value-transferred">Value transferred<a class="anchor" aria-label="anchor" href="#value-transferred"></a>
@@ -548,20 +550,20 @@ beginning-of-year assets. Values far above 1 are flagged in
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">md</span><span class="op">$</span><span class="va">transfers</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"FMV_TOTAL"</span>, <span class="st">"FMV_ASSETS"</span>, <span class="st">"FMV_CASH"</span>, <span class="st">"FMV_REAL_ESTATE"</span>, <span class="st">"COVERAGE"</span>, <span class="st">"FLAG_OUTLIER"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   MERGER_ID FMV_TOTAL FMV_ASSETS FMV_CASH FMV_REAL_ESTATE</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;     &lt;num&gt;      &lt;num&gt;    &lt;num&gt;           &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: 2021-042305850-041695745    641776     641834   317621               0</span></span>
-<span><span class="co">#&gt; 2: 2021-132890752-861250084    621192     621192        0               0</span></span>
-<span><span class="co">#&gt; 3: 2021-141732612-141670547     19876      19876    19876               0</span></span>
-<span><span class="co">#&gt; 4: 2021-232659951-300994771   3635000    3635000        0         3635000</span></span>
-<span><span class="co">#&gt; 5: 2021-263889207-861250084  28420106   28420106        0               0</span></span>
-<span><span class="co">#&gt; 6: 2021-431339285-436034533    364976     364976        0               0</span></span>
+<span><span class="co">#&gt; 1: 2021-132890752-861250084    621192     621192        0               0</span></span>
+<span><span class="co">#&gt; 2: 2021-141732612-141670547     19876      19876    19876               0</span></span>
+<span><span class="co">#&gt; 3: 2021-232659951-300994771   3635000    3635000        0         3635000</span></span>
+<span><span class="co">#&gt; 4: 2021-263889207-861250084  28420106   28420106        0               0</span></span>
+<span><span class="co">#&gt; 5: 2021-431339285-436034533    364976     364976        0               0</span></span>
+<span><span class="co">#&gt; 6: 2021-454035038-861250084   3809252    3809252        0               0</span></span>
 <span><span class="co">#&gt;      COVERAGE FLAG_OUTLIER</span></span>
 <span><span class="co">#&gt;         &lt;num&gt;       &lt;lgcl&gt;</span></span>
-<span><span class="co">#&gt; 1: 0.98035274        FALSE</span></span>
-<span><span class="co">#&gt; 2: 0.13817759        FALSE</span></span>
-<span><span class="co">#&gt; 3:         NA        FALSE</span></span>
-<span><span class="co">#&gt; 4: 1.35343088        FALSE</span></span>
-<span><span class="co">#&gt; 5: 0.63862057        FALSE</span></span>
-<span><span class="co">#&gt; 6: 0.07462893        FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt; 1: 0.13817759        FALSE</span></span>
+<span><span class="co">#&gt; 2:         NA        FALSE</span></span>
+<span><span class="co">#&gt; 3: 1.35343088        FALSE</span></span>
+<span><span class="co">#&gt; 4: 0.63862057        FALSE</span></span>
+<span><span class="co">#&gt; 5: 0.07462893        FALSE</span></span>
+<span><span class="co">#&gt; 6: 0.51346299        FALSE</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="donor-and-recipient-attributes">Donor and recipient attributes<a class="anchor" aria-label="anchor" href="#donor-and-recipient-attributes"></a>
@@ -584,14 +586,14 @@ organization’s calendar);</li>
 <span><span class="co">#&gt; Key: &lt;MERGER_ID&gt;</span></span>
 <span><span class="co">#&gt;                   MERGER_ID                                     NAME  STATE</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;                                   &lt;char&gt; &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1: 2021-042305850-041695745  GLOUCESTER FIRE DEPARTMENT CREDIT UNION     MA</span></span>
-<span><span class="co">#&gt; 2: 2021-132890752-861250084       COUNCIL FOR ADULT AND EXPERIENTIAL     IN</span></span>
-<span><span class="co">#&gt; 3: 2021-141732612-141670547 FRIENDS OF THE WARREN-WASHINGTON SUBSTAN     NY</span></span>
+<span><span class="co">#&gt; 1: 2021-132890752-861250084       COUNCIL FOR ADULT AND EXPERIENTIAL     IN</span></span>
+<span><span class="co">#&gt; 2: 2021-141732612-141670547 FRIENDS OF THE WARREN-WASHINGTON SUBSTAN     NY</span></span>
+<span><span class="co">#&gt; 3: 2021-232659951-300994771              WEST-MONT CHRISTIAN ACADEMY     PA</span></span>
 <span><span class="co">#&gt;      AGE      NTEE REVENUE_TM4 REVENUE_TM2 REVENUE_T0 ASSETS_T0</span></span>
 <span><span class="co">#&gt;    &lt;int&gt;    &lt;char&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;     &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:    83 UNDEFINED       29734       34186      23682         0</span></span>
-<span><span class="co">#&gt; 2:    42       B60    10676822     5794883    3930537         0</span></span>
-<span><span class="co">#&gt; 3:    28 UNDEFINED          NA          NA         NA         0</span></span></code></pre></div>
+<span><span class="co">#&gt; 1:    42       B60    10676822     5794883    3930537         0</span></span>
+<span><span class="co">#&gt; 2:    28 UNDEFINED          NA          NA         NA         0</span></span>
+<span><span class="co">#&gt; 3:    39       B20     1720367     1757887      14427   2316208</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="part-vii-panel">Part VII panel<a class="anchor" aria-label="anchor" href="#part-vii-panel"></a>
@@ -629,22 +631,22 @@ detail come from the full Form 990 only.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">md</span><span class="op">$</span><span class="va">fiscal</span></span>
 <span><span class="va">f</span><span class="op">[</span><span class="va">ROLE</span> <span class="op">==</span> <span class="st">"recipient"</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"TIME_FROM_MERGER"</span>, <span class="st">"REVENUE"</span>, <span class="st">"EXPENSES"</span>, <span class="st">"ASSETS"</span>, <span class="st">"STAFF_EXP"</span>, <span class="st">"OVERHEAD_RATIO"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;                   MERGER_ID TIME_FROM_MERGER   REVENUE EXPENSES     ASSETS</span></span>
-<span><span class="co">#&gt;                      &lt;char&gt;            &lt;int&gt;     &lt;num&gt;    &lt;num&gt;      &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1: 2021-042305850-041695745               -5  64430195 56107971 1633755224</span></span>
-<span><span class="co">#&gt; 2: 2021-042305850-041695745               -4  71469349 56395350 1682401982</span></span>
-<span><span class="co">#&gt; 3: 2021-042305850-041695745               -3  79251770 64685998 1877534257</span></span>
-<span><span class="co">#&gt; 4: 2021-042305850-041695745               -2  89211246 75756292 2092358761</span></span>
-<span><span class="co">#&gt; 5: 2021-042305850-041695745               -1 101297996 85388608 2385374276</span></span>
-<span><span class="co">#&gt; 6: 2021-042305850-041695745                0  92937477 78093785 2510941078</span></span>
+<span><span class="co">#&gt;                   MERGER_ID TIME_FROM_MERGER  REVENUE  EXPENSES   ASSETS</span></span>
+<span><span class="co">#&gt;                      &lt;char&gt;            &lt;int&gt;    &lt;num&gt;     &lt;num&gt;    &lt;num&gt;</span></span>
+<span><span class="co">#&gt; 1: 2021-132890752-861250084                0 36146755  17521070 87757237</span></span>
+<span><span class="co">#&gt; 2: 2021-132890752-861250084                1 76931166  79334560 58003532</span></span>
+<span><span class="co">#&gt; 3: 2021-132890752-861250084                2 74422160 127845259        0</span></span>
+<span><span class="co">#&gt; 4: 2021-141732612-141670547               -5   769134    737421   144252</span></span>
+<span><span class="co">#&gt; 5: 2021-141732612-141670547               -4  1052146   1082249   143189</span></span>
+<span><span class="co">#&gt; 6: 2021-141732612-141670547               -3  1160369   1017077   487309</span></span>
 <span><span class="co">#&gt;    STAFF_EXP OVERHEAD_RATIO</span></span>
 <span><span class="co">#&gt;        &lt;num&gt;          &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:  22270552             NA</span></span>
-<span><span class="co">#&gt; 2:  22688647             NA</span></span>
-<span><span class="co">#&gt; 3:  25816134             NA</span></span>
-<span><span class="co">#&gt; 4:  27518061             NA</span></span>
-<span><span class="co">#&gt; 5:  33406510             NA</span></span>
-<span><span class="co">#&gt; 6:  32885525             NA</span></span></code></pre></div>
+<span><span class="co">#&gt; 1:  12145865     0.33733910</span></span>
+<span><span class="co">#&gt; 2:  57050443     0.38829966</span></span>
+<span><span class="co">#&gt; 3:  56784484     0.19622319</span></span>
+<span><span class="co">#&gt; 4:    530126     0.08916481</span></span>
+<span><span class="co">#&gt; 5:    683892     0.10239511</span></span>
+<span><span class="co">#&gt; 6:    589851     0.11333852</span></span></code></pre></div>
 <p>With <code>ratios = TRUE</code> (the default), the panel also gets
 the ratios from <code><a href="https://nonprofit-open-data-collective.github.io/fiscal/reference/compute_all_panel.html" class="external-link">fiscal::compute_all_panel()</a></code>. Two choices
 matter when you study change over time:</p>
