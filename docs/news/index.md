@@ -2,8 +2,13 @@
 
 ## npmerger 0.0.0.9000
 
-- Matched comparison samples:
+- Matched comparison samples
+  ([`vignette("matching")`](https://nonprofit-open-data-collective.github.io/npmerger/articles/matching.md)):
 
+  - [`build_match_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_match_data.md)
+    runs every matching step in one call and returns the sample, pool,
+    candidates for each specification, balance, and coverage
+    ([`match_coverage()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_coverage.md)).
   - [`get_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_panel.md)
     builds the full 990 / 990-EZ organization-year panel for every
     filer, with constant-dollar size, margin, equity ratio, months of

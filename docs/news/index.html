@@ -17,6 +17,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md">Roadmap</a></li>
 <li class="active nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -44,8 +45,10 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.0.9000" id="npmerger-0009000">npmerger 0.0.0.9000<a class="anchor" aria-label="anchor" href="#npmerger-0009000"></a></h2>
 <ul><li>
-<p>Matched comparison samples:</p>
+<p>Matched comparison samples (<code><a href="../articles/matching.html">vignette("matching")</a></code>):</p>
 <ul><li>
+<code><a href="../reference/build_match_data.html">build_match_data()</a></code> runs every matching step in one call and returns the sample, pool, candidates for each specification, balance, and coverage (<code><a href="../reference/match_coverage.html">match_coverage()</a></code>).</li>
+<li>
 <code><a href="../reference/get_panel.html">get_panel()</a></code> builds the full 990 / 990-EZ organization-year panel for every filer, with constant-dollar size, margin, equity ratio, months of cash, NTEE, and subsection (<code><a href="../reference/panel_measures.html">panel_measures()</a></code>, <code><a href="../reference/real_dollars.html">real_dollars()</a></code>, <code><a href="../reference/cpi_u.html">cpi_u()</a></code>, <code><a href="../reference/ntee_level.html">ntee_level()</a></code>).</li>
 <li>
 <code><a href="../reference/merger_sample.html">merger_sample()</a></code> keeps merger cases whose recipient filed in every year t-2..t+2, with t-3/t-2 baselines for donor and recipient.</li>

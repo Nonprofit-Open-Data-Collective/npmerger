@@ -2,6 +2,7 @@
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/404.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/articles/classifier.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/articles/index.html</loc></url>
+<url><loc>https://nonprofit-open-data-collective.github.io/npmerger/articles/matching.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/authors.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/index.html</loc></url>
@@ -15,6 +16,7 @@
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/add_filing_history.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/add_mission_similarity.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/asset_class.html</loc></url>
+<url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/build_match_data.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_cases.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_data.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/classify_transactions.html</loc></url>
@@ -35,6 +37,7 @@
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/legacy_ntee.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/match_balance.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/match_candidates.html</loc></url>
+<url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/match_coverage.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/match_pool.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_attributes.html</loc></url>
 <url><loc>https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_features.html</loc></url>

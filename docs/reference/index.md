@@ -144,6 +144,10 @@ Build the full 990 panel, a research sample of mergers with a full
 observation window, and candidate comparison organizations for merger
 recipients.
 
+- [`build_match_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_match_data.md)
+  : Build the matched comparison data in one call
+- [`match_coverage()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_coverage.md)
+  : How many treated units have match candidates
 - [`get_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_panel.md)
   : Build the full 990 organization-year panel
 - [`panel_columns()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_columns.md)

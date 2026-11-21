@@ -1,6 +1,9 @@
 # npmerger 0.0.0.9000
 
-* Matched comparison samples:
+* Matched comparison samples (`vignette("matching")`):
+  - `build_match_data()` runs every matching step in one call and returns
+    the sample, pool, candidates for each specification, balance, and
+    coverage (`match_coverage()`).
   - `get_panel()` builds the full 990 / 990-EZ organization-year panel for
     every filer, with constant-dollar size, margin, equity ratio, months of
     cash, NTEE, and subsection (`panel_measures()`, `real_dollars()`,

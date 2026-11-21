@@ -86,3 +86,21 @@ test_that("fill_ntee fills only missing codes and records the source", {
   expect_identical(f$NTEE_SOURCE, c("bmf", "legacy_bmf_2022-08", NA, "legacy_bmf_2019-08"))
   expect_identical(fill_ntee(f, leg)$NTEE2, f$NTEE2)   # idempotent
 })
+
+test_that("build_match_data runs the matching steps and reports coverage", {
+  p <- fake_panel()
+  md <- list(cases = fake_cases(),
+             sched_n = data.table::data.table(EIN2 = c("C6", "D1"), TAX_YEAR = c(2013L, 2012L)))
+  mm <- build_match_data(md, panel = p, verbose = FALSE)
+  expect_s3_class(mm, "merger_match_data")
+  expect_named(mm$candidates, c("margin", "equity"))
+  expect_true("C1" %in% mm$candidates$margin$C_EIN2)
+  expect_false("C6" %in% mm$candidates$margin$C_EIN2)
+  expect_equal(mm$coverage$MATCHED, c(1L, 1L))
+  expect_equal(mm$coverage$TREATED, c(1L, 1L))
+  expect_setequal(unique(mm$balance$K), c(1L, 5L))
+  one <- build_match_data(md, panel = p, health = "MARGIN", verbose = FALSE)
+  expect_named(one$candidates, "margin")
+  expect_warning(build_match_data(list(cases = fake_cases()), panel = p, verbose = FALSE), "sched_n")
+  expect_output(print(mm), "treated matched")
+})

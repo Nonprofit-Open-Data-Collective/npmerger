@@ -12,7 +12,7 @@ home:
 
 navbar:
   structure:
-    left: [intro, classifier, reference, roadmap, news]
+    left: [intro, classifier, matching, reference, roadmap, news]
   components:
     intro:
       text: Overview
@@ -20,6 +20,9 @@ navbar:
     classifier:
       text: Classifier
       href: articles/classifier.html
+    matching:
+      text: Matching
+      href: articles/matching.html
     roadmap:
       text: Roadmap
       href: https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md
@@ -95,6 +98,8 @@ reference:
 - title: Matched comparison samples
   desc: Build the full 990 panel, a research sample of mergers with a full observation window, and candidate comparison organizations for merger recipients.
   contents:
+  - build_match_data
+  - match_coverage
   - get_panel
   - panel_columns
   - panel_measures
