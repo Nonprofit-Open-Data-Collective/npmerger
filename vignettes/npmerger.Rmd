@@ -25,10 +25,9 @@ Data comes from the NCCS e-file release through
 fiscal-health metrics come from
 [fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
 
-> **Status.** Retrieval, cleaning, filing-level features, merger evidence,
-> and the classifier work today. Merger cases, attribute tables, and the Part VII and fiscal
-> panels are planned; their functions are documented but stop with a
-> "not implemented yet" message. See the
+> **Status.** The full pipeline works, from Schedule N through the analysis
+> tables. The classifier has not yet been validated against hand-labeled
+> cases. See the
 > [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md).
 
 ## What counts as a merger
@@ -115,12 +114,19 @@ flags or Part VII overlap as the leadership evidence:
 
 ## The pipeline
 
-Each stage is a separate function, so you can stop at any point, inspect the
-result, or substitute your own step.
+`build_merger_data()` runs everything and returns every table:
+
+```{r, eval = FALSE}
+md <- build_merger_data(2019:2021, path = "PANEL990")
+```
+
+Each stage is also a separate function, so you can stop at any point,
+inspect the result, or substitute your own step:
 
 ```{r, eval = FALSE}
 sn  <- get_schedule_n(2019:2021)   # Schedule N tables, via panel990
 tx  <- sn_transactions(sn)         # one row per asset line, Parts I and II
+tx  <- recover_recipient_ein(tx, get_name_index(2018:2022))  # fill missing EINs
 fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
 ev  <- get_evidence_tables(fl)     # 990 tables for the donors and recipients
 fe  <- merger_features(fl, ev)     # add the evidence to each filing
@@ -225,26 +231,104 @@ merger_id(2020, "01-0215911", "010431680")
 merger_group_id(2020, "010431680")
 ```
 
-## Planned output tables
+## Output tables
 
-These functions are documented now and will be built next:
+The package ships a small extract of real 2021 filings, so the whole
+pipeline can run offline. Here it is run without the **fiscal** ratios, to
+keep this page quick:
 
-* `sched_n_table()`: one row per Schedule N filing, with its label and
-  evidence. *Available now.*
-* `merger_attributes(role = "donor")` and `merger_attributes(role = "recipient")`:
-  the merger ID, Schedule N year, revenue, expenses, and assets for the
-  five years up to the merger, address, organization age, and NTEE code.
-* `merger_part7()`: everyone listed on Part VII for both organizations
-  from t-2 to t+2, with time from the merger and a flag for people who
-  appear on both.
-* `merger_fiscal_panel()`: the donor up to the merger year and the
-  recipient before and after it. It will include fiscal-health metrics from
-  **fiscal**, plus staff expenses, executive pay, grants, overhead, and
-  debt.
+```{r}
+ex <- npmerger_example()
+md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
+                        names = ex$names, bmf_data = ex$bmf,
+                        ratios = FALSE, verbose = FALSE)
+md
+```
 
-Two design choices for the fiscal panel:
+### Schedule N table
 
-* The fiscal-health index will be calibrated once on a reference sample and
-  then applied unchanged to every year, so scores can be compared over time.
-* Any smoothing will use only the current and past years. A centered window
-  would pull post-merger information into the pre-merger years.
+`md$sched_n` has one row per Schedule N filing, with its label and the
+evidence behind it:
+
+```{r}
+head(md$sched_n[, c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "BASIS", "AFFILIATED", "N_DONORS")])
+```
+
+### Merger cases
+
+`md$cases` has one row per donor–recipient pair.
+
+* `MERGER_YEAR` is time 0 for the donor.
+* `RECIP_MERGER_YEAR` is time 0 for the recipient: the recipient's tax year
+  that contains the asset distribution date. It can differ from the
+  donor's year when the two keep different fiscal years.
+* `MERGER_GROUP_ID` and `N_GROUP` tie together the donors that fold into
+  the same successor.
+
+```{r}
+md$cases[, c("MERGER_ID", "MERGER_GROUP_ID", "TYPE", "MERGER_YEAR", "RECIP_MERGER_YEAR", "N_GROUP", "FMV_TO_RECIP")]
+```
+
+### Value transferred
+
+`md$transfers` breaks the reported fair market value down by asset class
+(`asset_class()`).
+
+* `FMV_ASSETS` excludes liabilities the recipient assumed.
+* `COVERAGE` compares the transfer to the donor's beginning-of-year assets.
+  Values far above 1 are flagged in `FLAG_OUTLIER`.
+
+```{r}
+head(md$transfers[, c("MERGER_ID", "FMV_TOTAL", "FMV_ASSETS", "FMV_CASH", "FMV_REAL_ESTATE", "COVERAGE", "FLAG_OUTLIER")])
+```
+
+### Donor and recipient attributes
+
+`md$donors` and `md$recipients` share the merger ID and one layout:
+
+* `SN_YEAR` and `REF_YEAR` (time 0 on that organization's calendar);
+* name and address;
+* formation and ruling years, and age;
+* NTEE code;
+* revenue, expenses, and assets for the five years up to `REF_YEAR`.
+
+```{r}
+d <- md$donors
+d[1:3, c("MERGER_ID", "NAME", "STATE", "AGE", "NTEE", "REVENUE_TM4", "REVENUE_TM2", "REVENUE_T0", "ASSETS_T0")]
+```
+
+### Part VII panel
+
+`md$part7` lists everyone on either organization's Part VII from t-2 to t+2.
+`IN_BOTH` marks people who appear on both:
+
+```{r}
+p <- md$part7
+p[IN_BOTH == TRUE][1:6, c("MERGER_ID", "ROLE", "TIME_FROM_MERGER", "PERSON_NAME", "TITLE", "COMP_ORG")]
+```
+
+### Fiscal panel
+
+`md$fiscal` stacks the donor's years up to the merger and the recipient's
+years before and after it, with harmonized 990 and 990-EZ measures.
+Overhead, executive compensation, employees, and debt detail come from the
+full Form 990 only.
+
+```{r}
+f <- md$fiscal
+f[ROLE == "recipient"][1:6, c("MERGER_ID", "TIME_FROM_MERGER", "REVENUE", "EXPENSES", "ASSETS", "STAFF_EXP", "OVERHEAD_RATIO")]
+```
+
+With `ratios = TRUE` (the default), the panel also gets the ratios from
+`fiscal::compute_all_panel()`. Two choices matter when you study change over
+time:
+
+* **A fixed calibration.** The ratios' winsorized and percentile variants
+  are recomputed within each year. For an index that is comparable across
+  years, fit `fiscal::fiscal_health_fit()` once on a reference sample and
+  pass it (and `fiscal::fiscal_weights()`) as `fit` and `weights`.
+* **Backward-looking smoothing.** `smooth = "trailing"` averages each
+  organization's current and two previous years (`smooth_trailing()`).
+  It never uses future years, so pre-merger values are not contaminated
+  by post-merger ones. Use it for matching and baselines, and raw values
+  for event-time outcomes.

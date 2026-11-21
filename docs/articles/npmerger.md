@@ -15,11 +15,9 @@ Data comes from the NCCS e-file release through
 and fiscal-health metrics come from
 [fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
 
-> **Status.** Retrieval, cleaning, filing-level features, merger
-> evidence, and the classifier work today. Merger cases, attribute
-> tables, and the Part VII and fiscal panels are planned; their
-> functions are documented but stop with a “not implemented yet”
-> message. See the
+> **Status.** The full pipeline works, from Schedule N through the
+> analysis tables. The classifier has not yet been validated against
+> hand-labeled cases. See the
 > [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md).
 
 ## What counts as a merger
@@ -112,13 +110,22 @@ N flags or Part VII overlap as the leadership evidence:
 
 ## The pipeline
 
-Each stage is a separate function, so you can stop at any point, inspect
-the result, or substitute your own step.
+[`build_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_data.md)
+runs everything and returns every table:
+
+``` r
+
+md <- build_merger_data(2019:2021, path = "PANEL990")
+```
+
+Each stage is also a separate function, so you can stop at any point,
+inspect the result, or substitute your own step:
 
 ``` r
 
 sn  <- get_schedule_n(2019:2021)   # Schedule N tables, via panel990
 tx  <- sn_transactions(sn)         # one row per asset line, Parts I and II
+tx  <- recover_recipient_ein(tx, get_name_index(2018:2022))  # fill missing EINs
 fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
 ev  <- get_evidence_tables(fl)     # 990 tables for the donors and recipients
 fe  <- merger_features(fl, ev)     # add the evidence to each filing
@@ -256,29 +263,243 @@ merger_group_id(2020, "010431680")
 #> [1] "2020-010431680"
 ```
 
-## Planned output tables
+## Output tables
 
-These functions are documented now and will be built next:
+The package ships a small extract of real 2021 filings, so the whole
+pipeline can run offline. Here it is run without the **fiscal** ratios,
+to keep this page quick:
 
-- [`sched_n_table()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sched_n_table.md):
-  one row per Schedule N filing, with its label and evidence. *Available
-  now.*
-- `merger_attributes(role = "donor")` and
-  `merger_attributes(role = "recipient")`: the merger ID, Schedule N
-  year, revenue, expenses, and assets for the five years up to the
-  merger, address, organization age, and NTEE code.
-- [`merger_part7()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_part7.md):
-  everyone listed on Part VII for both organizations from t-2 to t+2,
-  with time from the merger and a flag for people who appear on both.
-- [`merger_fiscal_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_fiscal_panel.md):
-  the donor up to the merger year and the recipient before and after it.
-  It will include fiscal-health metrics from **fiscal**, plus staff
-  expenses, executive pay, grants, overhead, and debt.
+``` r
 
-Two design choices for the fiscal panel:
+ex <- npmerger_example()
+md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
+                        names = ex$names, bmf_data = ex$bmf,
+                        ratios = FALSE, verbose = FALSE)
+md
+#> <merger_data>
+#> Schedule N filings by type:
+#>   merger2                  9
+#>   asset_transfer           5
+#>   mergerN                  4
+#>   closure                  4
+#>   consolidation            4
+#>   asset_disposition        3
+#> Tables:
+#>   cases            17 rows
+#>   transfers        17 rows
+#>   donors           17 rows
+#>   recipients       17 rows
+#>   part7          1786 rows
+#>   fiscal          181 rows
+```
 
-- The fiscal-health index will be calibrated once on a reference sample
-  and then applied unchanged to every year, so scores can be compared
-  over time.
-- Any smoothing will use only the current and past years. A centered
-  window would pull post-merger information into the pre-merger years.
+### Schedule N table
+
+`md$sched_n` has one row per Schedule N filing, with its label and the
+evidence behind it:
+
+``` r
+
+head(md$sched_n[, c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "BASIS", "AFFILIATED", "N_DONORS")])
+#>    TAX_YEAR               OBJECTID           EIN2          TYPE        BASIS
+#>       <int>                 <char>         <char>        <char>       <char>
+#> 1:     2021 OID-202440449349301959 EIN-04-2305850       merger2 corroborated
+#> 2:     2021 OID-202222529349300142 EIN-13-2890752 consolidation       leader
+#> 3:     2021 OID-202213189349309256 EIN-13-6737136       closure         <NA>
+#> 4:     2021 OID-202302299349200025 EIN-14-1732612       merger2       leader
+#> 5:     2021 OID-202331009349300123 EIN-23-2659951       merger2       leader
+#> 6:     2021 OID-202231339349309508 EIN-23-7401639       closure         <NA>
+#>    AFFILIATED N_DONORS
+#>        <lgcl>    <int>
+#> 1:      FALSE        1
+#> 2:       TRUE        4
+#> 3:      FALSE       NA
+#> 4:      FALSE        1
+#> 5:      FALSE        1
+#> 6:      FALSE       NA
+```
+
+### Merger cases
+
+`md$cases` has one row per donor–recipient pair.
+
+- `MERGER_YEAR` is time 0 for the donor.
+- `RECIP_MERGER_YEAR` is time 0 for the recipient: the recipient’s tax
+  year that contains the asset distribution date. It can differ from the
+  donor’s year when the two keep different fiscal years.
+- `MERGER_GROUP_ID` and `N_GROUP` tie together the donors that fold into
+  the same successor.
+
+``` r
+
+md$cases[, c("MERGER_ID", "MERGER_GROUP_ID", "TYPE", "MERGER_YEAR", "RECIP_MERGER_YEAR", "N_GROUP", "FMV_TO_RECIP")]
+#>                    MERGER_ID MERGER_GROUP_ID          TYPE MERGER_YEAR
+#>                       <char>          <char>        <char>       <int>
+#>  1: 2021-042305850-041695745  2021-041695745       merger2        2021
+#>  2: 2021-132890752-861250084  2021-861250084 consolidation        2021
+#>  3: 2021-141732612-141670547  2021-141670547       merger2        2021
+#>  4: 2021-232659951-300994771  2021-300994771       merger2        2021
+#>  5: 2021-263889207-861250084  2021-861250084 consolidation        2021
+#>  6: 2021-431339285-436034533  2021-436034533       mergerN        2021
+#>  7: 2021-454035038-861250084  2021-861250084 consolidation        2021
+#>  8: 2021-463851186-880330858  2021-880330858       mergerN        2021
+#>  9: 2021-464830921-382426175  2021-382426175       merger2        2021
+#> 10: 2021-560478530-436034533  2021-436034533       mergerN        2021
+#> 11: 2021-561479296-581344392  2021-581344392       merger2        2021
+#> 12: 2021-742275383-840510404  2021-840510404       merger2        2021
+#> 13: 2021-820603982-860858401  2021-860858401       merger2        2021
+#> 14: 2021-830686168-383043861  2021-383043861       merger2        2021
+#> 15: 2021-843640492-861250084  2021-861250084 consolidation        2021
+#> 16: 2021-853056693-844965336  2021-844965336       merger2        2021
+#> 17: 2021-880387136-880330858  2021-880330858       mergerN        2021
+#>     RECIP_MERGER_YEAR N_GROUP FMV_TO_RECIP
+#>                 <int>   <int>        <num>
+#>  1:              2021       1       641776
+#>  2:              2021       4       621192
+#>  3:              2021       1        19876
+#>  4:              2020       1      3635000
+#>  5:              2021       4     28420106
+#>  6:              2021       2       364976
+#>  7:              2021       4      3809252
+#>  8:              2021       2      2244659
+#>  9:              2021       1      8462698
+#> 10:              2022       2      3763351
+#> 11:              2021       1       286110
+#> 12:              2021       1     10262017
+#> 13:              2021       1        24216
+#> 14:              2021       1     13857198
+#> 15:              2021       4     17392454
+#> 16:              2021       1         1947
+#> 17:              2021       2            0
+```
+
+### Value transferred
+
+`md$transfers` breaks the reported fair market value down by asset class
+([`asset_class()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/asset_class.md)).
+
+- `FMV_ASSETS` excludes liabilities the recipient assumed.
+- `COVERAGE` compares the transfer to the donor’s beginning-of-year
+  assets. Values far above 1 are flagged in `FLAG_OUTLIER`.
+
+``` r
+
+head(md$transfers[, c("MERGER_ID", "FMV_TOTAL", "FMV_ASSETS", "FMV_CASH", "FMV_REAL_ESTATE", "COVERAGE", "FLAG_OUTLIER")])
+#>                   MERGER_ID FMV_TOTAL FMV_ASSETS FMV_CASH FMV_REAL_ESTATE
+#>                      <char>     <num>      <num>    <num>           <num>
+#> 1: 2021-042305850-041695745    641776     641834   317621               0
+#> 2: 2021-132890752-861250084    621192     621192        0               0
+#> 3: 2021-141732612-141670547     19876      19876    19876               0
+#> 4: 2021-232659951-300994771   3635000    3635000        0         3635000
+#> 5: 2021-263889207-861250084  28420106   28420106        0               0
+#> 6: 2021-431339285-436034533    364976     364976        0               0
+#>      COVERAGE FLAG_OUTLIER
+#>         <num>       <lgcl>
+#> 1: 0.98035274        FALSE
+#> 2: 0.13817759        FALSE
+#> 3:         NA        FALSE
+#> 4: 1.35343088        FALSE
+#> 5: 0.63862057        FALSE
+#> 6: 0.07462893        FALSE
+```
+
+### Donor and recipient attributes
+
+`md$donors` and `md$recipients` share the merger ID and one layout:
+
+- `SN_YEAR` and `REF_YEAR` (time 0 on that organization’s calendar);
+- name and address;
+- formation and ruling years, and age;
+- NTEE code;
+- revenue, expenses, and assets for the five years up to `REF_YEAR`.
+
+``` r
+
+d <- md$donors
+d[1:3, c("MERGER_ID", "NAME", "STATE", "AGE", "NTEE", "REVENUE_TM4", "REVENUE_TM2", "REVENUE_T0", "ASSETS_T0")]
+#> Key: <MERGER_ID>
+#>                   MERGER_ID                                     NAME  STATE
+#>                      <char>                                   <char> <char>
+#> 1: 2021-042305850-041695745  GLOUCESTER FIRE DEPARTMENT CREDIT UNION     MA
+#> 2: 2021-132890752-861250084       COUNCIL FOR ADULT AND EXPERIENTIAL     IN
+#> 3: 2021-141732612-141670547 FRIENDS OF THE WARREN-WASHINGTON SUBSTAN     NY
+#>      AGE      NTEE REVENUE_TM4 REVENUE_TM2 REVENUE_T0 ASSETS_T0
+#>    <int>    <char>       <num>       <num>      <num>     <num>
+#> 1:    83 UNDEFINED       29734       34186      23682         0
+#> 2:    42       B60    10676822     5794883    3930537         0
+#> 3:    28 UNDEFINED          NA          NA         NA         0
+```
+
+### Part VII panel
+
+`md$part7` lists everyone on either organization’s Part VII from t-2 to
+t+2. `IN_BOTH` marks people who appear on both:
+
+``` r
+
+p <- md$part7
+p[IN_BOTH == TRUE][1:6, c("MERGER_ID", "ROLE", "TIME_FROM_MERGER", "PERSON_NAME", "TITLE", "COMP_ORG")]
+#>                   MERGER_ID   ROLE TIME_FROM_MERGER       PERSON_NAME     TITLE
+#>                      <char> <char>            <int>            <char>    <char>
+#> 1: 2021-132890752-861250084  donor               -2         ERIN ROTH   TRUSTEE
+#> 2: 2021-132890752-861250084  donor               -2        LARRY LUTZ   TRUSTEE
+#> 3: 2021-132890752-861250084  donor               -2     THOMAS DAWSON     CHAIR
+#> 4: 2021-132890752-861250084  donor               -2    WILLIAM HANSEN   TRUSTEE
+#> 5: 2021-132890752-861250084  donor               -1 CHRISTINA L CLARK SECRETARY
+#> 6: 2021-132890752-861250084  donor               -1         ERIN ROTH   TRUSTEE
+#>    COMP_ORG
+#>       <num>
+#> 1:        0
+#> 2:        0
+#> 3:        0
+#> 4:        0
+#> 5:        0
+#> 6:        0
+```
+
+### Fiscal panel
+
+`md$fiscal` stacks the donor’s years up to the merger and the
+recipient’s years before and after it, with harmonized 990 and 990-EZ
+measures. Overhead, executive compensation, employees, and debt detail
+come from the full Form 990 only.
+
+``` r
+
+f <- md$fiscal
+f[ROLE == "recipient"][1:6, c("MERGER_ID", "TIME_FROM_MERGER", "REVENUE", "EXPENSES", "ASSETS", "STAFF_EXP", "OVERHEAD_RATIO")]
+#>                   MERGER_ID TIME_FROM_MERGER   REVENUE EXPENSES     ASSETS
+#>                      <char>            <int>     <num>    <num>      <num>
+#> 1: 2021-042305850-041695745               -5  64430195 56107971 1633755224
+#> 2: 2021-042305850-041695745               -4  71469349 56395350 1682401982
+#> 3: 2021-042305850-041695745               -3  79251770 64685998 1877534257
+#> 4: 2021-042305850-041695745               -2  89211246 75756292 2092358761
+#> 5: 2021-042305850-041695745               -1 101297996 85388608 2385374276
+#> 6: 2021-042305850-041695745                0  92937477 78093785 2510941078
+#>    STAFF_EXP OVERHEAD_RATIO
+#>        <num>          <num>
+#> 1:  22270552             NA
+#> 2:  22688647             NA
+#> 3:  25816134             NA
+#> 4:  27518061             NA
+#> 5:  33406510             NA
+#> 6:  32885525             NA
+```
+
+With `ratios = TRUE` (the default), the panel also gets the ratios from
+[`fiscal::compute_all_panel()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/compute_all_panel.html).
+Two choices matter when you study change over time:
+
+- **A fixed calibration.** The ratios’ winsorized and percentile
+  variants are recomputed within each year. For an index that is
+  comparable across years, fit
+  [`fiscal::fiscal_health_fit()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_health_fit.html)
+  once on a reference sample and pass it (and
+  [`fiscal::fiscal_weights()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_weights.html))
+  as `fit` and `weights`.
+- **Backward-looking smoothing.** `smooth = "trailing"` averages each
+  organization’s current and two previous years
+  ([`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)).
+  It never uses future years, so pre-merger values are not contaminated
+  by post-merger ones. Use it for matching and baselines, and raw values
+  for event-time outcomes.

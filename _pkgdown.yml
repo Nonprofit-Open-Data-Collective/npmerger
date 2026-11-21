@@ -22,17 +22,25 @@ navbar:
       href: https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md
 
 reference:
+- title: Run the whole pipeline
+  desc: Build every merger table in one call, or try it offline on the bundled example.
+  contents:
+  - build_merger_data
+  - npmerger_example
+  - efile_years
 - title: Retrieve Schedule N
-  desc: Download Schedule N tables (and, later, core 990 tables for selected organizations) through panel990.
+  desc: Download Schedule N tables through panel990.
   contents:
   - get_schedule_n
   - sn_table_names
-  - get_core
 - title: Clean and stack transactions
-  desc: Turn raw Schedule N tables into one row per asset line and one row per filing.
+  desc: Turn raw Schedule N tables into one row per asset line and one row per filing, and recover missing recipient EINs.
   contents:
   - sn_transactions
   - sn_filings
+  - recover_recipient_ein
+  - get_name_index
+  - org_name_key
   - sn_flag
   - clean_ein
   - parse_irc_section
@@ -56,16 +64,30 @@ reference:
   - classify_transactions
   - merger_rules
   - transaction_types
-- title: Build merger cases and tables
-  desc: Merger identifiers, donor-recipient cases, and the analysis tables built around each merger.
-  contents:
-  - merger_id
-  - build_merger_cases
-  - transfer_value
   - sched_n_table
+- title: Build merger cases
+  desc: Donor-recipient pairs with merger IDs, each organization's merger year, and the value of assets transferred.
+  contents:
+  - build_merger_cases
+  - merger_id
+  - merger_roles
+  - transfer_value
+  - asset_class
+- title: Core financial data
+  desc: Read core 990 tables for merger organizations and build harmonized 990 / 990-EZ organization-years.
+  contents:
+  - get_core
+  - core_tables
+  - org_years
+  - merger_measures
+  - get_bmf
+- title: Analysis tables
+  desc: Donor and recipient attributes, the Part VII panel, and the fiscal-health panel around each merger.
+  contents:
   - merger_attributes
   - merger_part7
   - merger_fiscal_panel
+  - smooth_trailing
 - title: Package
   contents:
   - npmerger-package

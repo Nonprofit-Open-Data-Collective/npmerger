@@ -1,13 +1,22 @@
 # Retrieve core 990 tables for a set of organizations
 
-Reads header, summary (990 and 990-EZ), Part VII and other core tables
-for a selected set of EINs only, pushing the EIN filter into the parquet
-scan.
+Downloads (or reuses cached) core tables and reads only the rows for the
+requested organizations, pushing the EIN filter into the parquet scan.
+990-EZ filers are included: their revenue and expenses are in the
+summary table and their balance sheet in the Part X table.
 
 ## Usage
 
 ``` r
-get_core(eins, years, tables = c("P00", "P01", "F9-P01-T00-SUMMARY-EZ"), ...)
+get_core(
+  eins,
+  years,
+  which = names(core_tables()),
+  path = "PANEL990",
+  source = panel990::data_source(),
+  verbose = TRUE,
+  ...
+)
 ```
 
 ## Arguments
@@ -21,14 +30,22 @@ get_core(eins, years, tables = c("P00", "P01", "F9-P01-T00-SUMMARY-EZ"), ...)
 
   Tax years.
 
-- tables:
+- which:
 
-  Table names or 'panel990' aliases.
+  Names of
+  [`core_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/core_tables.md)
+  to read.
+
+- path, source, verbose:
+
+  Passed to
+  [`panel990::download_tables()`](https://nonprofit-open-data-collective.github.io/panel990/reference/download_tables.html).
 
 - ...:
 
-  Passed to 'panel990' retrieval functions.
+  Further arguments to
+  [`panel990::download_tables()`](https://nonprofit-open-data-collective.github.io/panel990/reference/download_tables.html).
 
 ## Value
 
-A named list of data.tables.
+A list of class `merger_core` holding one data.table per table.

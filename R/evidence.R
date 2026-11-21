@@ -12,7 +12,8 @@ evidence_tables <- function() {
   k <- c("EIN2", "OBJECTID", "TAX_YEAR")
   list(
     header  = list(table = "F9-P00-T00-HEADER",
-                   columns = c(k, "RETURN_TYPE", "RETURN_TIME_STAMP", "F9_00_RETURN_FINAL_X", "F9_00_RETURN_INITIAL_X",
+                   columns = c(k, "RETURN_TYPE", "RETURN_TIME_STAMP", "TAX_PERIOD_BEGIN_DATE", "TAX_PERIOD_END_DATE",
+                               "F9_00_RETURN_FINAL_X", "F9_00_RETURN_INITIAL_X",
                                "F9_00_YEAR_FORMATION", "F9_00_GROUP_EXEMPT_NUM")),
     p7      = list(table = "F9-P07-T01-COMPENSATION", columns = c(k, "F9_07_COMP_DTK_NAME_PERS", "F9_07_COMP_DTK_TITLE")),
     p6      = list(table = "F9-P06-T00-GOVERNANCE", columns = c(k, "F9_06_GVRN_CHANGE_DOC_X")),

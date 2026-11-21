@@ -2,18 +2,35 @@
 % Please edit documentation in R/cases.R
 \name{transfer_value}
 \alias{transfer_value}
-\title{Value of assets transferred to each recipient}
+\title{Value of assets transferred in each merger}
 \usage{
-transfer_value(tx, cases)
+transfer_value(cases, tx, core = NULL, max_coverage = 2)
 }
 \arguments{
+\item{cases}{Output of \code{\link[=build_merger_cases]{build_merger_cases()}}.}
+
 \item{tx}{Output of \code{\link[=sn_transactions]{sn_transactions()}}.}
 
-\item{cases}{Output of \code{\link[=build_merger_cases]{build_merger_cases()}}.}
+\item{core}{Optional organization-year table from \code{\link[=org_years]{org_years()}}.}
+
+\item{max_coverage}{Flag transfers above this multiple of the donor's
+beginning-of-year assets.}
 }
 \value{
-A data.table of FMV by merger and asset class, with outlier flags.
+A data.table, one row per \code{MERGER_ID}, with:
+\itemize{
+\item \verb{FMV_<class>} columns (see \code{\link[=asset_class]{asset_class()}});
+\item \code{FMV_TOTAL} (all lines as reported) and \code{FMV_ASSETS} (excluding
+liabilities assumed, which filers usually enter as positive amounts);
+\item \code{N_LINES}, \code{N_FMV_MISSING}, and \code{ANY_NEGATIVE};
+\item with \code{core}: \code{DONOR_ASSETS_BOY}, \code{COVERAGE} (\code{FMV_ASSETS} divided by
+the donor's beginning-of-year assets), and \code{FLAG_OUTLIER} (coverage
+above \code{max_coverage}, or negative \code{FMV_ASSETS}).
+}
 }
 \description{
-Value of assets transferred to each recipient
+Sums the fair market value of the asset lines the donor reported for its
+recipient, by asset class. With \code{core}, it also compares the total to the
+donor's beginning-of-year assets (\code{COVERAGE}) and flags implausible
+values.
 }

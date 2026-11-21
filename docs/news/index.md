@@ -2,6 +2,47 @@
 
 ## npmerger 0.0.0.9000
 
+- [`build_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_data.md)
+  runs the whole pipeline and returns every table. It accepts
+  pre-fetched inputs, so
+  [`npmerger_example()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/npmerger_example.md)
+  runs offline.
+
+- Merger cases:
+  [`build_merger_cases()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_cases.md)
+  (merger IDs, groups, and the merger year on each organization’s fiscal
+  calendar),
+  [`merger_roles()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_roles.md),
+  [`transfer_value()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/transfer_value.md)
+  (FMV by asset class, coverage of the donor’s assets, outlier flags),
+  and
+  [`asset_class()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/asset_class.md).
+
+- Core data:
+  [`get_core()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_core.md),
+  [`org_years()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/org_years.md)
+  (one return per organization-year), and
+  [`merger_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_measures.md)
+  (harmonized 990 / 990-EZ revenue, expenses, assets, debt, staff costs,
+  executive pay, grants, and overhead).
+  [`get_bmf()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_bmf.md)
+  adds NTEE codes and ruling years.
+
+- Analysis tables:
+  [`merger_attributes()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_attributes.md)
+  (donor and recipient attributes with five years of size history),
+  [`merger_part7()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_part7.md)
+  (Part VII rosters from t-2 to t+2 with `IN_BOTH`), and
+  [`merger_fiscal_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_fiscal_panel.md)
+  (measures, ‘fiscal’ ratios, an optional fixed-calibration index, and
+  optional trailing smoothing via
+  [`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)).
+
+- [`recover_recipient_ein()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/recover_recipient_ein.md)
+  recovers missing recipient EINs by unique name and ZIP or state match
+  against 990 filers
+  ([`get_name_index()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_name_index.md)).
+
 - Merger evidence:
   [`get_evidence_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_evidence_tables.md)
   reads the 990 header, Part VII, Part VI, Schedule O, Schedule R,
@@ -20,11 +61,14 @@
   ([`add_affiliation()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_affiliation.md)),
   and mission similarity
   ([`add_mission_similarity()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_mission_similarity.md)).
+
 - [`classify_transactions()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/classify_transactions.md)
   promotes an asset transfer to a merger when at least two corroborating
   signals agree, and records `BASIS` and `N_CORROBORATE`.
+
 - pkgdown site using the NODC `pkgstyle` template, and an overview
   vignette.
+
 - Initial package skeleton: Schedule N retrieval, flag/EIN/IRC-section
   parsers, transaction-level stacking of Schedule N Parts I and II,
   merger ID helpers, and default classification rules.

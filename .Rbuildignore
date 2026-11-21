@@ -18,3 +18,4 @@
 ^.*\.pptx$
 ^01-build-merger-panel\.rmd$
 ^\.claude$
+^lit$

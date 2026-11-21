@@ -19,3 +19,6 @@ temp/
 01-build-merger-panel.rmd
 
 .claude/
+
+# literature review drafts (local only)
+lit/

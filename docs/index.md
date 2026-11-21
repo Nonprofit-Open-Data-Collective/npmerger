@@ -11,9 +11,9 @@ fiscal-health panels. Data is retrieved with
 and fiscal metrics come from
 [fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
 
-> Status: early development. Retrieval, cleaning, filing-level features,
-> merger evidence, and the rule-based classifier are working. Case
-> building, attribute tables, and panels are stubs. See the
+> Status: early development. The full pipeline works, from Schedule N
+> through the analysis tables. The classifier has not yet been validated
+> against hand-labeled cases. See the
 > [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md)
 > and the
 > [overview](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html).
@@ -32,6 +32,17 @@ remotes::install_github("Nonprofit-Open-Data-Collective/npmerger")
 
 library(npmerger)
 
+# everything in one call: Schedule N, evidence, classification, cases,
+# transfers, donor/recipient attributes, Part VII panel, fiscal panel
+md <- build_merger_data(2019:2021, path = "PANEL990")
+md$cases; md$donors; md$recipients; md$part7; md$fiscal
+
+# offline, on the bundled example
+ex <- npmerger_example()
+build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
+                  names = ex$names, bmf_data = ex$bmf)
+
+# or stage by stage
 sn  <- get_schedule_n(2019:2021)   # Schedule N tables via panel990
 tx  <- sn_transactions(sn)         # one row per asset line (Parts I + II)
 fl  <- sn_filings(sn, tx)          # one row per Schedule N filing

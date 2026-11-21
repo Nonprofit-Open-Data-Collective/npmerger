@@ -1,5 +1,23 @@
 # npmerger 0.0.0.9000
 
+* `build_merger_data()` runs the whole pipeline and returns every table. It
+  accepts pre-fetched inputs, so `npmerger_example()` runs offline.
+* Merger cases: `build_merger_cases()` (merger IDs, groups, and the merger
+  year on each organization's fiscal calendar), `merger_roles()`,
+  `transfer_value()` (FMV by asset class, coverage of the donor's assets,
+  outlier flags), and `asset_class()`.
+* Core data: `get_core()`, `org_years()` (one return per organization-year),
+  and `merger_measures()` (harmonized 990 / 990-EZ revenue, expenses,
+  assets, debt, staff costs, executive pay, grants, and overhead).
+  `get_bmf()` adds NTEE codes and ruling years.
+* Analysis tables: `merger_attributes()` (donor and recipient attributes
+  with five years of size history), `merger_part7()` (Part VII rosters from
+  t-2 to t+2 with `IN_BOTH`), and `merger_fiscal_panel()` (measures,
+  'fiscal' ratios, an optional fixed-calibration index, and optional
+  trailing smoothing via `smooth_trailing()`).
+* `recover_recipient_ein()` recovers missing recipient EINs by unique name
+  and ZIP or state match against 990 filers (`get_name_index()`).
+
 * Merger evidence: `get_evidence_tables()` reads the 990 header, Part VII,
   Part VI, Schedule O, Schedule R, Schedule A, and mission tables for the
   donors and recipients in a set of filings. `merger_features()` adds:

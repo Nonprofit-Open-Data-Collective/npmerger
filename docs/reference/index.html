@@ -40,9 +40,39 @@
     </div>
 
     <div class="section level2">
+      <h2 id="run-the-whole-pipeline">Run the whole pipeline<a class="anchor" aria-label="anchor" href="#run-the-whole-pipeline"></a></h2>
+
+      <div class="section-desc"><p>Build every merger table in one call, or try it offline on the bundled example.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="build_merger_data.html">build_merger_data()</a></code>
+
+        </dt>
+        <dd>Build the full merger dataset</dd>
+
+        <dt>
+
+          <code><a href="npmerger_example.html">npmerger_example()</a></code>
+
+        </dt>
+        <dd>Example data for offline use</dd>
+
+        <dt>
+
+          <code><a href="efile_years.html">efile_years()</a></code>
+
+        </dt>
+        <dd>Tax years available in the e-file release</dd>
+      </dl></div><div class="section level2">
       <h2 id="retrieve-schedule-n">Retrieve Schedule N<a class="anchor" aria-label="anchor" href="#retrieve-schedule-n"></a></h2>
 
-      <div class="section-desc"><p>Download Schedule N tables (and, later, core 990 tables for selected organizations) through panel990.</p></div>
+      <div class="section-desc"><p>Download Schedule N tables through panel990.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -62,17 +92,10 @@
 
         </dt>
         <dd>Schedule N table names in the NCCS efile release</dd>
-
-        <dt>
-
-          <code><a href="get_core.html">get_core()</a></code>
-
-        </dt>
-        <dd>Retrieve core 990 tables for a set of organizations</dd>
       </dl></div><div class="section level2">
       <h2 id="clean-and-stack-transactions">Clean and stack transactions<a class="anchor" aria-label="anchor" href="#clean-and-stack-transactions"></a></h2>
 
-      <div class="section-desc"><p>Turn raw Schedule N tables into one row per asset line and one row per filing.</p></div>
+      <div class="section-desc"><p>Turn raw Schedule N tables into one row per asset line and one row per filing, and recover missing recipient EINs.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -92,6 +115,27 @@
 
         </dt>
         <dd>One row per Schedule N filing</dd>
+
+        <dt>
+
+          <code><a href="recover_recipient_ein.html">recover_recipient_ein()</a></code>
+
+        </dt>
+        <dd>Recover missing recipient EINs by name and location</dd>
+
+        <dt>
+
+          <code><a href="get_name_index.html">get_name_index()</a></code> <code><a href="get_name_index.html">name_index()</a></code>
+
+        </dt>
+        <dd>Name index of 990 filers</dd>
+
+        <dt>
+
+          <code><a href="org_name_key.html">org_name_key()</a></code>
+
+        </dt>
+        <dd>Normalize organization names for matching</dd>
 
         <dt>
 
@@ -229,10 +273,17 @@
 
         </dt>
         <dd>Transaction type labels</dd>
-      </dl></div><div class="section level2">
-      <h2 id="build-merger-cases-and-tables">Build merger cases and tables<a class="anchor" aria-label="anchor" href="#build-merger-cases-and-tables"></a></h2>
 
-      <div class="section-desc"><p>Merger identifiers, donor-recipient cases, and the analysis tables built around each merger.</p></div>
+        <dt>
+
+          <code><a href="sched_n_table.html">sched_n_table()</a></code>
+
+        </dt>
+        <dd>Schedule N transaction table</dd>
+      </dl></div><div class="section level2">
+      <h2 id="build-merger-cases">Build merger cases<a class="anchor" aria-label="anchor" href="#build-merger-cases"></a></h2>
+
+      <div class="section-desc"><p>Donor-recipient pairs with merger IDs, each organization’s merger year, and the value of assets transferred.</p></div>
 
       <dl></dl></div><div class="section level2">
 
@@ -241,13 +292,6 @@
 
       <dl><dt>
 
-          <code><a href="merger_id.html">merger_id()</a></code> <code><a href="merger_id.html">merger_group_id()</a></code>
-
-        </dt>
-        <dd>Build merger identifiers</dd>
-
-        <dt>
-
           <code><a href="build_merger_cases.html">build_merger_cases()</a></code>
 
         </dt>
@@ -255,19 +299,86 @@
 
         <dt>
 
+          <code><a href="merger_id.html">merger_id()</a></code> <code><a href="merger_id.html">merger_group_id()</a></code>
+
+        </dt>
+        <dd>Build merger identifiers</dd>
+
+        <dt>
+
+          <code><a href="merger_roles.html">merger_roles()</a></code>
+
+        </dt>
+        <dd>Donor and recipient roles for each merger</dd>
+
+        <dt>
+
           <code><a href="transfer_value.html">transfer_value()</a></code>
 
         </dt>
-        <dd>Value of assets transferred to each recipient</dd>
+        <dd>Value of assets transferred in each merger</dd>
 
         <dt>
 
-          <code><a href="sched_n_table.html">sched_n_table()</a></code>
+          <code><a href="asset_class.html">asset_class()</a></code>
 
         </dt>
-        <dd>Schedule N transaction table</dd>
+        <dd>Classify Schedule N asset descriptions</dd>
+      </dl></div><div class="section level2">
+      <h2 id="core-financial-data">Core financial data<a class="anchor" aria-label="anchor" href="#core-financial-data"></a></h2>
+
+      <div class="section-desc"><p>Read core 990 tables for merger organizations and build harmonized 990 / 990-EZ organization-years.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="get_core.html">get_core()</a></code>
+
+        </dt>
+        <dd>Retrieve core 990 tables for a set of organizations</dd>
 
         <dt>
+
+          <code><a href="core_tables.html">core_tables()</a></code>
+
+        </dt>
+        <dd>Core 990 tables read for merger organizations</dd>
+
+        <dt>
+
+          <code><a href="org_years.html">org_years()</a></code>
+
+        </dt>
+        <dd>One row per organization-year from core tables</dd>
+
+        <dt>
+
+          <code><a href="merger_measures.html">merger_measures()</a></code>
+
+        </dt>
+        <dd>Harmonized financial measures for 990 and 990-EZ filers</dd>
+
+        <dt>
+
+          <code><a href="get_bmf.html">get_bmf()</a></code>
+
+        </dt>
+        <dd>Retrieve BMF organization traits for merger organizations</dd>
+      </dl></div><div class="section level2">
+      <h2 id="analysis-tables">Analysis tables<a class="anchor" aria-label="anchor" href="#analysis-tables"></a></h2>
+
+      <div class="section-desc"><p>Donor and recipient attributes, the Part VII panel, and the fiscal-health panel around each merger.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
 
           <code><a href="merger_attributes.html">merger_attributes()</a></code>
 
@@ -287,6 +398,13 @@
 
         </dt>
         <dd>Fiscal-health panel around each merger</dd>
+
+        <dt>
+
+          <code><a href="smooth_trailing.html">smooth_trailing()</a></code>
+
+        </dt>
+        <dd>Smooth panel variables using only current and past years</dd>
       </dl></div><div class="section level2">
       <h2 id="package">Package<a class="anchor" aria-label="anchor" href="#package"></a></h2>
 

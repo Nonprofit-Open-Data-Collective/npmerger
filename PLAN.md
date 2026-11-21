@@ -137,11 +137,17 @@ Design choices:
    - Mission similarity: `add_mission_similarity()`.
 
    Real-data check on 2021 (5,167 filings; script `dev/run-2021.R`): closure 2,160; asset_disposition 1,090; asset_transfer 938; merger2 858; mergerN 107; consolidation 14. Of these, 54 mergers rest on corroboration rather than leadership. Affiliated pairs make up 37% of merger2, 76% of mergerN, and 4% of closures. 98% of merger donors file a final return. Evidence retrieval takes about 2.5 minutes cold (from the parquet cache) and 0.4 minutes warm.
-4. **Cases + IDs + asset values** (`build_merger_cases`, `transfer_value`).
-5. **Attribute tables** (donor/recipient), with BMF NTEE + age.
-6. **Part VII panel** (t-2..t+2) and **fiscal panel** using `fiscal`.
-7. **Recipient EIN recovery** (fuzzy matching) to win back the 28% missing EINs.
-8. Pipeline wrapper, vignettes, pkgdown site, full-years run with a manifest of counts per year and label.
+4. ✅ **Cases, IDs, and asset values:**
+   - `get_core()`, `org_years()`, `merger_measures()`.
+   - `build_merger_cases()`, which places the merger year on the recipient's fiscal calendar.
+   - `transfer_value()` and `asset_class()`. Classifying transferred value moved the "other" bucket from 31% to 3%.
+5. ✅ **Attribute tables:** `merger_attributes()` and `get_bmf()`. NTEE coverage is 97–98%.
+6. ✅ **Part VII panel** (`merger_part7()`) and **fiscal panel** (`merger_fiscal_panel()`, `smooth_trailing()`).
+7. ✅ **Recipient EIN recovery** (`recover_recipient_ein()`), by unique name + ZIP, then name + state. It recovers only about 1,200 lines (1.2%): of the lines with no EIN, about 40% have no recipient name, and many name churches, governments, or "various". Most missing-EIN recipients do not file 990s, so the 23% that remain missing is largely a data limit.
+8. ✅ **Wrapper and documentation:**
+   - `build_merger_data()`, plus offline example data (`npmerger_example()`, built by `data-raw/example.R`).
+   - Vignette and site.
+   - Full-years run (`dev/run-all-years.R`) and descriptives (`dev/descriptives.R`); see section 8.
 
 ---
 
@@ -207,14 +213,53 @@ For merger panels this leaks post-merger information into pre-merger years. I co
 - A trailing window cuts noise as much as centered does (−63% volatility), with no look-ahead.
 - Trailing does **lag** real changes: the post-merger rise is spread over k years (trailing .26 → .29 → .31 for t = 0..2).
 - Plan:
-  1. Add `align = c("center", "trailing")` to `panel990::panel_smooth()` and make the window calendar-year based. This is a separate panel990 change. npmerger needs it but shouldn't fork it.
+  1. Add `align = c("left", "center", "right")` to `panel990::panel_smooth()` (default `"center"`). `"right"` is the trailing window, counted by calendar year. This was requested in panel990. npmerger's `smooth_trailing()` calls it when the installed panel990 supports `"right"`, and otherwise uses an equivalent internal version.
   2. In `merger_fiscal_panel()`, offer `smooth = "trailing"` (default `k = 3`).
   3. Use trailing-smoothed values for matching covariates and baselines (t-2), and **raw** values for event-time outcome estimates. Otherwise the lag smears the merger effect.
+
+---
+
+## 8. Full-years run (Schedule N 2010–2024, e-file v3_1; 2026-11-20)
+
+`dev/run-all-years.R` took 53 minutes on a warm cache (8.3 GB, 2009–2025).
+
+**Scale:**
+- 60,235 Schedule N filings; **12,059 merger filings**: merger2 9,405; mergerN 2,430; consolidation 224.
+- These become 11,943 donor→recipient cases in 10,336 merger events.
+- Mergers grew from about 330 a year (2010) to about 1,050 (2024).
+- 4% of merger2 and 9% of mergerN rest on corroboration rather than leadership evidence. 40% of merger2 and 65% of mergerN are between affiliated organizations.
+
+**Descriptives** (`dev/descriptives.R`; sizes are for year t-1, the last full year before the merger):
+
+| | Closing org (donor) | Recipient |
+|---|---|---|
+| Revenue: median (p25–p75) | $260k ($56k–$1.28m) | $6.3m ($0.95m–$31.8m) |
+| Assets: median | $447k | $10.3m |
+| Revenue: mean / 5%-trimmed mean | $11.7m / $1.24m | $141m / $32.6m |
+
+- **Size gap.** The median recipient has 11.9× the donor's revenue (p25 2.7×, p75 82×). The recipient is larger in 89% of mergers, more than 10× larger in 53%, and more than 100× larger in 23%. The ratio is smaller for consolidations (1.2–1.5×) and larger for affiliated mergers (19–25×).
+- **Multi-organization mergers.**
+  - 8.2% of merger events have two or more closing donors, and those events account for 20% of all closing organizations.
+  - Group size: 2 donors in 5.6% of events, 3 in 1.5%, 4 or more in 1.1%.
+  - 92 consolidations into a new entity, involving 223 donors.
+- **Part VII joiners** (10,871 mergers with both rosters observed).
+  - On average 2.0 donor people newly appear on the recipient's Part VII after the merger (median 1). 54% of mergers have at least one joiner.
+  - About 14% of the donor's roster joins (median donor roster: 11 people).
+  - Separately, 58% of mergers already had at least one person on both rosters before the merger (mean 2.8). Affiliated mergers average 5 such people.
+- **CEO / executive director.**
+  - A donor CEO or ED can be identified in 4,755 mergers: 82% by title, the rest as the highest-paid officer. Many small donors have no paid executive.
+  - **54% of those CEOs appear at the recipient after the merger.** Of those, 73% are listed as CEO or ED there, 11% as another officer or staff, and 8% as a board member.
+  - The rate is 75% for affiliated two-party mergers, 35% for unaffiliated ones, and 61–64% for consolidations.
+- **Asset transfers.**
+  - Median $308k; 5%-trimmed mean $1.9m; mean $10.9m.
+  - $116bn in total across 10,637 positive, unflagged transfers. 662 transfers are flagged as outliers.
+  - The median transfer is 91% of the donor's beginning-of-year assets.
+  - As a share of the recipient's t-1 assets: median 5.2%. 29% of transfers are under 1%, 24% are 10–50%, and 17% are 50% or more. Consolidations are the high end (median 16–39%), since the recipient is new.
 
 ---
 
 ## 6. Open questions
 
 1. **990-EZ donors.** They are about half of Part I filers, but mostly tiny. Include them by default, with a size filter as an option?
-2. **Year range.** v3_1 covers roughly 2018–2024 here. Should the old 2011–2017 e-file years (v2_x) be supported too, or only the current release?
+2. **Year range.** The current release (v3_1) covers 2009–2025, so the older v2_x releases are no longer needed. 2009 and 2025 are partial years.
 3. **Fiscal index reference sample.** Which reference should the fiscal-health model be calibrated on (section 7)?

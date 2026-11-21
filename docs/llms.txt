@@ -11,9 +11,9 @@ fiscal-health panels. Data is retrieved with
 and fiscal metrics come from
 [fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
 
-> Status: early development. Retrieval, cleaning, filing-level features,
-> merger evidence, and the rule-based classifier are working. Case
-> building, attribute tables, and panels are stubs. See the
+> Status: early development. The full pipeline works, from Schedule N
+> through the analysis tables. The classifier has not yet been validated
+> against hand-labeled cases. See the
 > [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md)
 > and the
 > [overview](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html).
@@ -32,6 +32,17 @@ remotes::install_github("Nonprofit-Open-Data-Collective/npmerger")
 
 library(npmerger)
 
+# everything in one call: Schedule N, evidence, classification, cases,
+# transfers, donor/recipient attributes, Part VII panel, fiscal panel
+md <- build_merger_data(2019:2021, path = "PANEL990")
+md$cases; md$donors; md$recipients; md$part7; md$fiscal
+
+# offline, on the bundled example
+ex <- npmerger_example()
+build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
+                  names = ex$names, bmf_data = ex$bmf)
+
+# or stage by stage
 sn  <- get_schedule_n(2019:2021)   # Schedule N tables via panel990
 tx  <- sn_transactions(sn)         # one row per asset line (Parts I + II)
 fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
@@ -64,27 +75,43 @@ and `YEAR-TOEIN` groups multi-party mergers
 
 # Package index
 
+## Run the whole pipeline
+
+Build every merger table in one call, or try it offline on the bundled
+example.
+
+- [`build_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_data.md)
+  : Build the full merger dataset
+- [`npmerger_example()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/npmerger_example.md)
+  : Example data for offline use
+- [`efile_years()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/efile_years.md)
+  : Tax years available in the e-file release
+
 ## Retrieve Schedule N
 
-Download Schedule N tables (and, later, core 990 tables for selected
-organizations) through panel990.
+Download Schedule N tables through panel990.
 
 - [`get_schedule_n()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_schedule_n.md)
   : Retrieve Schedule N tables
 - [`sn_table_names()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_table_names.md)
   : Schedule N table names in the NCCS efile release
-- [`get_core()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_core.md)
-  : Retrieve core 990 tables for a set of organizations
 
 ## Clean and stack transactions
 
 Turn raw Schedule N tables into one row per asset line and one row per
-filing.
+filing, and recover missing recipient EINs.
 
 - [`sn_transactions()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_transactions.md)
   : Stack Schedule N Part I and Part II asset lines
 - [`sn_filings()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_filings.md)
   : One row per Schedule N filing
+- [`recover_recipient_ein()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/recover_recipient_ein.md)
+  : Recover missing recipient EINs by name and location
+- [`get_name_index()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_name_index.md)
+  [`name_index()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_name_index.md)
+  : Name index of 990 filers
+- [`org_name_key()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/org_name_key.md)
+  : Normalize organization names for matching
 - [`sn_flag()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_flag.md)
   : Parse efile checkbox values
 - [`clean_ein()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/clean_ein.md)
@@ -134,27 +161,55 @@ reorganization, using rules you can change.
   : Default transaction classification rules
 - [`transaction_types()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/transaction_types.md)
   : Transaction type labels
+- [`sched_n_table()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sched_n_table.md)
+  : Schedule N transaction table
 
-## Build merger cases and tables
+## Build merger cases
 
-Merger identifiers, donor-recipient cases, and the analysis tables built
-around each merger.
+Donor-recipient pairs with merger IDs, each organization’s merger year,
+and the value of assets transferred.
 
+- [`build_merger_cases()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_cases.md)
+  : Build merger cases (donor-recipient pairs)
 - [`merger_id()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_id.md)
   [`merger_group_id()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_id.md)
   : Build merger identifiers
-- [`build_merger_cases()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_cases.md)
-  : Build merger cases (donor-recipient pairs)
+- [`merger_roles()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_roles.md)
+  : Donor and recipient roles for each merger
 - [`transfer_value()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/transfer_value.md)
-  : Value of assets transferred to each recipient
-- [`sched_n_table()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sched_n_table.md)
-  : Schedule N transaction table
+  : Value of assets transferred in each merger
+- [`asset_class()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/asset_class.md)
+  : Classify Schedule N asset descriptions
+
+## Core financial data
+
+Read core 990 tables for merger organizations and build harmonized 990 /
+990-EZ organization-years.
+
+- [`get_core()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_core.md)
+  : Retrieve core 990 tables for a set of organizations
+- [`core_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/core_tables.md)
+  : Core 990 tables read for merger organizations
+- [`org_years()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/org_years.md)
+  : One row per organization-year from core tables
+- [`merger_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_measures.md)
+  : Harmonized financial measures for 990 and 990-EZ filers
+- [`get_bmf()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_bmf.md)
+  : Retrieve BMF organization traits for merger organizations
+
+## Analysis tables
+
+Donor and recipient attributes, the Part VII panel, and the
+fiscal-health panel around each merger.
+
 - [`merger_attributes()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_attributes.md)
   : Donor and recipient attribute tables
 - [`merger_part7()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_part7.md)
   : Part VII panel around each merger
 - [`merger_fiscal_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_fiscal_panel.md)
   : Fiscal-health panel around each merger
+- [`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)
+  : Smooth panel variables using only current and past years
 
 ## Package
 

@@ -7,7 +7,9 @@
 build_merger_cases(
   classified,
   tx,
-  types = c("merger2", "mergerN", "consolidation")
+  header = NULL,
+  types = c("merger2", "mergerN", "consolidation"),
+  group_window = 1L
 )
 }
 \arguments{
@@ -15,13 +17,30 @@ build_merger_cases(
 
 \item{tx}{Output of \code{\link[=sn_transactions]{sn_transactions()}}.}
 
+\item{header}{Optional 990 header rows for recipients (with \code{EIN2},
+\code{TAX_YEAR}, \code{TAX_PERIOD_BEGIN_DATE}, \code{TAX_PERIOD_END_DATE}), used to
+place the distribution date on the recipient's fiscal calendar.}
+
 \item{types}{Transaction types to keep.}
+
+\item{group_window}{Years between donors that still count as one group.}
 }
 \value{
-A data.table of cases.
+A data.table of class \code{merger_cases}, one row per \code{MERGER_ID}.
 }
 \description{
-Turns classified filings into donor-recipient pairs with \code{MERGER_ID},
-\code{MERGER_GROUP_ID}, the merger year on each side's fiscal calendar, and
-a role table.
+Turns classified filings into one row per donor-recipient pair.
+}
+\details{
+\itemize{
+\item \code{MERGER_ID} is \code{YEAR-FROMEIN-TOEIN}, using the donor's Schedule N year.
+\item \code{MERGER_GROUP_ID} is \code{YEAR-TOEIN}. It links donors that fold into the
+same recipient within \code{group_window} years of each other, and uses the
+earliest donor year in the group.
+\item \code{MERGER_YEAR} is the donor's Schedule N tax year (time 0 for the donor).
+\item \code{RECIP_MERGER_YEAR} is the recipient's tax year whose filing period
+contains the asset distribution date (time 0 for the recipient). It
+falls back to \code{MERGER_YEAR} when the recipient's filing period is
+unknown.
+}
 }

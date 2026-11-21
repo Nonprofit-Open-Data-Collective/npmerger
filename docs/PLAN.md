@@ -205,14 +205,42 @@ Org age = tax year − min(formation year, ruling year).
     of merger2, 76% of mergerN, and 4% of closures. 98% of merger donors
     file a final return. Evidence retrieval takes about 2.5 minutes cold
     (from the parquet cache) and 0.4 minutes warm.
-4.  **Cases + IDs + asset values** (`build_merger_cases`,
-    `transfer_value`).
-5.  **Attribute tables** (donor/recipient), with BMF NTEE + age.
-6.  **Part VII panel** (t-2..t+2) and **fiscal panel** using `fiscal`.
-7.  **Recipient EIN recovery** (fuzzy matching) to win back the 28%
-    missing EINs.
-8.  Pipeline wrapper, vignettes, pkgdown site, full-years run with a
-    manifest of counts per year and label.
+4.  ✅ **Cases, IDs, and asset values:**
+    - [`get_core()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_core.md),
+      [`org_years()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/org_years.md),
+      [`merger_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_measures.md).
+    - [`build_merger_cases()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_cases.md),
+      which places the merger year on the recipient’s fiscal calendar.
+    - [`transfer_value()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/transfer_value.md)
+      and
+      [`asset_class()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/asset_class.md).
+      Classifying transferred value moved the “other” bucket from 31% to
+      3%.
+5.  ✅ **Attribute tables:**
+    [`merger_attributes()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_attributes.md)
+    and
+    [`get_bmf()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_bmf.md).
+    NTEE coverage is 97–98%.
+6.  ✅ **Part VII panel**
+    ([`merger_part7()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_part7.md))
+    and **fiscal panel**
+    ([`merger_fiscal_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_fiscal_panel.md),
+    [`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)).
+7.  ✅ **Recipient EIN recovery**
+    ([`recover_recipient_ein()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/recover_recipient_ein.md)),
+    by unique name + ZIP, then name + state. It recovers only about
+    1,200 lines (1.2%): of the lines with no EIN, about 40% have no
+    recipient name, and many name churches, governments, or “various”.
+    Most missing-EIN recipients do not file 990s, so the 23% that remain
+    missing is largely a data limit.
+8.  ✅ **Wrapper and documentation:**
+    - [`build_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_data.md),
+      plus offline example data
+      ([`npmerger_example()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/npmerger_example.md),
+      built by `data-raw/example.R`).
+    - Vignette and site.
+    - Full-years run (`dev/run-all-years.R`) and descriptives
+      (`dev/descriptives.R`); see section 8.
 
 ------------------------------------------------------------------------
 
@@ -327,10 +355,13 @@ of the t-1 index with the year-t index, controlling for t-2:
 - Trailing does **lag** real changes: the post-merger rise is spread
   over k years (trailing .26 → .29 → .31 for t = 0..2).
 - Plan:
-  1.  Add `align = c("center", "trailing")` to
+  1.  Add `align = c("left", "center", "right")` to
       [`panel990::panel_smooth()`](https://nonprofit-open-data-collective.github.io/panel990/reference/panel_smooth.html)
-      and make the window calendar-year based. This is a separate
-      panel990 change. npmerger needs it but shouldn’t fork it.
+      (default `"center"`). `"right"` is the trailing window, counted by
+      calendar year. This was requested in panel990. npmerger’s
+      [`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)
+      calls it when the installed panel990 supports `"right"`, and
+      otherwise uses an equivalent internal version.
   2.  In
       [`merger_fiscal_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_fiscal_panel.md),
       offer `smooth = "trailing"` (default `k = 3`).
@@ -340,12 +371,74 @@ of the t-1 index with the year-t index, controlling for t-2:
 
 ------------------------------------------------------------------------
 
+## 8. Full-years run (Schedule N 2010–2024, e-file v3_1; 2026-11-20)
+
+`dev/run-all-years.R` took 53 minutes on a warm cache (8.3 GB,
+2009–2025).
+
+**Scale:** - 60,235 Schedule N filings; **12,059 merger filings**:
+merger2 9,405; mergerN 2,430; consolidation 224. - These become 11,943
+donor→recipient cases in 10,336 merger events. - Mergers grew from about
+330 a year (2010) to about 1,050 (2024). - 4% of merger2 and 9% of
+mergerN rest on corroboration rather than leadership evidence. 40% of
+merger2 and 65% of mergerN are between affiliated organizations.
+
+**Descriptives** (`dev/descriptives.R`; sizes are for year t-1, the last
+full year before the merger):
+
+|  | Closing org (donor) | Recipient |
+|----|----|----|
+| Revenue: median (p25–p75) | \$260k (\$56k–\$1.28m) | \$6.3m (\$0.95m–\$31.8m) |
+| Assets: median | \$447k | \$10.3m |
+| Revenue: mean / 5%-trimmed mean | \$11.7m / \$1.24m | \$141m / \$32.6m |
+
+- **Size gap.** The median recipient has 11.9× the donor’s revenue (p25
+  2.7×, p75 82×). The recipient is larger in 89% of mergers, more than
+  10× larger in 53%, and more than 100× larger in 23%. The ratio is
+  smaller for consolidations (1.2–1.5×) and larger for affiliated
+  mergers (19–25×).
+- **Multi-organization mergers.**
+  - 8.2% of merger events have two or more closing donors, and those
+    events account for 20% of all closing organizations.
+  - Group size: 2 donors in 5.6% of events, 3 in 1.5%, 4 or more in
+    1.1%.
+  - 92 consolidations into a new entity, involving 223 donors.
+- **Part VII joiners** (10,871 mergers with both rosters observed).
+  - On average 2.0 donor people newly appear on the recipient’s Part VII
+    after the merger (median 1). 54% of mergers have at least one
+    joiner.
+  - About 14% of the donor’s roster joins (median donor roster: 11
+    people).
+  - Separately, 58% of mergers already had at least one person on both
+    rosters before the merger (mean 2.8). Affiliated mergers average 5
+    such people.
+- **CEO / executive director.**
+  - A donor CEO or ED can be identified in 4,755 mergers: 82% by title,
+    the rest as the highest-paid officer. Many small donors have no paid
+    executive.
+  - **54% of those CEOs appear at the recipient after the merger.** Of
+    those, 73% are listed as CEO or ED there, 11% as another officer or
+    staff, and 8% as a board member.
+  - The rate is 75% for affiliated two-party mergers, 35% for
+    unaffiliated ones, and 61–64% for consolidations.
+- **Asset transfers.**
+  - Median \$308k; 5%-trimmed mean \$1.9m; mean \$10.9m.
+  - \$116bn in total across 10,637 positive, unflagged transfers. 662
+    transfers are flagged as outliers.
+  - The median transfer is 91% of the donor’s beginning-of-year assets.
+  - As a share of the recipient’s t-1 assets: median 5.2%. 29% of
+    transfers are under 1%, 24% are 10–50%, and 17% are 50% or more.
+    Consolidations are the high end (median 16–39%), since the recipient
+    is new.
+
+------------------------------------------------------------------------
+
 ## 6. Open questions
 
 1.  **990-EZ donors.** They are about half of Part I filers, but mostly
     tiny. Include them by default, with a size filter as an option?
-2.  **Year range.** v3_1 covers roughly 2018–2024 here. Should the old
-    2011–2017 e-file years (v2_x) be supported too, or only the current
-    release?
+2.  **Year range.** The current release (v3_1) covers 2009–2025, so the
+    older v2_x releases are no longer needed. 2009 and 2025 are partial
+    years.
 3.  **Fiscal index reference sample.** Which reference should the
     fiscal-health model be calibrated on (section 7)?
