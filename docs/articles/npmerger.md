@@ -16,8 +16,11 @@ and fiscal-health metrics come from
 [fiscal](https://github.com/Nonprofit-Open-Data-Collective/fiscal).
 
 > **Status.** The full pipeline works, from Schedule N through the
-> analysis tables. The classifier has not yet been validated against
-> hand-labeled cases. See the
+> analysis tables. The classifier has been checked against 300
+> hand-labeled filings; see [How the classifier separates mergers from
+> other
+> cases](https://nonprofit-open-data-collective.github.io/npmerger/articles/classifier.md)
+> and the
 > [roadmap](https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md).
 
 ## What counts as a merger

@@ -213,6 +213,35 @@ fiscal-health panel around each merger.
 - [`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)
   : Smooth panel variables using only current and past years
 
+## Matched comparison samples
+
+Build the full 990 panel, a research sample of mergers with a full
+observation window, and candidate comparison organizations for merger
+recipients.
+
+- [`get_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_panel.md)
+  : Build the full 990 organization-year panel
+- [`panel_columns()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_columns.md)
+  : Columns read for the full 990 matching panel
+- [`panel_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_measures.md)
+  : Slim matching measures for an organization-year table
+- [`merger_sample()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_sample.md)
+  : Research sample of mergers with a full observation window
+- [`schedule_n_events()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/schedule_n_events.md)
+  : Schedule N involvement by organization and year
+- [`match_pool()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_pool.md)
+  : Pool of potential comparison organization-years
+- [`match_candidates()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_candidates.md)
+  : Find match candidates for merger recipients
+- [`match_balance()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_balance.md)
+  : Covariate balance of a matched sample
+- [`ntee_level()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/ntee_level.md)
+  : Clean NTEE code to a given number of characters
+- [`real_dollars()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/real_dollars.md)
+  : Convert nominal dollars to constant dollars
+- [`cpi_u()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/cpi_u.md)
+  : Consumer price index (CPI-U, annual average)
+
 ## Package
 
 - [`npmerger`](https://nonprofit-open-data-collective.github.io/npmerger/reference/npmerger-package.md)
@@ -223,5 +252,7 @@ fiscal-health panel around each merger.
 
 ### All vignettes
 
+- [How the classifier separates mergers from other
+  cases](https://nonprofit-open-data-collective.github.io/npmerger/articles/classifier.md):
 - [Overview: finding nonprofit mergers in IRS 990
   data](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.md):

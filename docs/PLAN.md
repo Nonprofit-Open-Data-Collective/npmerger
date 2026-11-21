@@ -541,3 +541,46 @@ overlap. - A human pass over the low-confidence labels.
     years.
 3.  **Fiscal index reference sample.** Which reference should the
     fiscal-health model be calibrated on (section 7)?
+
+------------------------------------------------------------------------
+
+## 10. Matched comparison sample for merger2 recipients (2026-11-21, `dev/build-matching.R`)
+
+**Design.** - **Full 990 panel**
+([`get_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_panel.md)):
+6,218,170 org-years from 809,497 organizations (990 and 990-EZ,
+2009–2025), with constant 2024 dollars (CPI-U). - **Research sample**
+([`merger_sample()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_sample.md)):
+merger2 cases whose recipient filed in every year from t-2 to t+2 on its
+own fiscal calendar. That keeps 4,524 of 9,984 cases, or 4,507 recipient
+× merger-year treated units. - Baselines for donor and recipient are the
+mean of t-3 and t-2 (t-2 required). - The donor window (t-2 and t-1) is
+flagged, not required. - **Pool**
+([`match_pool()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_pool.md)):
+any org-year Y with returns in every year from Y-2 to Y+2 and no
+Schedule N involvement (as filer or named recipient) in Y-3..Y+2. That
+gives 2,975,950 org-years from 506,514 organizations. Calendar years
+need not match the treated year; only 9% of candidate pairs share it. -
+**Candidates**
+([`match_candidates()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_candidates.md))
+are matched on: - exact NTEE at two characters (e.g. E2); - assets and
+expenses each within a factor of 2, in logs; - either operating margin
+within ±0.10 or equity ratio within ±0.15. - All candidates are kept,
+ranked by standardized distance.
+
+**Results.** - **Margin spec:** 3,112 of 4,507 treated units (69%) have
+candidates. Mean 819 per matched unit, median 324, p10 16, p90 2,440.
+3,008 units have at least 5 candidates and 2,697 at least 25. -
+**Equity-ratio spec:** 3,094 matched (69%), median 353 per unit. -
+**Balance** is very close. With k = 1 or 5, every \|SMD\| ≤ 0.04,
+against SMDs of 1.1–1.2 on size versus the unmatched pool. - **Why 1,395
+treated units are unmatched:** - 1,305 have no usable NTEE code: BMF
+`ntee_code_clean` is “UNDEFINED” or “INVALID”. Many are 501(c)(3)s
+(YMCAs, VNAs, health centers); the rest are 501(c)(6) chambers, lodges,
+and credit unions. - 68 have no candidate within the calipers. They are
+very large (median assets \$112m). - 22 are missing a baseline value. -
+29% of panel org-years have no NTEE code (16% among 501(c)(3)s).
+
+**Next.** Fill missing NTEE codes from another source (IRS EO BMF
+`NTEE_CD`, or older NCCS BMF vintages). That would add up to 1,305
+treated units.

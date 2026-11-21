@@ -1,0 +1,445 @@
+# How the classifier separates mergers from other cases
+
+Every Schedule N filing tells us that an organization gave away a large
+share of its assets. Most of those filings are not mergers. The
+organization may have closed and scattered what was left, sold a
+building and kept operating, or handed its last few thousand dollars to
+a local charity.
+[`classify_transactions()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/classify_transactions.md)
+sorts each filing into one of eight labels using rules you can read and
+change. This page explains those rules, the evidence behind each one,
+and how the three merger labels (`merger2`, `mergerN`, and
+`consolidation`) differ.
+
+``` r
+
+library(npmerger)
+transaction_types()
+#> [1] "merger2"           "mergerN"           "consolidation"    
+#> [4] "asset_transfer"    "closure"           "asset_disposition"
+#> [7] "reorganization"    "other"
+```
+
+## Five questions
+
+The classifier answers five questions about each filing, in order. Each
+answer either settles the label or passes the filing on to the next
+question.
+
+1.  **Did the filer end?** If not, the filing is an `asset_disposition`.
+2.  **Did the assets go back to the filer itself?** If so, it is a
+    `reorganization`.
+3.  **Did one nonprofit get most of the assets?** If not, it is a
+    `closure`.
+4.  **Is there evidence that this was a merger, not just a gift?** If
+    not, it is an `asset_transfer`.
+5.  **How many dissolving organizations sent their assets to the same
+    successor, and is the successor new?** This picks among `merger2`,
+    `mergerN`, and `consolidation`.
+
+The code is one `fcase()` in the same order, so the first rule that
+matches wins:
+
+| Order | Condition | Label |
+|----|----|----|
+| 1 | Not terminated, and filed Part II | `asset_disposition` |
+| 2 | The dominant recipient’s EIN is the filer’s own | `reorganization` |
+| 3 | Terminated, with no dominant nonprofit successor | `closure` |
+| 4 | Terminated, merger evidence, 2+ donors, new successor | `consolidation` |
+| 5 | Terminated, merger evidence, 2+ donors | `mergerN` |
+| 6 | Terminated, merger evidence | `merger2` |
+| 7 | Terminated | `asset_transfer` |
+| 8 | Anything else (no usable rows) | `other` |
+
+The sections below explain each test.
+
+## 1. Did the filer end? (`TERMINATED`)
+
+Schedule N has two parts:
+
+- **Part I** is for an organization that liquidated, terminated, or
+  dissolved.
+- **Part II** is for an organization that disposed of more than 25% of
+  its net assets and kept operating.
+
+A filing is `TERMINATED` if it has Part I. Filers often use the wrong
+part, though. In hand validation, all 12 Part-II-only filings with the
+final-return box checked had in fact ended (7 of them were mergers). So
+by default (`final_as_termination = TRUE`), a Part II filing on a final
+return also counts as a termination.
+
+A filer that did not end and reported Part II is an `asset_disposition`:
+a sale, a spin-off, or a transfer of one program or facility. It is
+never a merger label, even when leadership moves with the assets,
+because the filer is still there.
+
+## 2. Did the assets go back to the filer? (`reorganization`)
+
+When the recipient’s EIN is the filer’s own EIN, the “transfer” is an
+internal restructuring. This rule is narrow. Most real reorganizations
+(conversion to an LLC, a new corporation, a PTA becoming a PTO) produce
+a new EIN, so they fall through to the later rules.
+
+## 3. Did one nonprofit get most of the assets? (`TOP_SHARE`)
+
+[`sn_filings()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_filings.md)
+groups the asset lines by recipient and keeps only recipients that look
+like nonprofits: a parsed IRC section of 501(c)(3) or another exempt
+type, or a valid EIN with no section given. It then records:
+
+- `N_NP_RECIP`: the number of nonprofit recipients;
+- `TOP_RECIP_EIN`: the nonprofit recipient with the most fair market
+  value;
+- `TOP_SHARE`: that recipient’s share of **all** value transferred,
+  including value to individuals, businesses, and governments.
+
+A filing has **one dominant nonprofit successor** when `TOP_SHARE` is at
+least `min_top_share` (0.75 by default). When the filing reports no fair
+market values, a single nonprofit recipient counts instead.
+
+A terminated filing that fails this test is a `closure`. That covers
+organizations whose assets were spread across several charities, went to
+individuals or vendors, were spent down, or were zero. The 0.75
+threshold comes from hand validation: 10 of 11 dissolutions with a top
+share between 0.5 and 0.75 read as dispersed closures, and none as
+mergers.
+
+``` r
+
+x <- data.frame(
+  EIN2 = "EIN-01-0000001", HAS_P1 = TRUE, HAS_P2 = FALSE, LEADER_SN = FALSE,
+  LEADER_P7 = FALSE, N_NP_RECIP = c(1L, 4L, 1L, 0L),
+  TOP_SHARE = c(0.95, 0.40, 0.60, NA), TOP_RECIP_EIN = c(rep("020000002", 3), NA)
+)
+classify_transactions(x)[, c("N_NP_RECIP", "TOP_SHARE", "TYPE")]
+#>    N_NP_RECIP TOP_SHARE           TYPE
+#>         <int>     <num>         <char>
+#> 1:          1      0.95 asset_transfer
+#> 2:          4      0.40        closure
+#> 3:          1      0.60        closure
+#> 4:          0        NA        closure
+```
+
+## 4. Is there merger evidence? (`LEADER`, `SN_MERGER_TEXT`, `BASIS`)
+
+A terminated organization that gives nearly everything to one nonprofit
+is still not necessarily a merger. Many small groups dissolve and send a
+residual balance to a charity they like. What separates a merger is a
+sign that the organization’s **people or operations continue** at the
+recipient. The classifier accepts two kinds of evidence by default.
+
+**Leadership continuity (`LEADER`).** Either source counts
+(`leader = "either"`):
+
+- **Schedule N lines 2a–2c** (`LEADER_SN`): the filer says an officer,
+  director, trustee, or key employee became a director, employee, or
+  owner of the successor.
+- **Part VII overlap** (`LEADER_P7`, from
+  [`leader_overlap()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/leader_overlap.md)):
+  at least one person on the donor’s Part VII in years t-1 or t also
+  appears on the recipient’s Part VII in years t or t+1. Names are
+  matched on first and last name
+  ([`person_key()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/person_key.md)).
+
+``` r
+
+person_key(c("Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith"))
+#> [1] "JANE SMITH" "JANE SMITH" NA
+```
+
+The Schedule N boxes are under-reported. About 40% of filings that would
+otherwise be asset transfers, with no box checked, still share people
+with the recipient on Part VII. Among pairs that did check a box,
+87–100% share people, against 9% of closures. So Part VII is a second
+channel rather than a replacement.
+
+**The filer’s own merger language (`SN_MERGER_TEXT`).** When the asset
+descriptions, valuation methods, or Part III explanation on Schedule N
+match
+[`sn_merger_pattern()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_merger_pattern.md),
+the filer has said in so many words that this was a merger (“transfer
+due to merger”, “lodge merged with …”). This counts by default
+(`sn_text = TRUE`). In hand validation all 51 such filings with one
+successor read as mergers.
+
+``` r
+
+sn_merger_pattern()
+#> [1] "merg|consolidat|amalgamat"
+```
+
+**Corroboration (off by default).** Three more signals are recorded on
+every filing by
+[`add_corroboration()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_corroboration.md):
+
+- merger language in the donor’s Schedule O (`SO_MERGER_TEXT_DONOR`);
+- merger language in the recipient’s Schedule O
+  (`SO_MERGER_TEXT_RECIP`);
+- a significant change to the recipient’s governing documents, Part VI
+  line 4, in year t or t+1 (`GOV_DOC_CHANGE_RECIP`).
+
+With `merger_rules(promote = TRUE)`, a filing with no leadership or
+Schedule N text evidence becomes a merger when at least two of these
+agree. Promotion is off by default because only 1 of 13 promoted filings
+read as a merger in hand validation. The signals are still useful as
+descriptive evidence, and for a deliberately broad definition.
+
+A terminated filing with one dominant successor but none of this
+evidence is an `asset_transfer`.
+
+`BASIS` records which evidence made a filing a merger: `"leader"` takes
+precedence, then `"sn_text"`, then `"corroborated"`. It is `NA` for
+non-mergers.
+
+``` r
+
+x <- data.frame(
+  case = c("box checked", "Part VII overlap", "Schedule N text", "two Schedule O signals", "nothing"),
+  EIN2 = "EIN-01-0000001", HAS_P1 = TRUE, HAS_P2 = FALSE,
+  LEADER_SN      = c(TRUE, FALSE, FALSE, FALSE, FALSE),
+  LEADER_P7      = c(FALSE, TRUE, FALSE, FALSE, FALSE),
+  SN_MERGER_TEXT = c(FALSE, FALSE, TRUE, FALSE, FALSE),
+  SO_MERGER_TEXT_DONOR = c(FALSE, FALSE, FALSE, TRUE, FALSE),
+  SO_MERGER_TEXT_RECIP = c(FALSE, FALSE, FALSE, TRUE, FALSE),
+  N_NP_RECIP = 1L, TOP_SHARE = 1, TOP_RECIP_EIN = "020000002"
+)
+default <- classify_transactions(x)
+broad   <- classify_transactions(x, merger_rules(promote = TRUE))
+data.frame(case = x$case, default = default$TYPE, BASIS = default$BASIS,
+           promote = broad$TYPE, BASIS_promote = broad$BASIS)
+#>                     case        default   BASIS        promote BASIS_promote
+#> 1            box checked        merger2  leader        merger2        leader
+#> 2       Part VII overlap        merger2  leader        merger2        leader
+#> 3        Schedule N text        merger2 sn_text        merger2       sn_text
+#> 4 two Schedule O signals asset_transfer    <NA>        merger2  corroborated
+#> 5                nothing asset_transfer    <NA> asset_transfer          <NA>
+```
+
+## 5. merger2, mergerN, and consolidation
+
+A filing that passes all four tests is a merger. The last step sorts
+mergers by the **structure of the deal on the recipient’s side**:
+
+| Label | Definition | Typical case |
+|----|----|----|
+| `merger2` | The successor is the dominant recipient of **this donor only** (within t ± 1). | One organization folds into another that already exists. |
+| `mergerN` | The successor is the dominant recipient of **two or more** dissolving donors within t ± 1, and it already existed. | A parent or regional body absorbs several chapters, locals, or affiliates; a system brings several organizations into one. |
+| `consolidation` | A `mergerN` where the successor is **newly formed**. | Two or more organizations close and form a new third organization. |
+
+### Counting donors (`N_DONORS`)
+
+[`add_donor_counts()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_donor_counts.md)
+looks at every terminated filing with a dominant nonprofit successor
+(test 3 above) and counts the distinct donors whose dominant successor
+is the same EIN, in tax years within `window` (1) of each other. The
+count includes the filing itself. A filing is multi-party when
+`N_DONORS >= min_donors_n` (2).
+
+Three details matter when reading the labels:
+
+- **The other donors need not be mergers.** `N_DONORS` counts every
+  dissolving organization that sent most of its assets to the successor,
+  including ones labelled `asset_transfer`. A merger whose successor
+  also received a residual gift from an unrelated dissolving group that
+  year is `mergerN`. This keeps the count from depending on how well the
+  evidence for each other donor was reported. It also means that a large
+  charity collecting small residual gifts can look like a serial
+  acquirer. The `min_top_share` test reduces this: a donor counts only
+  when the successor received most of its assets.
+- **The label belongs to the filing.** Each donor in a multi-party
+  merger gets its own `mergerN` or `consolidation` label, based on its
+  own merger evidence. A donor with no merger evidence stays
+  `asset_transfer`, even when its successor absorbed others.
+- **One filing rarely shows the whole deal.** In hand validation readers
+  saw multi-party language in only 6% of `mergerN` filings. The label
+  comes from matching filings across organizations, which no single
+  return reveals. Most `mergerN` cases are one recipient absorbing
+  several affiliates over a year or two, rather than one negotiated
+  multi-party agreement.
+
+### New successors (`R_NEW`)
+
+[`add_filing_history()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_filing_history.md)
+marks the successor as new when, within `new_entity_years` (1) of the
+merger year, either:
+
+- its formation year on the 990 header (`R_FORMED`) is t-1 or later; or
+- it filed an initial return between t-1 and t+1.
+
+A new successor turns a `mergerN` into a `consolidation`. With a single
+donor, a new successor does **not** make a consolidation: the filing
+stays `merger2`. One organization moving into a newly formed entity is
+usually a change of legal form, not two organizations combining. `R_NEW`
+is kept on the filing, so those cases are easy to find.
+
+### A worked example
+
+Seven organizations dissolve in 2021 and send their assets to four
+successors:
+
+- A merges into X, an older organization that receives no other donor.
+- B and C merge into Y, an older organization. F also dissolves and
+  sends its assets to Y, but reports no leadership continuity.
+- D and E merge into Z, formed in 2021.
+- G merges into W, also formed in 2021, but alone.
+
+``` r
+
+ein <- function(i) sprintf("EIN-01-%07d", i)
+rec <- c(X = "020000001", Y = "020000002", Z = "020000003", W = "020000004")
+
+fl <- data.frame(
+  donor = c("A", "B", "C", "F", "D", "E", "G"),
+  OBJECTID = paste0("obj", 1:7), EIN2 = ein(1:7), TAX_YEAR = 2021L,
+  HAS_P1 = TRUE, HAS_P2 = FALSE,
+  LEADER_SN = c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE),
+  LEADER_P7 = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE),
+  N_NP_RECIP = 1L, TOP_SHARE = 1,
+  TOP_RECIP_EIN = rec[c("X", "Y", "Y", "Y", "Z", "Z", "W")]
+)
+
+# 990 headers for the four successors: formation year and initial-return box
+header <- data.frame(
+  EIN2 = as_ein2(rec), TAX_YEAR = 2021L, OBJECTID = paste0("r", 1:4),
+  F9_00_RETURN_FINAL_X = "0",
+  F9_00_RETURN_INITIAL_X = c("0", "0", "1", "1"),
+  F9_00_YEAR_FORMATION = c("1980", "1975", "2021", "2021")
+)
+
+fl <- add_donor_counts(fl)
+fl <- add_filing_history(fl, header)
+out <- classify_transactions(fl)
+out <- out[order(out$donor)]
+out[, c("donor", "TOP_RECIP_EIN", "LEADER", "N_DONORS", "R_NEW", "TYPE")]
+#>     donor TOP_RECIP_EIN LEADER N_DONORS  R_NEW           TYPE
+#>    <char>        <char> <lgcl>    <int> <lgcl>         <char>
+#> 1:      A     020000001   TRUE        1  FALSE        merger2
+#> 2:      B     020000002   TRUE        3  FALSE        mergerN
+#> 3:      C     020000002   TRUE        3  FALSE        mergerN
+#> 4:      D     020000003   TRUE        2   TRUE  consolidation
+#> 5:      E     020000003   TRUE        2   TRUE  consolidation
+#> 6:      F     020000002  FALSE        3  FALSE asset_transfer
+#> 7:      G     020000004   TRUE        1   TRUE        merger2
+```
+
+- A is `merger2`: one donor, an existing successor.
+- B and C are `mergerN`. Y has three dissolving donors, B, C, and F.
+- F is an `asset_transfer`. It counts toward Y’s donors, but has no
+  merger evidence of its own.
+- D and E are `consolidation`: two donors, and Z is new.
+- G is `merger2` even though W is new, because it is the only donor.
+
+### From filings to merger events
+
+The labels are per filing.
+[`build_merger_cases()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_cases.md)
+then turns the merger filings into donor–recipient pairs (`MERGER_ID`)
+and groups the donors that fold into one successor into a merger event
+(`MERGER_GROUP_ID`, with `N_GROUP` donors). The grouping uses only
+filings with a merger label and chains years: donors more than
+`group_window` years apart start a new group. So `N_GROUP` can be
+smaller than `N_DONORS`. In the example above, group Y has two donors (B
+and C), not three, because F is not a merger.
+
+### How common each one is
+
+On Schedule N filings for 2010–2024 (60,235 filings, default rules):
+
+| Label             | Filings |
+|-------------------|---------|
+| closure           | 26,021  |
+| asset_disposition | 12,320  |
+| merger2           | 9,690   |
+| asset_transfer    | 9,548   |
+| mergerN           | 2,382   |
+| consolidation     | 274     |
+
+These 12,346 merger filings form 12,228 donor–recipient cases in 10,651
+merger events. 8.1% of events have two or more donors, but those events
+account for about a fifth of all closing organizations. 39% of `merger2`
+and 63% of `mergerN` filings are between affiliated organizations
+(`AFFILIATED`: a Schedule R link, a 509(a)(3) supporting organization,
+or a shared group exemption). That flag is kept apart from the label, so
+you can separate arm’s-length mergers from consolidations within one
+family of organizations.
+
+## How well it works
+
+The rules were checked against 300 filings drawn from 2010–2024, 50 from
+each original label, read blind against a codebook (`dev/validation/`).
+With the current defaults:
+
+| classifier \\ hand label | merger | transfer | closure | disposition | reorg |
+|--------------------------|--------|----------|---------|-------------|-------|
+| merger                   | 109    | 43       | 1       | 1           | 5     |
+| asset_transfer           | 6      | 26       | 5       | 0           | 2     |
+| closure                  | 3      | 14       | 45      | 1           | 3     |
+| asset_disposition        | 4      | 1        | 2       | 29          | 0     |
+
+- Overall agreement is 70% (68% weighted to population shares).
+- Merger precision is 69% (62% weighted). Merger recall is 71%
+  (weighted).
+- By basis: `leader` mergers are 70% precise (n = 149), `sn_text` 5 of
+  5, and `corroborated` 0 of 5.
+
+The largest remaining error is the 43 merger-labelled filings that
+readers saw as residual transfers. Most are chapters, union locals,
+auxiliaries, and plans sending their last assets to a parent or sister
+body where the same officers **already** sat. Part VII overlap is real
+in these cases, but it predates the transfer. Restricting the Part VII
+channel to people who newly join the recipient after the merger is more
+precise, and is still under study. The readers also could not see Part
+VII, so that channel was not tested cleanly.
+
+## Changing the rules
+
+Every threshold is an argument to
+[`merger_rules()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_rules.md),
+and every evidence column stays on the output. You can relabel without
+re-running the pipeline, and compare definitions side by side:
+
+``` r
+
+rules <- list(
+  default     = merger_rules(),
+  strict      = merger_rules(leader = "sn", sn_text = FALSE),
+  broad       = merger_rules(promote = TRUE, min_top_share = 0.5),
+  bigger_deal = merger_rules(min_donors_n = 3L)
+)
+data.frame(donor = fl$donor,
+           sapply(rules, function(r) classify_transactions(fl, r)$TYPE))[order(fl$donor), ]
+#>   donor        default         strict          broad    bigger_deal
+#> 1     A        merger2        merger2        merger2        merger2
+#> 2     B        mergerN        mergerN        mergerN        mergerN
+#> 3     C        mergerN asset_transfer        mergerN        mergerN
+#> 5     D  consolidation  consolidation  consolidation        merger2
+#> 6     E  consolidation  consolidation  consolidation        merger2
+#> 4     F asset_transfer asset_transfer asset_transfer asset_transfer
+#> 7     G        merger2        merger2        merger2        merger2
+```
+
+Under the strict rules, C becomes an asset transfer, because its only
+evidence was Part VII. With `min_donors_n = 3`, D and E become
+`merger2`, while B and C stay `mergerN`, because Y has three donors.
+
+The main switches:
+
+| Argument | Default | What it changes |
+|----|----|----|
+| `min_top_share` | 0.75 | Share of value the successor must receive (closure vs. one successor) |
+| `final_as_termination` | `TRUE` | Part II filings on a final return count as terminations |
+| `leader` | `"either"` | Leadership evidence from Schedule N (`"sn"`), Part VII (`"p7"`), or either |
+| `sn_text` | `TRUE` | Schedule N merger language counts as evidence |
+| `promote` | `FALSE` | Two or more corroborating signals make a merger |
+| `min_corroborate` | 2 | Signals needed for promotion |
+| `min_donors_n` | 2 | Donors needed for `mergerN` / `consolidation` |
+| `new_entity_years` | 1 | How recently the successor must be formed to count as new |
+
+`new_entity_years` and the donor-count window are also arguments of
+[`add_filing_history()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_filing_history.md)
+and
+[`add_donor_counts()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/add_donor_counts.md),
+because they are computed when the evidence is gathered. To change them,
+re-run those steps (or
+[`merger_features()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_features.md))
+before classifying.

@@ -2,6 +2,31 @@
 
 ## npmerger 0.0.0.9000
 
+- Matched comparison samples:
+
+  - [`get_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_panel.md)
+    builds the full 990 / 990-EZ organization-year panel for every
+    filer, with constant-dollar size, margin, equity ratio, months of
+    cash, NTEE, and subsection
+    ([`panel_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_measures.md),
+    [`real_dollars()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/real_dollars.md),
+    [`cpi_u()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/cpi_u.md),
+    [`ntee_level()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/ntee_level.md)).
+  - [`merger_sample()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_sample.md)
+    keeps merger cases whose recipient filed in every year t-2..t+2,
+    with t-3/t-2 baselines for donor and recipient.
+  - [`match_pool()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_pool.md)
+    builds eligible comparison org-years: a full t-2..t+2 window around
+    any year, and no Schedule N involvement nearby
+    ([`schedule_n_events()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/schedule_n_events.md)).
+  - [`match_candidates()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_candidates.md)
+    finds every candidate in the same NTEE group within size and
+    profitability (or fiscal-health) calipers, across any years, ranked
+    by distance.
+    [`match_balance()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/match_balance.md)
+    reports standardized differences.
+  - `dev/build-matching.R` adds these tables to the database.
+
 - Classifier rules revised after hand validation on 300 filings
   (`dev/validation/`; PLAN.md section 9). Agreement with hand labels
   rose from 62% to 70%, and merger recall from 51% to 71%.
