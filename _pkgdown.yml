@@ -12,11 +12,14 @@ home:
 
 navbar:
   structure:
-    left: [intro, reference, roadmap, news]
+    left: [intro, classifier, reference, roadmap, news]
   components:
     intro:
       text: Overview
       href: articles/npmerger.html
+    classifier:
+      text: Classifier
+      href: articles/classifier.html
     roadmap:
       text: Roadmap
       href: https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md
