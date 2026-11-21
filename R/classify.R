@@ -24,9 +24,12 @@
 #' @param sn_text If `TRUE` (default), merger language in Schedule N's own
 #'   text (`SN_MERGER_TEXT`, see [sn_merger_pattern()]) counts as merger
 #'   evidence on its own, like leadership continuity.
-#' @param promote If `TRUE` (default), a dissolution to one nonprofit successor
+#' @param promote If `TRUE`, a dissolution to one nonprofit successor
 #'   with no leadership evidence is promoted from `asset_transfer` to a merger
-#'   label when at least `min_corroborate` corroborating signals agree.
+#'   label when at least `min_corroborate` corroborating signals agree. Off
+#'   by default: in hand validation only 1 of 13 promoted filings read as a
+#'   merger. The signals are still computed, so promotion can be turned on
+#'   for a broad definition.
 #' @param min_corroborate Number of corroborating signals required for
 #'   promotion. One signal alone was too loose on 2019-21 data; two promoted
 #'   about 5% of asset transfers, and those looked like mergers on measures
@@ -39,10 +42,11 @@
 #' @export
 #' @examples
 #' merger_rules()
-#' merger_rules(leader = "sn", promote = FALSE)
+#' merger_rules(leader = "sn", sn_text = FALSE)
+#' merger_rules(promote = TRUE)   # broad definition
 merger_rules <- function(min_top_share = 0.75, leader = c("either", "sn", "p7"),
                          min_donors_n = 2L, new_entity_years = 1L, sn_text = TRUE,
-                         promote = TRUE, min_corroborate = 2L,
+                         promote = FALSE, min_corroborate = 2L,
                          corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP",
                                          "GOV_DOC_CHANGE_RECIP"),
                          final_as_termination = TRUE) {

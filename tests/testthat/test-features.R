@@ -65,7 +65,7 @@ test_that("add_corroboration flags Schedule O text and governing-doc changes", {
   expect_identical(out$SO_MERGER_TEXT_DONOR, c(TRUE, FALSE, FALSE, FALSE, FALSE))
   expect_identical(out$SO_MERGER_TEXT_RECIP, c(TRUE, TRUE, FALSE, FALSE, TRUE))
   expect_identical(out$GOV_DOC_CHANGE_RECIP, c(TRUE, TRUE, FALSE, FALSE, TRUE))  # 2021 within t..t+1 of 2020
-  cl <- classify_transactions(out[, LEADER_P7 := FALSE])[order(OBJECTID)]
+  cl <- classify_transactions(out[, LEADER_P7 := FALSE], merger_rules(promote = TRUE))[order(OBJECTID)]
   expect_identical(cl$TYPE[1:2], c("merger2", "merger2"))
   expect_identical(cl$BASIS[1:2], c("corroborated", "corroborated"))
 })

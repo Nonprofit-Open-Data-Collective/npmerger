@@ -74,9 +74,11 @@ explanation say the transfer is part of a merger or consolidation
 validation every terminated filing with one successor and such text read as
 a merger.
 
-**Corroborating disclosures.** A dissolution to one nonprofit successor
-with no leadership evidence is promoted to a merger when at least two of
-these agree:
+**Corroborating disclosures.** These are recorded for every filing. With
+`merger_rules(promote = TRUE)`, a dissolution to one nonprofit successor
+with no other merger evidence is promoted to a merger when at least two of
+them agree. Promotion is off by default, because in hand validation few
+promoted filings read as mergers. The signals are:
 
 * merger language in the donor's Schedule O narrative;
 * merger language in the recipient's Schedule O narrative;
@@ -210,12 +212,13 @@ out[, c("case", "LEADER", "N_CORROBORATE", "BASIS", "TYPE")]
 ```
 
 The rules are arguments, so you can run strict and broad definitions side by
-side. For example, the strict definition counts only the Schedule N boxes
-and turns off promotion:
+side. For example, a strict definition counts only the Schedule N boxes,
+and a broad one turns promotion on:
 
 ```{r}
-strict <- classify_transactions(filings, merger_rules(leader = "sn", promote = FALSE))
-data.frame(case = filings$case, default = out$TYPE, strict = strict$TYPE)
+strict <- classify_transactions(filings, merger_rules(leader = "sn"))
+broad  <- classify_transactions(filings, merger_rules(promote = TRUE))
+data.frame(case = filings$case, strict = strict$TYPE, default = out$TYPE, broad = broad$TYPE)
 ```
 
 `merger_rules()` also sets these thresholds and switches:

@@ -12,6 +12,9 @@
   - `merger_rules(sn_text = TRUE)`: merger language in Schedule N's own text
     (`SN_MERGER_TEXT` from `sn_filings()`, pattern `sn_merger_pattern()`)
     is merger evidence on its own, with `BASIS = "sn_text"`.
+  - `merger_rules(promote = FALSE)` is now the default. Only 1 of 13
+    promoted filings read as a merger. Set `promote = TRUE` for a broad
+    definition.
 
 * `build_merger_data()` runs the whole pipeline and returns every table. It
   accepts pre-fetched inputs, so `npmerger_example()` runs offline.
@@ -39,7 +42,7 @@
   filing history and new-entity detection (`add_filing_history()`),
   corroborating disclosures (`add_corroboration()`), affiliation
   (`add_affiliation()`), and mission similarity (`add_mission_similarity()`).
-* `classify_transactions()` promotes an asset transfer to a merger when at
+* `classify_transactions()` can promote an asset transfer to a merger when at
   least two corroborating signals agree, and records `BASIS` and
   `N_CORROBORATE`.
 * pkgdown site using the NODC `pkgstyle` template, and an overview vignette.

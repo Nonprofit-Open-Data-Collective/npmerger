@@ -10,7 +10,7 @@ merger_rules(
   min_donors_n = 2L,
   new_entity_years = 1L,
   sn_text = TRUE,
-  promote = TRUE,
+  promote = FALSE,
   min_corroborate = 2L,
   corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP"),
   final_as_termination = TRUE
@@ -38,9 +38,12 @@ merger year counts as a new entity (consolidation).}
 text (\code{SN_MERGER_TEXT}, see \code{\link[=sn_merger_pattern]{sn_merger_pattern()}}) counts as merger
 evidence on its own, like leadership continuity.}
 
-\item{promote}{If \code{TRUE} (default), a dissolution to one nonprofit successor
+\item{promote}{If \code{TRUE}, a dissolution to one nonprofit successor
 with no leadership evidence is promoted from \code{asset_transfer} to a merger
-label when at least \code{min_corroborate} corroborating signals agree.}
+label when at least \code{min_corroborate} corroborating signals agree. Off
+by default: in hand validation only 1 of 13 promoted filings read as a
+merger. The signals are still computed, so promotion can be turned on
+for a broad definition.}
 
 \item{min_corroborate}{Number of corroborating signals required for
 promotion. One signal alone was too loose on 2019-21 data; two promoted
@@ -67,5 +70,6 @@ stricter or broader definitions.
 }
 \examples{
 merger_rules()
-merger_rules(leader = "sn", promote = FALSE)
+merger_rules(leader = "sn", sn_text = FALSE)
+merger_rules(promote = TRUE)   # broad definition
 }

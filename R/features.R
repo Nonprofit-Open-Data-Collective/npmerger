@@ -182,7 +182,7 @@ add_filing_history <- function(fl, header, new_entity_years = 1L) {
 #'
 #' Flags Schedule O merger language on the donor's and the recipient's
 #' returns, and a significant change to the recipient's governing documents
-#' (Part VI line 4). [classify_transactions()] promotes an asset transfer to
+#' (Part VI line 4). With `merger_rules(promote = TRUE)`, [classify_transactions()] promotes an asset transfer to
 #' a merger when at least two of these agree (see [merger_rules()]).
 #'
 #' @param fl Filing table from [sn_filings()].

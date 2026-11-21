@@ -31,6 +31,6 @@ add_corroboration(
 \description{
 Flags Schedule O merger language on the donor's and the recipient's
 returns, and a significant change to the recipient's governing documents
-(Part VI line 4). \code{\link[=classify_transactions]{classify_transactions()}} promotes an asset transfer to
+(Part VI line 4). With \code{merger_rules(promote = TRUE)}, \code{\link[=classify_transactions]{classify_transactions()}} promotes an asset transfer to
 a merger when at least two of these agree (see \code{\link[=merger_rules]{merger_rules()}}).
 }
