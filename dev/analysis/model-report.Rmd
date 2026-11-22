@@ -1,0 +1,355 @@
+---
+title: "Are merger recipients better off? Model methods and results"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+params:
+  root: !r file.path(Sys.getenv("USERPROFILE", path.expand("~")), "Documents", "NPMERGER")
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(data.table)
+a  <- file.path(params$root, "analysis")
+ld <- fread(file.path(a, "did_long_difference.csv"))
+es <- fread(file.path(a, "did_event_study.csv"))
+im <- fread(file.path(a, "did_implied_changes.csv"))
+sz <- fread(file.path(a, "did_size_percentiles.csv"))
+S  <- readRDS(file.path(a, "did_sample.rds"))
+D  <- c("naive | recipient match", "proforma | recipient match", "proforma | combined match")
+DL <- c("Recipient alone", "Pro forma, recipient match", "Pro forma, combined match")
+OUT <- c(LOG_REVENUE = "Log revenue", LOG_ASSETS = "Log assets", MARGIN = "Operating margin",
+         LOG_EXP_ASSETS = "Log(expenses / assets)", LOG_EMPLOYEES = "Log(1 + employees)")
+star <- function(p) fcase(p < .01, "***", p < .05, "**", p < .1, "*", default = "")
+pct <- function(b, y) ifelse(y == "MARGIN", sprintf("%+.1f pts", 100 * b), sprintf("%+.1f%%", 100 * (exp(b) - 1)))
+cell <- function(b, se, p, y) sprintf("%s%s<br><small>%.3f (%.3f)</small>", pct(b, y), star(p), b, se)
+wide <- function(x, label = "Group") {
+  x <- copy(x)[, design := factor(design, D, DL)][, outcome := factor(outcome, names(OUT), OUT)]
+  x[, v := cell(estimate, se, p, as.character(names(OUT))[as.integer(outcome)])]
+  w <- dcast(x, outcome + term ~ design, value.var = "v")
+  setnames(w, c("outcome", "term"), c("Outcome", label))
+  w
+}
+kt <- function(x, ...) knitr::kable(x, escape = FALSE, format.args = list(big.mark = ","), ...)
+n_sets <- function(dsg) ld[spec == "pooled" & design == dsg & outcome == "LOG_REVENUE", n_sets]
+b_of <- function(dsg, y, spec = "pooled", term = "") ld[design == dsg & outcome == y & spec == !!spec & term == !!term, estimate]
+```
+
+How do nonprofits that absorb another organization through a merger fare
+afterwards? This report estimates changes in revenue, assets,
+profitability, spending relative to assets, and employment for recipients
+in two-party mergers, compared with matched organizations that did not
+merge. Matching and the sample are described in `matching-report.html`.
+
+# Methods
+
+## Two ways to define "better off"
+
+Absorbing a donor adds its assets, revenue, and staff to the recipient's
+books, so a recipient's size rises mechanically. That gives two
+reasonable questions, which we estimate side by side:
+
+* **Recipient alone.** *Did the recipient grow?* Before and after are both
+  the recipient's own figures. This includes the absorbed donor, so it
+  measures growth from the recipient's point of view.
+* **Pro forma.** *Is the merged organization more than the sum of its
+  parts?* "Before" adds the donor's figures to the recipient's, each on
+  its own fiscal calendar. "After" is the recipient alone. A value of zero
+  means the combined organization held onto everything the two had
+  separately, relative to controls.
+
+The pro forma version is estimated twice:
+
+* with controls matched to the recipient alone (the original match);
+* with controls re-matched to the combined size of recipient plus donor.
+
+## Specification
+
+**Long difference (headline).** For organization *i* in matched set *s*:
+
+$$\Delta y_{is} = y_{is,t+2} - y_{is,t-2} = \alpha_s + \beta\, \text{Merger}_i + \varepsilon_{is}$$
+
+* α~s~ is a fixed effect for each matched set: one recipient and its
+  same-year controls. Because controls share the recipient's calendar
+  year, α~s~ also absorbs year effects.
+* Recipients have weight 1, and each control has weight 1/k within its
+  set.
+* Standard errors are clustered two ways, by matched set and by
+  organization, because a control can appear in more than one set.
+* Only sets with a recipient and at least one control observed in both
+  years are used.
+
+**Event study.** For years t-3 to t+2, with t-2 as the reference:
+
+$$y_{ist} = \mu_{is} + \lambda_{s,t} + \sum_{k \neq -2} \beta_k\, \text{Merger}_i \cdot 1[t = k] + \varepsilon_{ist}$$
+
+The coefficient at t-3 is the pre-trend test. t0 is a transition year
+(partial-year books, assets arriving, one-time contribution revenue), so
+we read results at t+1 and t+2.
+
+**Heterogeneity.** The long difference is re-estimated with Merger
+interacted with:
+
+* the transfer size: fair market value transferred as a share of the
+  recipient's assets at t-2;
+* recipient size band;
+* affiliation;
+* CEO outcome;
+* board outcome.
+
+Each group's coefficient is its own effect relative to its own controls.
+
+## Outcomes
+
+| Outcome | Definition |
+|---|---|
+| Log revenue | log of total revenue, 2024 dollars |
+| Log assets | log of total assets (end of year), 2024 dollars |
+| Operating margin | (revenue − expenses) / revenue, bounded to −1..1 |
+| Log(expenses / assets) | trimmed at the 1st and 99th percentiles |
+| Log(1 + employees) | Part V employee count; full Form 990 filers only |
+
+**Reading the coefficients.** Log coefficients are converted to percent
+changes, exp(β) − 1, relative to controls over the same years. For
+example, 0.244 is +27.7% and −0.062 is −6.0%. Margin coefficients are in
+percentage points. Tables show the percent change with significance stars
+(\*\*\* p < .01, \*\* p < .05, \* p < .1), and the log-point estimate with
+its standard error underneath.
+
+# Results
+
+## Event study
+
+![](`r file.path(a, "event_study.png")`)
+
+```{r pretrend}
+pt <- es[E == -3L, list(design = factor(design, D, DL), outcome = OUT[outcome], b = sprintf("%.3f (%.3f)", estimate, se))]
+kt(dcast(pt, outcome ~ design, value.var = "b"), caption = "Pre-trend: coefficient at t-3 (reference t-2)")
+```
+
+There are no pre-trends: every t-3 coefficient is within 0.02 of zero. In
+the recipient-alone version, revenue and assets begin to rise at t-1. That
+is most likely fiscal years not lining up, or the merger beginning before
+the donor's final return. After t0 the effects are flat through t+2.
+
+## Main effects
+
+```{r pooled}
+kt(wide(ld[spec == "pooled"], "")[, !""], caption = sprintf(
+  "Long difference t-2 to t+2. Matched sets: %s (recipient match), %s (combined match)",
+  format(n_sets(D[1]), big.mark = ","), format(n_sets(D[3]), big.mark = ",")))
+```
+
+```{r implied}
+iv <- im[, list(Design = factor(design, D, DL), Measure = measure, Change = sprintf("%+.1f%%", 100 * pct_change),
+                p25 = fifelse(measure == "employees", sprintf("%+.0f", chg_p25), sprintf("%+.2fm", chg_p25 / 1e6)),
+                Median = fifelse(measure == "employees", sprintf("%+.0f", chg_p50), sprintf("%+.2fm", chg_p50 / 1e6)),
+                p75 = fifelse(measure == "employees", sprintf("%+.0f", chg_p75), sprintf("%+.2fm", chg_p75 / 1e6)))]
+setorder(iv, Measure, Design)
+szt <- sz[, list(Base = base, Measure = measure,
+                 p25 = fifelse(measure == "employees", sprintf("%.0f", p25), sprintf("$%.1fm", p25 / 1e6)),
+                 Median = fifelse(measure == "employees", sprintf("%.0f", p50), sprintf("$%.1fm", p50 / 1e6)),
+                 p75 = fifelse(measure == "employees", sprintf("%.0f", p75), sprintf("$%.1fm", p75 / 1e6)))]
+kt(szt, caption = "Baseline size of recipients and of recipient + donor combined")
+kt(iv, caption = "Implied changes at those sizes (dollars in millions, 2024 dollars; employees in people). Recipient alone applies the change to the recipient's size; pro forma applies it to the combined size")
+```
+
+**Recipient alone.** Recipients grow substantially compared with similar
+organizations that did not merge. Two years on, the median recipient has
+about $2m more in assets, $1.1m more in revenue, and 6 more employees.
+Most of this is the donor's books arriving: the growth rises steeply with
+transfer size (below).
+
+**Pro forma.** The merged organization ends up slightly smaller than the
+two organizations were separately:
+
+* assets about 4–6% smaller;
+* revenue 7–9% smaller;
+* staff about 8% smaller.
+
+Roughly, 1 + 1 ≈ 1.9 after two years. Re-matching controls on the
+combined size barely changes this, so the shortfall is not caused by
+controls being the wrong size.
+
+**Profitability does not change.** Operating margin is flat in every
+version. It spikes at t0 (about +5 points) as the donated assets are
+booked as one-time contribution revenue, then returns to zero.
+Expenses-to-assets falls 2–3%, because assets grow more than spending.
+
+## By transfer size
+
+```{r dose}
+kt(wide(ld[spec == "dose"][, term := sub("DOSE_BIN", "", term)], "Transfer / recipient assets"),
+   caption = "Long difference by transfer size")
+```
+
+Recipient-alone growth tracks the size of the transfer. Assets grow about
+4% when the transfer is under 1% of the recipient's assets, and about 145%
+when it is half or more. The pro forma revenue shortfall appears in every
+band, even the smallest. So donors were larger at t-2 than what they finally
+handed over: they shrink before dissolving.
+
+## By recipient size
+
+```{r size}
+kt(wide(ld[spec == "size"][, term := sub("SIZE_BAND", "", term)], "Recipient assets (baseline)"),
+   caption = "Long difference by recipient size")
+```
+
+The largest recipients ($100m+ in assets) come closest to keeping the full
+combined assets and revenue: their pro forma estimates are near zero, with
+some loss of staff. Mid-size recipients ($10–100m) shed the most staff in
+the pro forma comparison. Small recipients (under $10m) grow the most on
+their own books and show the largest pro forma revenue loss.
+
+## By affiliation
+
+```{r aff}
+kt(wide(ld[spec == "affiliated"][, term := fifelse(term == "AFFILIATEDTRUE", "Affiliated", "Arm's length")], "Pair"),
+   caption = "Long difference by affiliation")
+```
+
+Mergers within one family of organizations show less recipient-alone
+growth and larger pro forma losses. Part of that is mechanical: an
+affiliated donor's revenue often includes grants from the parent or a
+sister organization, so adding donor and recipient revenue counts some
+money twice. Arm's-length mergers show a small margin gain in the
+pro forma version with the recipient match.
+
+## By CEO outcome
+
+```{r ceo}
+kt(wide(ld[spec == "ceo"][, term := sub("CEO_CAT", "", term)], "CEO outcome"),
+   caption = "Long difference by CEO outcome (single-donor mergers with both CEOs identified)")
+```
+
+**Recipient keeps its CEO vs. both CEOs remain.** Recipient-alone growth
+is similar in the two groups:
+
+* revenue +26% when only the recipient's CEO remains, and +35% when both
+  remain;
+* assets +25% and +33%;
+* employees +25% and +38%.
+
+The point estimates are larger when both CEOs stay. That fits larger donors
+whose operations and leaders both come across. But the two groups'
+confidence intervals overlap, and only `r ld[design == D[1] & spec == "ceo" & term == "CEO_CATboth_ceos" & outcome == "LOG_REVENUE", n_sets]`
+sets are estimated in total across all CEO groups.
+
+In the pro forma comparison, mergers where only the recipient's CEO
+remains are the closest to "1 + 1 = 2": assets and revenue are about
+zero, and margin is +2.7 points with the recipient match. Mergers where
+the two organizations already shared a CEO show the smallest
+recipient-alone growth and the largest pro forma revenue loss, consistent
+with affiliated deals.
+
+## By board outcome
+
+```{r board}
+kt(wide(ld[spec == "board"][, term := sub("BOARD_CAT", "", term)], "Board outcome"),
+   caption = "Long difference by board outcome")
+```
+
+* **The recipient's board stays intact and the donor's board dissolves.**
+  This is the most common pattern. It has the smallest recipient-alone
+  growth: revenue +13%, assets +17%, employees +8%. In the pro forma
+  comparison it loses about 8% of revenue and 10% of staff. It looks like
+  an absorption.
+* **The boards combine (`combine_minor`, `combine_major`).** Recipient-alone
+  growth is larger: assets +32% and +70%. With a minor share of donor
+  seats, the merged organization holds onto its combined assets, revenue,
+  and staff in the pro forma comparison (estimates near zero).
+* **Donor members take 20% or more of the seats (`combine_major`).** These
+  are mergers of near-equals. Margin falls about 5 points and pro forma
+  revenue falls about 13–16%. Integration seems to be costlier.
+* **The recipient's board turns over.** This shows large recipient-alone
+  growth but pro forma losses similar to the intact-board group.
+
+These governance categories are observed after the merger. They are
+descriptive, not causal: a combined board may reflect a larger or more
+equal deal, rather than produce a better outcome.
+
+# Robustness: merger years through 2021
+
+```{r rob-setup}
+rb_dir <- file.path(a, "maxyear2021")
+has_rb <- file.exists(file.path(rb_dir, "did_long_difference.csv"))
+if (has_rb) {
+  rb  <- fread(file.path(rb_dir, "did_long_difference.csv"))
+  rbe <- fread(file.path(rb_dir, "did_event_study.csv"))
+  rbf <- fread(file.path(rb_dir, "did_funnel.csv"))
+  n_rb <- rbf[grepl("same-year control \\(recipient", step), n]
+  n_rb_c <- rbf[grepl("same-year control \\(combined", step), n]
+}
+cmp <- function(spec_, label = NULL) {
+  x <- rbind(ld[spec == spec_][, run := "All years"], rb[spec == spec_][, run := "Through 2021"])
+  x[, design := factor(design, D, DL)][, y := outcome][, outcome := factor(outcome, names(OUT), OUT)]
+  x[, v := sprintf("%s%s", pct(estimate, y), star(p))]
+  if (!is.null(label)) x[, term := sub(label, "", term)]
+  w <- dcast(x, outcome + term ~ design + run, value.var = "v", sep = ": ")
+  if (all(w$term == "")) w[, term := NULL]
+  setnames(w, intersect(c("outcome", "term"), names(w)), c("Outcome", "Group")[seq_along(intersect(c("outcome", "term"), names(w)))])
+  w
+}
+```
+
+`r if (!has_rb) "*Robustness results not found: run did-recipients.R with MAX_YEAR=2021 and OUT_SUBDIR=maxyear2021.*"`
+
+```{r rob, eval = has_rb, results = "asis"}
+cat(sprintf(paste(
+  "Mergers in 2022 and 2023 have post-periods that run into 2024 and 2025, and 2025 is only partly",
+  "filed. Calendar-year effects on the t-2 to t+2 change are jointly significant for every outcome,",
+  "and margins are lower in windows ending in 2024 and 2025. This check re-runs every model with",
+  "merger years 2011 to 2021 only: %s recipients in the recipient match (%s in the combined match),",
+  "compared with %s and %s in the main sample.\n\n"),
+  format(n_rb, big.mark = ","), format(n_rb_c, big.mark = ","),
+  format(n_sets(D[1]), big.mark = ","), format(n_sets(D[3]), big.mark = ",")))
+```
+
+```{r rob-pooled, eval = has_rb}
+kt(cmp("pooled"), caption = "Main effects: all merger years vs. merger years through 2021 (percent change, or percentage points for margin)")
+```
+
+```{r rob-gov, eval = has_rb}
+kt(cmp("ceo", "CEO_CAT")[Outcome %in% c("Log revenue", "Log assets", "Operating margin")],
+   caption = "CEO outcome splits, all years vs. through 2021")
+kt(cmp("board", "BOARD_CAT")[Outcome %in% c("Log revenue", "Log assets", "Operating margin")],
+   caption = "Board outcome splits, all years vs. through 2021")
+```
+
+```{r rob-event, eval = has_rb}
+ev <- rbind(es[, run := "All years"], rbe[, run := "Through 2021"])[outcome == "MARGIN"]
+ev[, design := factor(design, D, DL)]
+kt(dcast(ev, design + run ~ E, value.var = "estimate", fun.aggregate = function(v) round(v, 3)),
+   caption = "Event study for operating margin (reference t-2)")
+```
+
+`r if (has_rb) "**The results do not depend on the latest merger years.** Every main-effect estimate moves by less than 1.5 log points, and the signs and significance are unchanged. Without 2022–2023, margin estimates rise slightly (about +0.5 to +0.7 points), so the incomplete 2024–2025 returns were pulling margins down a little, but the pooled margin effect is still zero. The margin event study looks the same: a one-time spike at t0 and a return to zero by t+1. The governance splits also hold. The margin gain when only the recipient's CEO remains gets stronger (about +5 points in the pro forma comparison with the recipient match), and the margin decline when donor members hold 20% or more of the recipient's board seats is unchanged at about −5 points."`
+
+# Interpretation and caveats
+
+* **Both versions are informative.** From the recipient's point of view,
+  mergers are growth: substantial, lasting, and with no loss of operating
+  margin. From the combined point of view, the merged organization
+  keeps about 92–95% of the two organizations' joint revenue and assets
+  after two years, with about 8% fewer staff. Neither is "the" answer. The
+  recipient-alone version overstates the gain, and the pro forma version
+  likely overstates the loss.
+* **The pro forma version is a lower bound.** It assumes the donor would
+  have kept its full t-2 size, but dissolving organizations were usually
+  shrinking already. For affiliated pairs, adding donor and recipient
+  revenue can count intra-family grants twice. A tighter version would
+  use the donor at t-1, or scale the donor's figures by the share of its
+  assets actually transferred.
+* **Survival.** Recipients and controls must both file through t+2, so the
+  results describe organizations that survive. About 98% of recipients
+  keep filing.
+* **Employment** is observed only for full Form 990 filers. 990-EZ donors
+  count as zero employees in the pro forma.
+* **Matching** controls for observed size, sector, year, and margin. It
+  cannot rule out that organizations chosen as merger partners were on
+  different paths for unobserved reasons. The flat pre-trends help, but
+  they do not prove the absence of such differences.

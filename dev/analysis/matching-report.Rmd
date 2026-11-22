@@ -1,0 +1,292 @@
+---
+title: "Merger recipients and their comparison organizations: matching methods and sample"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
+params:
+  root: !r file.path(Sys.getenv("USERPROFILE", path.expand("~")), "Documents", "NPMERGER")
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(data.table)
+a  <- file.path(params$root, "analysis")
+S  <- readRDS(file.path(a, "did_sample.rds"))
+unit <- S$unit
+an   <- unit[T_ID %in% S$sets_r$SET]          # recipients in the analysis (recipient match)
+fun  <- fread(file.path(a, "did_funnel.csv"))
+cov  <- fread(file.path(a, "did_match_coverage_by_size.csv"))
+bal  <- fread(file.path(a, "did_balance.csv"))
+K <- S$settings$K
+big <- function(x) format(round(x), big.mark = ",")
+money <- function(x) ifelse(abs(x) >= 1e6, sprintf("$%.1fm", x / 1e6), sprintf("$%.0fk", x / 1e3))
+kt <- function(x, ...) knitr::kable(x, format.args = list(big.mark = ","), ...)
+```
+
+This report describes how merger recipients are matched to comparison
+organizations for the difference-in-differences analysis, and what the
+matched sample looks like. Results are in the companion report
+(`model-report.html`). Both are built from
+`dev/analysis/did-recipients.R` and `dev/analysis/leadership-measures.R`.
+
+# Treated units
+
+**Mergers.** The treated units are recipients in two-party mergers
+(`merger2`): one organization dissolves and transfers most of its assets
+to one existing nonprofit, with evidence that the transfer was a merger
+(leadership continuity on Schedule N or Part VII, or the filer's own merger
+language). Schedule N filings run from 2010 to 2024.
+
+**Time.** Time 0 is the recipient's tax year that contains the asset
+distribution date. All years are on the recipient's own fiscal calendar;
+the donor's years are on the donor's calendar.
+
+**Observation window.** A recipient must file a 990 or 990-EZ in every year
+from t-2 to t+2. The **baseline** is the mean of t-3 and t-2, with t-2
+required. The baseline skips t-1 so that matching does not pick up a
+dip or surge in the year just before the merger.
+
+**One unit per recipient-year.** A recipient that received two donors in the
+same year is one unit (17 cases). Recipients involved in another merger,
+as donor or recipient, within the window are dropped, so each unit has one
+clean event.
+
+```{r funnel}
+kt(fun[, list(Step = step, N = n)], caption = "Sample construction")
+```
+
+# Comparison pool
+
+The pool is every organization-year `YEAR` in the full 990 panel
+(`r big(S$pool_n)` organization-years, `r big(S$pool_orgs)` organizations)
+that:
+
+* filed in every year `YEAR-2` to `YEAR+2`, with a baseline in `YEAR-3` and `YEAR-2`;
+* had no Schedule N involvement, as filer or named recipient, in `YEAR-3` to `YEAR+2`.
+
+`YEAR` is the control's pseudo-merger year. Dollar amounts are in constant
+2024 dollars (CPI-U).
+
+# Matching rules
+
+For each recipient, a candidate control must:
+
+| Rule | Value |
+|---|---|
+| Same NTEE group | first two characters (major group and first digit, e.g. `E2`) |
+| Same calendar year | pseudo-merger year equals the recipient's merger year |
+| Baseline assets | within a factor of 2 (log difference ≤ log 2) |
+| Baseline expenses | within a factor of 2 |
+| Baseline operating margin | within 0.10 |
+
+Candidates passing every rule are ranked by a standardized distance: the
+root mean square of the differences in log assets, log expenses, and
+margin, each divided by its standard deviation in the pool. The **`r K`
+nearest** become controls. A recipient with fewer candidates keeps all
+it has. In the models each control is weighted 1/k within its set, so every
+recipient counts once.
+
+**Why the same calendar year?** Controls are allowed only from the
+recipient's own year. The matched-set × event-time fixed effects then
+absorb year shocks (the 2020 revenue shock, inflation) exactly. Allowing
+other years would require separate calendar-year effects.
+
+## Two matches
+
+* **Recipient match.** Controls are matched on the recipient's own
+  baseline. This is the natural comparison for "how did the recipient do?"
+* **Combined match.** Controls are re-matched with the same rules on the
+  combined baseline of recipient plus donor: summed assets and expenses,
+  and a revenue-weighted margin. This is the natural comparison for "how
+  did the merged organization do compared with the two separately?"
+  It needs the donor's baseline, so it covers fewer recipients.
+
+# Match coverage
+
+```{r coverage}
+cv <- cov[, list(`Recipient assets` = SIZE_BAND, Recipients = recipients,
+                 `Matched (recipient)` = matched_recipient,
+                 `Share matched` = sprintf("%.0f%%", 100 * matched_recipient / recipients),
+                 `Median gap, log assets` = round(med_abs_logassets_gap_r, 3),
+                 `Eligible (combined)` = eligible_combined, `Matched (combined)` = matched_combined,
+                 `Median gap, combined` = round(med_abs_logassets_gap_c, 3))]
+kt(cv, caption = "Coverage and closeness of the match by recipient size (baseline real assets)")
+nctrl <- S$sets_r[TREAT == 0L, .N, by = SET]
+```
+
+The median absolute log-asset gap between a recipient and its controls is
+about 0.13–0.15, roughly a 13–15% size difference. It is the same in
+every size band. The largest recipients ($100m+) are matched almost as
+often as small ones (87%). The unmatched ones are mostly the very largest
+systems, which have no peer within a factor of two in the same NTEE group
+and year. `r sprintf("%.0f%%", 100 * mean(nctrl$N == K))` of recipients
+have the full `r K` controls (median `r median(nctrl$N)`).
+
+# Balance
+
+Standardized mean differences (SMD) compare recipients with their
+weighted controls, and with the whole pool in the same year and NTEE
+groups. Dollar measures and employees are on the log(1 + x) scale. An SMD
+under 0.1 is conventionally considered balanced.
+
+```{r balance}
+b <- bal[, list(Match = match, Variable = variable, Scale = scale,
+                Treated = round(treated, 2), `Matched controls` = round(matched_controls, 2),
+                `Pool (same year, NTEE2)` = round(pool_same_year_ntee2, 2),
+                `SMD matched` = round(smd_matched, 3), `SMD pool` = round(smd_pool, 3))]
+kt(b, caption = "Covariate balance at baseline (mean of t-3 and t-2)")
+```
+
+Matching removes almost all of the size difference between recipients and
+other organizations. Before matching, recipients are about one standard
+deviation larger than their sector peers. Equity ratio and months of cash
+were not matched on, but they balance well too. Employees are slightly
+less balanced (SMD `r round(bal[match == "combined match" & variable == "EMPLOYEES", smd_matched], 2)`
+in the combined match), because the donor's 990-EZ filers report no
+employee count.
+
+# Sample traits
+
+## Size
+
+```{r size}
+pq <- function(v) quantile(v, c(.25, .5, .75), na.rm = TRUE, names = FALSE)
+rows <- list(
+  c("Recipient revenue", money(pq(an$R_REAL_REVENUE))), c("Recipient assets", money(pq(an$R_REAL_ASSETS))),
+  c("Recipient employees (full 990)", round(pq(an$R_EMPLOYEES))),
+  c("Donor revenue", money(pq(an[D_OK == TRUE, D_REAL_REVENUE]))), c("Donor assets", money(pq(an[D_OK == TRUE, D_REAL_ASSETS]))),
+  c("Combined revenue", money(pq(an[D_OK == TRUE, R_REAL_REVENUE + D_REAL_REVENUE]))),
+  c("Combined assets", money(pq(an[D_OK == TRUE, R_REAL_ASSETS + D_REAL_ASSETS]))),
+  c("Transfer / recipient assets (t-2)", sprintf("%.1f%%", 100 * pq(an$DOSE))))
+st <- as.data.table(do.call(rbind, rows)); setnames(st, c("Measure", "p25", "Median", "p75"))
+kt(st, caption = "Baseline size (mean of t-3 and t-2, 2024 dollars)")
+```
+
+The typical merger is a much larger organization absorbing a much smaller one. The median
+transfer is a few percent of the recipient's assets.
+
+### Donor size relative to recipient
+
+```{r size-diagram, results = "asis"}
+img <- file.path(a, "size_ratio_circles.png")
+if (file.exists(img)) {
+  cat(sprintf("![](%s){width=85%%}\n\n", img))
+} else cat("*Run `dev/analysis/size-diagram.R` to draw this diagram.*\n\n")
+```
+
+Each row groups mergers by the donor's baseline assets as a share of the
+recipient's. The recipient circle is fixed at 100%. The donor circle's
+**area** is the group's median ratio. The groups are drawn at break points
+that put 11–19% of mergers in each row.
+
+```{r size-groups}
+sg <- file.path(a, "size_ratio_groups.csv")
+if (file.exists(sg)) {
+  g <- fread(sg)[breaks == "suggested"]
+  kt(g[, list(`Donor assets as % of recipient` = G, Mergers = N, Share = sprintf("%.0f%%", PCT),
+              `Median ratio` = fifelse(MED_RATIO >= 1, sprintf("%.1fx", MED_RATIO), sprintf("%.1f%%", 100 * MED_RATIO)),
+              `Donor median assets` = money(D_MED), `Recipient median assets` = money(R_MED))],
+     caption = "Donor size relative to recipient (mergers with a donor baseline; 2024 dollars)")
+}
+```
+
+Donor size varies far less than recipient size. Median donors range from
+about $0.1m to $1.6m across the groups, while median recipients range from
+$71.5m down to $0.5m. So the ratio mostly reflects how large the recipient
+is:
+
+* At the top, small donors fold into large systems.
+* At the bottom are near-equals, and mergers where the donor is larger
+  than the recipient (14%, median 2×).
+
+```{r dose}
+kt(an[, .N, by = list(`Transfer size (FMV / recipient assets)` = DOSE_BIN)][order(`Transfer size (FMV / recipient assets)`)][
+  , Share := sprintf("%.0f%%", 100 * N / sum(N))], caption = "Transfer size")
+```
+
+## Year, sector, and affiliation
+
+```{r year, fig.width = 8, fig.height = 3.2}
+yy <- an[, .N, by = YEAR][order(YEAR)]
+par(mar = c(4, 4, 1, 1))
+barplot(yy$N, names.arg = yy$YEAR, col = "#1f5fa8", border = NA, las = 2, ylab = "Recipients", cex.names = 0.8)
+```
+
+```{r sector}
+ntee_major <- c(A = "Arts", B = "Education", C = "Environment", D = "Animals", E = "Health", F = "Mental health",
+                G = "Disease", H = "Medical research", I = "Crime & legal", J = "Employment", K = "Food & agriculture",
+                L = "Housing", M = "Public safety", N = "Recreation & sports", O = "Youth development",
+                P = "Human services", Q = "International", R = "Civil rights", S = "Community improvement",
+                T = "Philanthropy", U = "Science", V = "Social science", W = "Public benefit", X = "Religion",
+                Y = "Mutual benefit", Z = "Unknown")
+sec <- an[, .N, by = list(L = substr(NTEE2, 1, 1))][, Sector := fifelse(is.na(ntee_major[L]), "Unknown", ntee_major[L])]
+sec <- sec[, list(N = sum(N)), by = Sector][order(-N)][, Share := sprintf("%.1f%%", 100 * N / sum(N))]
+kt(sec, caption = "Recipients by NTEE major group")
+kt(an[, .N, by = list(Affiliated = AFFILIATED)][, Share := sprintf("%.0f%%", 100 * N / sum(N))],
+   caption = "Affiliated donor-recipient pairs (Schedule R link, supporting organization, or shared group exemption)")
+```
+
+## Leadership and board outcomes
+
+These are measured from Part VII rosters (`dev/analysis/leadership-measures.R`)
+and are available for single-donor units with donor, recipient-before, and
+recipient-after rosters.
+
+**CEO.** The CEO is the person with a CEO, executive director, president &
+CEO, administrator, or superintendent title. If there is none, it is the
+highest-paid officer or key employee.
+
+* The donor's CEO comes from its last roster at or before t0.
+* The recipient's CEO comes from its last roster before t0.
+* "Remains" means the person is on the recipient's roster at t+1 or t+2,
+  in any role.
+
+| CEO category | Meaning |
+|---|---|
+| `recipient_ceo_only` | Recipient's CEO remains; donor's CEO does not join |
+| `both_ceos` | Both remain at the recipient |
+| `donor_ceo_only` | Donor's CEO joins; recipient's CEO leaves |
+| `neither` | Both gone |
+| `shared_ceo` | The same person already led both, or the donor's CEO was on the recipient's roster before the merger |
+
+**Board.** The governing roster counts trustees and officers, plus 990-EZ
+listings. It excludes staff who are only key employees or highly
+compensated, and former officers.
+
+* *Retention* is the share of the recipient's t-1 roster still present at t+1.
+* *Donor joiners* are donor members who appear at t+1 and were not already
+  on the recipient's roster.
+
+| Board category | Meaning |
+|---|---|
+| `intact_donor_dissolves` | Recipient keeps at least half its board; no donor members join |
+| `combine_minor` | Recipient keeps at least half; donor joiners hold under 20% of seats |
+| `combine_major` | Recipient keeps at least half; donor joiners hold 20% or more |
+| `recipient_turnover` | Recipient keeps under half its board |
+
+```{r lead}
+lc <- an[, .N, by = list(CEO = fifelse(is.na(CEO_CAT), "(not identified)", as.character(CEO_CAT)))][order(-N)][
+  , Share := sprintf("%.0f%%", 100 * N / sum(N))]
+lb <- an[, .N, by = list(Board = fifelse(is.na(BOARD_CAT), "(not observed)", as.character(BOARD_CAT)))][order(-N)][
+  , Share := sprintf("%.0f%%", 100 * N / sum(N))]
+kt(lc, caption = "CEO outcomes among matched recipients")
+kt(lb, caption = "Board outcomes among matched recipients")
+kt(an[!is.na(CEO_CAT) & !is.na(BOARD_CAT), as.data.frame.matrix(table(CEO_CAT, BOARD_CAT))],
+   caption = "CEO by board outcome")
+```
+
+A CEO can be identified for both organizations in
+`r sprintf("%.0f%%", 100 * an[, mean(!is.na(CEO_CAT))])` of recipients. The
+rest are mostly small, volunteer-run donors with no paid staff and no CEO
+title. Board outcomes are observed for almost all of them. The most common
+pattern is the recipient's board staying intact while the donor's board
+dissolves. About a third of mergers bring donor board members onto the
+recipient's board.
+
+**Caution.** These categories are measured *after* the merger. They
+describe how mergers unfold rather than being assigned beforehand, so
+differences in outcomes across them are associations, not causal effects
+of governance choices.
