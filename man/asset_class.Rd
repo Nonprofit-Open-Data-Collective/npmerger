@@ -22,7 +22,14 @@ amounts due), \code{"investments"}, \code{"real_estate"}, \code{"equipment"},
 Maps free-text asset descriptions to broad classes.
 }
 \examples{
-asset_class(c("Cash & Cash Equivalents", "Accounts Receivable", "Land and building",
-              "All remaining assets", "Furniture and equipment", "Program contracts",
-              "Accounts payable & accrued expenses", "Prepaid expenses"))
+desc <- c( "Cash & Cash Equivalents",
+           "Accounts Receivable",
+           "Land and building",
+           "All remaining assets",
+           "Furniture and equipment",
+           "Program contracts",
+           "Accounts payable & accrued expenses",
+           "Prepaid expenses" )
+
+asset_class( desc )
 }

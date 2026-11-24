@@ -18,7 +18,8 @@ merger_fiscal_panel(
   fit = NULL,
   weights = NULL,
   smooth = c("none", "trailing"),
-  k = 3L
+  k = 3L,
+  trends = TRUE
 )
 ```
 
@@ -56,6 +57,12 @@ merger_fiscal_panel(
 
   Trailing window length in years.
 
+- trends:
+
+  Add
+  [`trend_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/trend_measures.md)
+  columns.
+
 ## Value
 
 A data.table, one row per merger, role, and year, with `MERGER_ID`,
@@ -65,14 +72,13 @@ measure columns, and (if requested) ratio and index columns.
 ## Comparability over time
 
 Ratios come from
-[`fiscal::compute_all_panel()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/compute_all_panel.html).
+[`fiscal::compute_all_panel()`](https://rdrr.io/pkg/fiscal/man/compute_all_panel.html).
 Its winsorized, standardized, and percentile variants are re-estimated
 within each tax year, so they rank organizations within a year rather
 than measure change. To track change, pass a `fit` (a fitted
-[`fiscal::fiscal_health_fit()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_health_fit.html)
-model calibrated once on a reference sample) and `weights`
-([`fiscal::fiscal_weights()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_weights.html)).
-Every organization-year is then scored with the same fixed parameters.
+`fiscal::fiscal_health_fit()` model calibrated once on a reference
+sample) and `weights` (`fiscal::fiscal_weights()`). Every
+organization-year is then scored with the same fixed parameters.
 
 ## Smoothing
 
@@ -83,3 +89,16 @@ before measures and ratios are computed. Use smoothed values for
 matching and baselines. Use raw values (`smooth = "none"`) for
 event-time outcome estimates, because a trailing window spreads a real
 post-merger change over `k` years.
+
+## Trends
+
+With `trends = TRUE`, growth, revenue volatility, and deficit-year
+columns from
+[`trend_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/trend_measures.md)
+are computed on the full (unsmoothed) organization-year history before
+the window is cut, so the first window year still has its prior-year
+growth. Use
+[`merger_proforma()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_proforma.md)
+on the result for a combined donor + recipient pre-merger baseline, and
+[`tuckman_chang()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/tuckman_chang.md)
+for vulnerability flags.

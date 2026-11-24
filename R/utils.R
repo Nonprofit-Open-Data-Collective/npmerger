@@ -9,7 +9,9 @@
 #' @return A logical vector the same length as `x`.
 #' @export
 #' @examples
-#' sn_flag(c("1", "true", "X", "0", "false", NA, ""))
+#' flags <- c( "1", "true", "X", "0", "false", NA, "" )
+#'
+#' sn_flag( flags )
 sn_flag <- function(x, na_value = NA) {
   x <- tolower(trimws(as.character(x)))
   out <- rep(as.logical(na_value), length(x))
@@ -29,8 +31,12 @@ sn_flag <- function(x, na_value = NA) {
 #' @return A character vector.
 #' @export
 #' @examples
-#' clean_ein(c("01-0215911", "10215911", "000000000", "EIN-01-0215911", NA))
-#' as_ein2("010215911")
+#' eins <- c( "01-0215911", "10215911", "000000000",
+#'            "EIN-01-0215911", NA )
+#'
+#' clean_ein( eins )
+#'
+#' as_ein2( "010215911" )
 clean_ein <- function(x) {
   x <- gsub("[^0-9]", "", as.character(x))
   short <- !is.na(x) & nchar(x) %in% 7:8
@@ -59,8 +65,10 @@ as_ein2 <- function(x) {
 #'   `"government"`, `"individual"`, `"business"`, `"other"`, or `"unknown"`.
 #' @export
 #' @examples
-#' parse_irc_section(c("501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
-#'                     "Individual", "City of Portland", NA))
+#' irc <- c( "501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
+#'           "Individual", "City of Portland", NA )
+#'
+#' parse_irc_section( irc )
 parse_irc_section <- function(x) {
   u <- toupper(gsub("[^A-Za-z0-9]", "", as.character(x)))
   data.table::fcase(

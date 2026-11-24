@@ -10,7 +10,6 @@ comparison organizations have returns for two years before and two years
 after.
 
 ``` r
-
 library(npmerger)
 library(data.table)
 ```
@@ -53,26 +52,71 @@ The real panel has more than six million organization-years. To show the
 mechanics, we simulate a small panel of 400 organizations in four NTEE
 groups and ten merger recipients.
 
+First, 400 organizations, each with an NTEE code, a typical size, and
+the year it first files:
+
 ``` r
-
 set.seed(1)
-orgs <- data.table(EIN2 = sprintf("ORG-%03d", 1:400),
-                   NTEE = sample(c("E21", "E22", "P20", "B82"), 400, TRUE),
-                   SIZE = exp(rnorm(400, 14, 1.5)),
-                   FIRST = sample(2009:2014, 400, TRUE))
-panel <- orgs[, .(TAX_YEAR = FIRST:(FIRST + 8L)), by = .(EIN2, NTEE, SIZE)]
-panel[, `:=`(REAL_ASSETS = SIZE * exp(rnorm(.N, 0, 0.1)),
-             REAL_EXPENSES = 0.6 * SIZE * exp(rnorm(.N, 0, 0.1)),
-             MARGIN = rnorm(.N, 0.03, 0.08), EQUITY_RATIO = runif(.N, 0.2, 0.9))]
-panel[, `:=`(REAL_REVENUE = REAL_EXPENSES / (1 - MARGIN), MONTHS_CASH = runif(.N, 0, 12),
-             EMPLOYEES = round(REAL_EXPENSES / 8e4), NTEE2 = ntee_level(NTEE, 2L))]
-setkey(panel, EIN2, TAX_YEAR)
 
-# ten mergers: organizations 1-10 absorb organizations 11-20 in 2015
-cases <- data.table(MERGER_ID = paste0("M", 1:10), MERGER_GROUP_ID = paste0("M", 1:10),
-                    TYPE = "merger2", DONOR_EIN2 = orgs$EIN2[11:20], RECIP_EIN2 = orgs$EIN2[1:10],
-                    MERGER_YEAR = 2015L, RECIP_MERGER_YEAR = 2015L)
-sched_n <- data.table(EIN2 = cases$DONOR_EIN2, TAX_YEAR = 2015L)
+EIN2  <- sprintf( "ORG-%03d", 1:400 )
+NTEE  <- sample( c("E21", "E22", "P20", "B82"), 400, TRUE )
+SIZE  <- exp( rnorm(400, 14, 1.5) )
+FIRST <- sample( 2009:2014, 400, TRUE )
+
+orgs <- data.table( EIN2, NTEE, SIZE, FIRST )
+```
+
+Next, a panel with nine years of returns for each one. `by =` runs the
+expression once per organization, so each row of `orgs` becomes nine
+organization-years:
+
+``` r
+panel <-
+  orgs[ , .( TAX_YEAR = FIRST:(FIRST + 8L) ),
+        by = .( EIN2, NTEE, SIZE ) ]
+```
+
+Then the financial measures that matching uses. Size varies a little
+around each organization’s typical value from year to year:
+
+``` r
+panel[ , `:=`(
+  REAL_ASSETS   = SIZE * exp( rnorm(.N, 0, 0.1) ),
+  REAL_EXPENSES = 0.6 * SIZE * exp( rnorm(.N, 0, 0.1) ),
+  MARGIN        = rnorm( .N, 0.03, 0.08 ),
+  EQUITY_RATIO  = runif( .N, 0.2, 0.9 )
+) ]
+
+panel[ , `:=`(
+  REAL_REVENUE = REAL_EXPENSES / (1 - MARGIN),
+  MONTHS_CASH  = runif( .N, 0, 12 ),
+  EMPLOYEES    = round( REAL_EXPENSES / 8e4 ),
+  NTEE2        = ntee_level( NTEE, 2L )
+) ]
+
+setkey( panel, EIN2, TAX_YEAR )
+```
+
+Last, the mergers. Organizations 1-10 absorb organizations 11-20 in
+2015, and the ten donors file Schedule N that year:
+
+``` r
+DONOR_EIN2 <- orgs$EIN2[ 11:20 ]
+RECIP_EIN2 <- orgs$EIN2[ 1:10 ]
+MERGER_ID  <- paste0( "M", 1:10 )
+
+cases <-
+  data.table(
+    MERGER_ID,
+    MERGER_GROUP_ID   = MERGER_ID,
+    TYPE              = "merger2",
+    DONOR_EIN2,
+    RECIP_EIN2,
+    MERGER_YEAR       = 2015L,
+    RECIP_MERGER_YEAR = 2015L
+  )
+
+sched_n <- data.table( EIN2 = DONOR_EIN2, TAX_YEAR = 2015L )
 ```
 
 [`build_match_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_match_data.md)
@@ -81,8 +125,15 @@ takes the list that
 returns. Here we pass only the two tables it uses.
 
 ``` r
+md <- list( cases = cases, sched_n = sched_n )
 
-mm <- build_match_data(list(cases = cases, sched_n = sched_n), panel = panel, verbose = FALSE)
+mm <-
+  build_match_data(
+    merger_data = md,
+    panel       = panel,
+    verbose     = FALSE
+  )
+
 mm
 #> <merger_match_data>
 #>   panel:     3,600 org-years
@@ -98,7 +149,6 @@ specification, how many treated units have candidates and how many they
 have:
 
 ``` r
-
 mm$coverage
 #>      SPEC TREATED MATCHED N_GE_5 N_GE_25 MEAN_CANDIDATES MEDIAN_CANDIDATES
 #>    <char>   <int>   <int>  <int>   <int>           <num>             <int>
@@ -116,8 +166,10 @@ recipient’s EIN) with a comparison organization-year (`C_EIN2`,
 columns are the differences on each matching variable.
 
 ``` r
+cand <- mm$candidates$margin
 
-head(mm$candidates$margin[, .(T_ID, C_EIN2, C_YEAR, NTEE_KEY, YEAR_GAP, D_MARGIN, DIST, RANK)])
+cand[ , .( T_ID, C_EIN2, C_YEAR, NTEE_KEY,
+           YEAR_GAP, D_MARGIN, DIST, RANK ) ] |> head()
 #>            T_ID  C_EIN2 C_YEAR NTEE_KEY YEAR_GAP      D_MARGIN       DIST  RANK
 #>          <char>  <char>  <int>   <char>    <int>         <num>      <num> <int>
 #> 1: 2015-ORG-001 ORG-052   2017       E2        2  1.363188e-03 0.06060345     1
@@ -134,10 +186,15 @@ separate candidate. To use each organization once per treated unit, keep
 its closest year:
 
 ``` r
+# closest first, then drop later years of the same organization
+cand <- cand[ order( T_ID, DIST ) ]
+dup  <- duplicated( cand[ , .( T_ID, C_EIN2 ) ] )
 
-one_per_org <- mm$candidates$margin[order(T_ID, DIST)][!duplicated(data.table(T_ID, C_EIN2))]
-nrow(mm$candidates$margin); nrow(one_per_org)
+one_per_org <- cand[ !dup ]
+
+nrow( cand )
 #> [1] 847
+nrow( one_per_org )
 #> [1] 242
 ```
 
@@ -145,27 +202,37 @@ Balance compares treated units with their closest `k` candidates, and
 with the whole pool in the same NTEE groups:
 
 ``` r
+bal <-
+  mm$balance[ SPEC == "margin" & K == 5,
+              .( VAR, TREATED, MATCHED, SMD_MATCHED, SMD_POOL ) ]
 
-mm$balance[SPEC == "margin" & K == 5, .(VAR, TREATED, MATCHED, SMD_MATCHED, SMD_POOL)]
-#>                  VAR     TREATED     MATCHED SMD_MATCHED   SMD_POOL
-#>               <char>       <num>       <num>       <num>      <num>
-#> 1:   log REAL_ASSETS 15.47630764 15.40595615  0.04732470  0.9939018
-#> 2: log REAL_EXPENSES 15.01106451 14.88376171  0.08441589  1.0088485
-#> 3:  log REAL_REVENUE 14.97946584 14.86015209  0.07968262  0.9704348
-#> 4:            MARGIN -0.03921995 -0.02845837 -0.19072130 -1.2486475
-#> 5:      EQUITY_RATIO  0.48792004  0.55156858 -0.45903601 -0.4134452
-#> 6:       MONTHS_CASH  6.76384020  5.20294552  0.47217316  0.2524556
+bal |> knitr::kable( digits = 3 )
 ```
+
+| VAR               | TREATED | MATCHED | SMD_MATCHED | SMD_POOL |
+|:------------------|--------:|--------:|------------:|---------:|
+| log REAL_ASSETS   |  15.476 |  15.406 |       0.047 |    0.994 |
+| log REAL_EXPENSES |  15.011 |  14.884 |       0.084 |    1.009 |
+| log REAL_REVENUE  |  14.979 |  14.860 |       0.080 |    0.970 |
+| MARGIN            |  -0.039 |  -0.028 |      -0.191 |   -1.249 |
+| EQUITY_RATIO      |   0.488 |   0.552 |      -0.459 |   -0.413 |
+| MONTHS_CASH       |   6.764 |   5.203 |       0.472 |    0.252 |
 
 To change the design, pass different arguments. For example, require the
 full three-character NTEE code, match on months of cash, and keep
 candidates within four years of the merger:
 
 ``` r
+alt <-
+  build_match_data(
+    merger_data  = md,
+    panel        = panel,
+    health       = c( cash = "MONTHS_CASH" ),
+    ntee_chars   = 3L,
+    max_year_gap = 4,
+    verbose      = FALSE
+  )
 
-alt <- build_match_data(list(cases = cases, sched_n = sched_n), panel = panel,
-                        health = c(cash = "MONTHS_CASH"), ntee_chars = 3L,
-                        max_year_gap = 4, verbose = FALSE)
 alt$coverage
 #>      SPEC TREATED MATCHED N_GE_5 N_GE_25 MEAN_CANDIDATES MEDIAN_CANDIDATES
 #>    <char>   <int>   <int>  <int>   <int>           <num>             <int>
@@ -178,16 +245,23 @@ alt$coverage
 ## Running it on the full data
 
 ``` r
+md <-
+  build_merger_data(
+    years = efile_years(),
+    path  = "PANEL990"
+  )
 
-md <- build_merger_data(years = efile_years(), path = "PANEL990")
-mm <- build_match_data(md, path = "PANEL990")   # builds the full panel first
+# builds the full 990 panel first (several minutes)
+mm <- build_match_data( md, path = "PANEL990" )
 
 # the five closest comparison org-years for each recipient
-top5 <- mm$candidates$margin[RANK <= 5]
+top5 <- mm$candidates$margin[ RANK <= 5 ]
 ```
 
-`dev/build-matching.R` in the package repository does this and writes
-every table to a DuckDB database.
+[`build_merger_database()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_database.md)
+runs this as the “match” stage of a project and writes every table to
+the project’s DuckDB database. See
+[`vignette("workflow")`](https://nonprofit-open-data-collective.github.io/npmerger/articles/workflow.md).
 
 **NTEE codes.** The current IRS Business Master File has no NTEE code
 for about a quarter of filers (it reports `"UNDEFINED"`), including many

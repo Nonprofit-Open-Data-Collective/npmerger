@@ -20,5 +20,11 @@ Sum of squared shares of revenue sources. Negative amounts count as zero
 and missing amounts as zero when at least one source is reported.
 }
 \examples{
-revenue_hhi(c(100, 50), c(0, 50), c(0, 0), c(0, NA))   # 1 and 0.5
+contrib <- c( 100, 50 )
+program <- c(   0, 50 )
+invest  <- c(   0,  0 )
+other   <- c(   0, NA )
+
+# 1 (one source) and 0.5 (two equal sources)
+revenue_hhi( contrib, program, invest, other )
 }

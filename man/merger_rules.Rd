@@ -13,7 +13,8 @@ merger_rules(
   promote = FALSE,
   min_corroborate = 2L,
   corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP", "GOV_DOC_CHANGE_RECIP"),
-  final_as_termination = TRUE
+  final_as_termination = TRUE,
+  name_key = c("canonical", "simple")
 )
 }
 \arguments{
@@ -60,6 +61,11 @@ in year t or t+1.}
 checked is treated as a termination, like a Part I filing. In hand
 validation none of these were ongoing dispositions; most were mergers
 or transfers at dissolution reported on the wrong part.}
+
+\item{name_key}{How Part VII names are matched between donor and recipient:
+\code{"canonical"} (default; canonical first name plus surname, via
+\code{\link[=name_keys]{name_keys()}} and the peopleparser package) or \code{"simple"} (first and last
+token, \code{\link[=person_key]{person_key()}}).}
 }
 \value{
 A list of class \code{merger_rules}.
@@ -70,6 +76,10 @@ stricter or broader definitions.
 }
 \examples{
 merger_rules()
-merger_rules(leader = "sn", sn_text = FALSE)
-merger_rules(promote = TRUE)   # broad definition
+
+# strict: Schedule N boxes only
+merger_rules( leader = "sn", sn_text = FALSE )
+
+# broad: corroborating signals can promote a filing
+merger_rules( promote = TRUE )
 }

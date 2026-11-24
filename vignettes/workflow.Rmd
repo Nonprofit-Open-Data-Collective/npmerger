@@ -1,0 +1,338 @@
+---
+title: "Workflow: from Schedule N to merger estimates"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Workflow: from Schedule N to merger estimates}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set( collapse = TRUE, comment = "#>" )
+has_fixest <- requireNamespace( "fixest", quietly = TRUE )
+```
+
+A study of nonprofit mergers with **npmerger** has three stages. Each one
+is a single function, and each writes its tables to one project database.
+
+| Stage | Function | What it builds | Reads |
+|---|---|---|---|
+| 1. Mergers | `build_merger_data()` | Schedule N labels, merger cases, donor and recipient tables, Part VII rosters, leadership outcomes, typology | Schedule N, plus the returns of the organizations involved |
+| 2. Matching | `build_match_data()` | The full 990 panel, the research sample, the comparison pool, candidates, balance | Every 990 and 990-EZ return |
+| 3. Model data | `build_model_data()` | Treated units, control sets, donor sums, the outcome panel | Stages 1 and 2 |
+
+The models then run from the stage 3 data: `merger_did()` for the main
+estimates, `did_breakouts()`, `did_sensitivity()`, and
+`did_event_study()`.
+
+**Stage 1 stands on its own.** Finding mergers needs only Schedule N and
+the returns of the organizations that filed it or received assets. If you
+only want a list of mergers, stop there. Stages 2 and 3 are for comparing
+merger recipients with organizations that did not merge.
+
+```{r}
+library( npmerger )
+library( data.table )
+```
+
+## The project folder
+
+`merger_project()` creates a folder that holds one build:
+
+```{r, eval = FALSE}
+proj <- merger_project( "~/Documents/NPMERGER" )
+```
+
+```
+NPMERGER/
+  PANEL990/          panel990 download cache (reused by later builds)
+  npmerger.duckdb    every table, plus build_log and build_settings
+  logs/              one log per stage run, <stage>-<time>.log
+  results/           model estimates
+  README.md          tables, row counts, and the build log
+```
+
+`build_merger_database()` runs the stages into that folder:
+
+```{r, eval = FALSE}
+build_merger_database(
+  project = proj,
+  stages  = c( "merger", "match", "model" ),
+  years   = efile_years()
+)
+```
+
+A fresh build of every e-file year (2009-2025), run in November 2026:
+
+| Stage | Time | Main tables |
+|---|---|---|
+| merger | 54 min on a first run (including the downloads), 42 min once cached | 63,706 Schedule N filings; 12,684 merger cases; 1.4 million Part VII person-years |
+| match | 7 min | 6.2 million organization-years; 3.0 million in the pool; 4,507 treated recipients |
+| model | under 1 min | 4,507 units; about 75,000 candidate rows per specification; 629,000 organization-years |
+
+The download cache is 8 GB and the database 1.6 GB. Running every model in
+the paper from the model stage takes under a minute.
+
+Each stage reads what it needs from the database, so you can rerun a later
+stage, for example with different matching calipers, without repeating
+the earlier ones:
+
+```{r, eval = FALSE}
+build_merger_database(
+  project    = proj,
+  stages     = c( "match", "model" ),
+  match_args = list( ntee_chars = 3L )
+)
+```
+
+Every stage run writes a log with the package versions, git commit,
+settings, a timestamped line for each step, and `sessionInfo()`. It also
+adds a row to the `build_log` table.
+
+## Stage 1: find the mergers
+
+`build_merger_data()` downloads Schedule N, classifies every filing, and
+builds the tables about each merger. Here it runs offline on the bundled
+extract of 2021 filings:
+
+```{r}
+ex <- npmerger_example()
+
+md <-
+  build_merger_data(
+    sn       = ex$sn,
+    evidence = ex$evidence,
+    core     = ex$core,
+    names    = ex$names,
+    bmf_data = ex$bmf,
+    ratios   = FALSE,
+    verbose  = FALSE
+  )
+
+md
+```
+
+On the full data, the same call takes `years` and a cache folder instead
+of the pre-fetched tables:
+
+```{r, eval = FALSE}
+md <-
+  build_merger_data(
+    years = efile_years(),
+    path  = proj$cache
+  )
+```
+
+Two of the tables describe the merger itself rather than the filings:
+
+```{r}
+md$typology[ , .( MERGER_ID, TYPE, TYPOLOGY, RATIO ) ] |> head()
+```
+
+`md$leadership` records what happened to the two chief executives and the
+two boards (`merger_leadership()`). It needs rosters on both sides of the
+merger, so it is empty for this one-year extract.
+
+## Stage 2: build the comparison data
+
+`build_match_data()` reads every 990 filer into one panel and finds
+comparison organizations for each merger recipient. See
+`vignette("matching")` for the design. The rest of this page uses a
+simulated panel of 600 organizations, 30 of which absorb another
+organization in 2015 and grow by about 30% afterwards.
+
+```{r, include = FALSE}
+# simulated panel and merger cases (same as the package tests)
+set.seed(1)
+n <- 600L
+orgs <- data.table(
+  EIN2  = sprintf( "ORG-%03d", seq_len(n) ),
+  NTEE  = sample( c("E21", "E22", "P20", "B82"), n, TRUE ),
+  SIZE  = exp( rnorm(n, 14, 1.2) ),
+  FIRST = sample( 2009:2012, n, TRUE ) )
+panel <- orgs[ , .( TAX_YEAR = FIRST:(FIRST + 8L) ), by = .( EIN2, NTEE, SIZE ) ]
+rec   <- orgs$EIN2[ 1:30 ]
+grow  <- with( panel, ifelse( EIN2 %in% rec & TAX_YEAR >= 2015L, 1.3, 1 ) )
+panel[ , `:=`(
+  OBJECTID = paste0( EIN2, "-", TAX_YEAR ), EZ = FALSE,
+  REVENUE  = grow * SIZE * exp( rnorm(.N, 0, 0.1) ),
+  ASSETS   = grow * 1.5 * SIZE * exp( rnorm(.N, 0, 0.1) ),
+  EMPLOYEES = round( SIZE / 8e4 ), NTEE_SOURCE = "bmf", SUBSECTION = "3" ) ]
+panel[ , `:=`(
+  EXPENSES = REVENUE * runif(.N, 0.9, 1.05), LIABILITIES = ASSETS * runif(.N, 0.1, 0.6),
+  CASH = ASSETS * runif(.N, 0.05, 0.3), STAFF_EXP = REVENUE * 0.5,
+  CONTRIBUTIONS = REVENUE * 0.6, PROGRAM_REVENUE = REVENUE * 0.3,
+  INVEST_INCOME = REVENUE * 0.05, OTHER_REVENUE = REVENUE * 0.05 ) ]
+panel[ , `:=`(
+  SURPLUS = REVENUE - EXPENSES, NET_ASSETS = ASSETS - LIABILITIES,
+  FUNC_EXP = EXPENSES, MGMT_EXP = EXPENSES * 0.12,
+  REAL_REVENUE = REVENUE, REAL_EXPENSES = EXPENSES, REAL_ASSETS = ASSETS ) ]
+panel[ , `:=`(
+  MARGIN = SURPLUS / REVENUE, EQUITY_RATIO = NET_ASSETS / ASSETS,
+  MONTHS_CASH = CASH / (EXPENSES / 12), NTEE2 = ntee_level(NTEE, 2L) ) ]
+setkey( panel, EIN2, TAX_YEAR )
+
+ids <- paste0( "M", 1:30 )
+sim <- list(
+  cases = data.table(
+    MERGER_ID = ids, MERGER_GROUP_ID = ids, TYPE = "merger2", BASIS = "leader",
+    AFFILIATED = rep( c(FALSE, TRUE), 15 ),
+    DONOR_EIN2 = orgs$EIN2[ 31:60 ], RECIP_EIN2 = rec,
+    MERGER_YEAR = 2015L, RECIP_MERGER_YEAR = 2015L ),
+  sched_n   = data.table( EIN2 = orgs$EIN2[ 31:60 ], TAX_YEAR = 2015L ),
+  transfers = data.table( MERGER_ID = ids, FMV_ASSETS = 1e5, FLAG_OUTLIER = FALSE ),
+  typology  = data.table( MERGER_ID = ids, TYPOLOGY = rep( c(
+    "Merger of near-equals", "Absorption of a stable smaller organization"), 15 ) ),
+  leadership = data.table( MERGER_ID = ids, CEO_CAT = "recipient_ceo_only",
+    BOARD_CAT = rep( c("combine_minor", "combine_major"), 15 ) ) )
+```
+
+```{r}
+mm <-
+  build_match_data(
+    merger_data = sim,
+    panel       = panel,
+    verbose     = FALSE
+  )
+
+mm
+```
+
+On the full data, leave out `panel` and give the cache folder. The panel
+is built from the same files stage 1 downloaded:
+
+```{r, eval = FALSE}
+mm <- build_match_data( md, path = proj$cache )
+```
+
+## Stage 3: assemble the model data
+
+`build_model_data()` does the slow joins once. It keeps one row per
+treated recipient with its breakout variables, the closest candidate
+controls for every matching specification (plus a match on the combined
+recipient and donor baseline), donor sums for the pro forma outcomes, and
+only the organization-years the models read.
+
+```{r}
+dd <- build_model_data( sim, mm, verbose = FALSE )
+
+dd
+```
+
+`max_k` and `max_year_gap` set the largest control sets and calendar-year
+gaps any later model can ask for (10 and 2 by default).
+
+## Run the models
+
+Every model reads only `dd`. `merger_did()` gives long-difference
+estimates, from two years before the merger to two years after, for each
+design:
+
+```{r, eval = has_fixest}
+fit <-
+  merger_did(
+    data     = dd,
+    outcomes = c( "LOG_REVENUE", "MARGIN" ),
+    keep     = NULL
+  )
+
+fit[ , .( design, outcome, estimate, se, n_sets ) ] |>
+  knitr::kable( digits = 3 )
+```
+
+`keep = NULL` uses every treated unit. The default,
+`~ OTHER == FALSE`, drops recipients involved in other mergers in the
+window.
+
+The three designs are listed by `did_designs()`. The recipient alone
+grows by about the simulated 30% (0.26 log points). The pro forma designs
+compare the merged organization with the recipient and donor combined
+before the merger. In this simulation the donors are about as large as
+their recipients, but the recipients grow by only 30%, so the merged
+organization ends up smaller than the two were apart and the pro forma
+estimates are negative.
+
+### Breakouts
+
+Interact treatment with any unit-level variable from `did_breakout_vars()`:
+
+```{r, eval = has_fixest}
+br <-
+  did_breakouts(
+    data     = dd,
+    by       = "AFFILIATED",
+    outcomes = "LOG_REVENUE",
+    designs  = "naive | recipient match",
+    keep     = NULL
+  )
+
+br[ , .( spec, term, estimate, se ) ] |>
+  knitr::kable( digits = 3 )
+```
+
+### Sensitivity
+
+`did_variants()` lists the paper's variants. Each is a set of
+`merger_did()` arguments, so adding one is a single line:
+
+```{r, eval = has_fixest}
+v <- did_variants()[ c( "base", "k1", "gap2" ) ]
+
+# use every unit in this small example
+v <- lapply( v, modifyList, list( keep = ~ TRUE ) )
+
+# one more: three controls per recipient
+v$k3 <- modifyList( v$base, list( k = 3L ) )
+
+sens <-
+  did_sensitivity(
+    data     = dd,
+    variants = v,
+    outcomes = "LOG_REVENUE",
+    designs  = "naive | recipient match"
+  )
+
+sens[ , .( variant, estimate, se, n_sets ) ] |>
+  knitr::kable( digits = 3 )
+```
+
+### Event study
+
+```{r, eval = has_fixest}
+es <-
+  did_event_study(
+    data     = dd,
+    outcomes = "LOG_REVENUE",
+    designs  = "naive | recipient match",
+    keep     = NULL
+  )
+
+es[ , .( E, estimate, se ) ] |>
+  knitr::kable( digits = 3 )
+```
+
+`did_baseline_means()`, `did_funnel()`, and `did_composition()` describe
+the same samples: outcome means at `t-2`, the counts from merger cases to
+the units and controls used, and the treated units in each breakout
+group.
+
+## Coming back to a project
+
+Everything is in the database, so a later session starts from
+`load_model_data()` instead of rebuilding:
+
+```{r, eval = FALSE}
+proj <- merger_project( "~/Documents/NPMERGER" )
+
+dd  <- load_model_data( proj )
+fit <- merger_did( dd )
+```
+
+`load_merger_data()` and `load_match_data()` return the stage 1 and stage
+2 objects, and `db_read()` reads any single table:
+
+```{r, eval = FALSE}
+db_tables( proj )
+
+db_read( proj, "match_balance" )
+```

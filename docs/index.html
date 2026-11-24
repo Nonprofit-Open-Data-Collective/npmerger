@@ -35,6 +35,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="articles/matching.html">Matching</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
@@ -67,7 +68,7 @@
 <p>Build nonprofit merger datasets from IRS Form 990 e-file data.</p>
 <p><strong>npmerger</strong> finds candidate mergers in Schedule N (liquidation, termination, dissolution, or significant disposition of assets). It classifies each transaction and builds analysis tables around every merger event: donor and recipient attributes, Part VII rosters, and fiscal-health panels. Data is retrieved with <a href="https://github.com/Nonprofit-Open-Data-Collective/panel990" class="external-link">panel990</a>, and fiscal metrics come from <a href="https://github.com/Nonprofit-Open-Data-Collective/fiscal" class="external-link">fiscal</a>.</p>
 <blockquote>
-<p>Status: early development. The full pipeline works, from Schedule N through the analysis tables. The classifier has not yet been validated against hand-labeled cases. See the <a href="https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md" class="external-link">roadmap</a> and the <a href="https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html">overview</a>.</p>
+<p>Status: early development. The full pipeline works, from Schedule N through the analysis tables. The classifier has been checked against 300 hand-labeled filings. See the <a href="https://github.com/Nonprofit-Open-Data-Collective/npmerger/blob/main/PLAN.md" class="external-link">roadmap</a> and the <a href="https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.html">overview</a>.</p>
 </blockquote>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -79,27 +80,54 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
+<p>Everything in one call: Schedule N, evidence, classification, cases, transfers, donor and recipient attributes, the Part VII panel, and the fiscal panel.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nonprofit-open-data-collective.github.io/npmerger/">npmerger</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># everything in one call: Schedule N, evidence, classification, cases,</span></span>
-<span><span class="co"># transfers, donor/recipient attributes, Part VII panel, fiscal panel</span></span>
-<span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span>, path <span class="op">=</span> <span class="st">"PANEL990"</span><span class="op">)</span></span>
-<span><span class="va">md</span><span class="op">$</span><span class="va">cases</span>; <span class="va">md</span><span class="op">$</span><span class="va">donors</span>; <span class="va">md</span><span class="op">$</span><span class="va">recipients</span>; <span class="va">md</span><span class="op">$</span><span class="va">part7</span>; <span class="va">md</span><span class="op">$</span><span class="va">fiscal</span></span>
+<span><span class="va">md</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span></span>
+<span>    years <span class="op">=</span> <span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span>,</span>
+<span>    path  <span class="op">=</span> <span class="st">"PANEL990"</span></span>
+<span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="co"># offline, on the bundled example</span></span>
-<span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/npmerger_example.html">npmerger_example</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span>sn <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">sn</span>, evidence <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">evidence</span>, core <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">core</span>,</span>
-<span>                  names <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">names</span>, bmf_data <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">bmf</span><span class="op">)</span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">cases</span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">donors</span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">recipients</span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">part7</span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">fiscal</span></span></code></pre></div>
+<p>Offline, on the bundled example:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/npmerger_example.html">npmerger_example</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># or stage by stage</span></span>
-<span><span class="va">sn</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span>   <span class="co"># Schedule N tables via panel990</span></span>
-<span><span class="va">tx</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sn_transactions.html">sn_transactions</a></span><span class="op">(</span><span class="va">sn</span><span class="op">)</span>         <span class="co"># one row per asset line (Parts I + II)</span></span>
-<span><span class="va">fl</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/sn_filings.html">sn_filings</a></span><span class="op">(</span><span class="va">sn</span>, <span class="va">tx</span><span class="op">)</span>          <span class="co"># one row per Schedule N filing</span></span>
-<span><span class="va">ev</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_evidence_tables.html">get_evidence_tables</a></span><span class="op">(</span><span class="va">fl</span><span class="op">)</span>     <span class="co"># header, Part VII, VI, Sched O/R/A for these orgs</span></span>
-<span><span class="va">fe</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/merger_features.html">merger_features</a></span><span class="op">(</span><span class="va">fl</span>, <span class="va">ev</span><span class="op">)</span>     <span class="co"># leadership, donor counts, corroboration, affiliation</span></span>
-<span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">fe</span><span class="op">)</span>   <span class="co"># merger2, mergerN, consolidation, closure, ...</span></span>
-<span><span class="fu"><a href="reference/sched_n_table.html">sched_n_table</a></span><span class="op">(</span><span class="va">lab</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">md</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span></span>
+<span>    sn       <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">sn</span>,</span>
+<span>    evidence <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">evidence</span>,</span>
+<span>    core     <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">core</span>,</span>
+<span>    names    <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">names</span>,</span>
+<span>    bmf_data <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">bmf</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p>Or stage by stage:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Schedule N tables, via panel990</span></span>
+<span><span class="va">sn</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span> <span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># one row per asset line (Parts I and II)</span></span>
+<span><span class="va">tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sn_transactions.html">sn_transactions</a></span><span class="op">(</span> <span class="va">sn</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># one row per Schedule N filing</span></span>
+<span><span class="va">fl</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/sn_filings.html">sn_filings</a></span><span class="op">(</span> <span class="va">sn</span>, <span class="va">tx</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># header, Parts VI and VII, Schedules O, R, A for these organizations</span></span>
+<span><span class="va">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_evidence_tables.html">get_evidence_tables</a></span><span class="op">(</span> <span class="va">fl</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># leadership, donor counts, corroboration, affiliation</span></span>
+<span><span class="va">fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/merger_features.html">merger_features</a></span><span class="op">(</span> <span class="va">fl</span>, <span class="va">ev</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># merger2, mergerN, consolidation, closure, ...</span></span>
+<span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span> <span class="va">fe</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/sched_n_table.html">sched_n_table</a></span><span class="op">(</span> <span class="va">lab</span> <span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="transaction-types">Transaction types<a class="anchor" aria-label="anchor" href="#transaction-types"></a>

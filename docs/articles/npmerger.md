@@ -89,7 +89,6 @@ analyses will want to separate them from arm’s-length mergers.
 ## Transaction types
 
 ``` r
-
 library(npmerger)
 transaction_types()
 #> [1] "merger2"           "mergerN"           "consolidation"    
@@ -125,23 +124,41 @@ N flags or Part VII overlap as the leadership evidence:
 runs everything and returns every table:
 
 ``` r
-
-md <- build_merger_data(2019:2021, path = "PANEL990")
+md <-
+  build_merger_data(
+    years = 2019:2021,
+    path  = "PANEL990"
+  )
 ```
 
 Each stage is also a separate function, so you can stop at any point,
 inspect the result, or substitute your own step:
 
 ``` r
+# Schedule N tables, via panel990
+sn <- get_schedule_n( 2019:2021 )
 
-sn  <- get_schedule_n(2019:2021)   # Schedule N tables, via panel990
-tx  <- sn_transactions(sn)         # one row per asset line, Parts I and II
-tx  <- recover_recipient_ein(tx, get_name_index(2018:2022))  # fill missing EINs
-fl  <- sn_filings(sn, tx)          # one row per Schedule N filing
-ev  <- get_evidence_tables(fl)     # 990 tables for the donors and recipients
-fe  <- merger_features(fl, ev)     # add the evidence to each filing
-lab <- classify_transactions(fe)   # labels plus the evidence behind them
-sched_n_table(lab)                 # YEAR, OBJECTID, EIN2, TYPE, evidence
+# one row per asset line, Parts I and II
+tx <- sn_transactions( sn )
+
+# fill missing recipient EINs by name (index covers t-1 to t+1)
+name_index <- get_name_index( 2018:2022 )
+tx <- recover_recipient_ein( tx, name_index )
+
+# one row per Schedule N filing
+fl <- sn_filings( sn, tx )
+
+# 990 tables for the donors and recipients
+ev <- get_evidence_tables( fl )
+
+# add the evidence to each filing
+fe <- merger_features( fl, ev )
+
+# labels, plus the evidence behind them
+lab <- classify_transactions( fe )
+
+# YEAR, OBJECTID, EIN2, TYPE, evidence
+sched_n_table( lab )
 ```
 
 [`get_schedule_n()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/get_schedule_n.md)
@@ -169,18 +186,21 @@ Schedule N is messy, and the low-level helpers handle the recurring
 problems. Checkboxes come in several encodings:
 
 ``` r
+flags <- c( "1", "true", "X", "0", "false", NA )
 
-sn_flag(c("1", "true", "X", "0", "false", NA))
+sn_flag( flags )
 #> [1]  TRUE  TRUE  TRUE FALSE FALSE    NA
 ```
 
 Recipient EINs arrive in many formats, including placeholders:
 
 ``` r
+eins <- c( "01-0215911", "10215911", "000000000", "EIN-01-0215911" )
 
-clean_ein(c("01-0215911", "10215911", "000000000", "EIN-01-0215911"))
+clean_ein( eins )
 #> [1] "010215911" "010215911" NA          "010215911"
-as_ein2("010215911")
+
+as_ein2( "010215911" )
 #> [1] "EIN-01-0215911"
 ```
 
@@ -188,9 +208,10 @@ The recipient’s IRC section is free text, with dozens of spellings of
 501(c)(3) alone:
 
 ``` r
+irc <- c( "501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
+          "Individual", "City of Portland", NA )
 
-parse_irc_section(c("501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
-                    "Individual", "City of Portland", NA))
+parse_irc_section( irc )
 #> [1] "501c3"        "501c3"        "other_exempt" "business"     "individual"  
 #> [6] "government"   "unknown"
 ```
@@ -207,23 +228,31 @@ takes a filing-level table and adds a label, plus the evidence used to
 reach it. Here is a small made-up example with one filing of each kind:
 
 ``` r
+case <- c( "sale", "dispersed", "flags",
+           "part7", "corroborated", "no evidence" )
+recip <- "020000002"   # the one nonprofit successor
 
-filings <- data.frame(
-  case          = c("sale", "dispersed", "flags", "part7", "corroborated", "no evidence"),
-  EIN2          = paste0("EIN-01-000000", 1:6),
-  HAS_P1        = c(FALSE, TRUE, TRUE, TRUE, TRUE, TRUE),
-  HAS_P2        = c(TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
-  LEADER_SN     = c(FALSE, FALSE, TRUE, FALSE, FALSE, FALSE),
-  LEADER_P7     = c(FALSE, FALSE, FALSE, TRUE, FALSE, FALSE),
-  N_NP_RECIP    = c(0L, 6L, 1L, 1L, 1L, 1L),
-  TOP_SHARE     = c(NA, 0.2, 1, 1, 1, 1),
-  TOP_RECIP_EIN = c(NA, "020000002", "020000002", "020000002", "020000002", "020000002"),
-  SO_MERGER_TEXT_DONOR = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE),
-  GOV_DOC_CHANGE_RECIP = c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE)
-)
+filings <-
+  data.frame(
+    case,
+    EIN2          = paste0( "EIN-01-000000", 1:6 ),
+    HAS_P1        = c( FALSE, TRUE, TRUE, TRUE, TRUE, TRUE ),
+    HAS_P2        = c( TRUE, FALSE, FALSE, FALSE, FALSE, FALSE ),
+    LEADER_SN     = c( FALSE, FALSE, TRUE, FALSE, FALSE, FALSE ),
+    LEADER_P7     = c( FALSE, FALSE, FALSE, TRUE, FALSE, FALSE ),
+    N_NP_RECIP    = c( 0L, 6L, 1L, 1L, 1L, 1L ),
+    TOP_SHARE     = c( NA, 0.2, 1, 1, 1, 1 ),
+    TOP_RECIP_EIN = c( NA, rep( recip, 5 ) ),
+    SO_MERGER_TEXT_DONOR =
+      c( FALSE, FALSE, FALSE, FALSE, TRUE, FALSE ),
+    GOV_DOC_CHANGE_RECIP =
+      c( FALSE, FALSE, FALSE, FALSE, TRUE, FALSE )
+  )
 
-out <- classify_transactions(filings)
-out[, c("case", "LEADER", "N_CORROBORATE", "BASIS", "TYPE")]
+out <- classify_transactions( filings )
+
+cols <- c( "case", "LEADER", "N_CORROBORATE", "BASIS", "TYPE" )
+out[ , ..cols ]
 #>            case LEADER N_CORROBORATE  BASIS              TYPE
 #>          <char> <lgcl>         <int> <char>            <char>
 #> 1:         sale  FALSE             0   <NA> asset_disposition
@@ -239,10 +268,18 @@ side by side. For example, a strict definition counts only the Schedule
 N boxes, and a broad one turns promotion on:
 
 ``` r
+strict_rules <- merger_rules( leader = "sn" )
+broad_rules  <- merger_rules( promote = TRUE )
 
-strict <- classify_transactions(filings, merger_rules(leader = "sn"))
-broad  <- classify_transactions(filings, merger_rules(promote = TRUE))
-data.frame(case = filings$case, strict = strict$TYPE, default = out$TYPE, broad = broad$TYPE)
+strict <- classify_transactions( filings, strict_rules )
+broad  <- classify_transactions( filings, broad_rules )
+
+data.frame(
+  case    = filings$case,
+  strict  = strict$TYPE,
+  default = out$TYPE,
+  broad   = broad$TYPE
+)
 #>           case            strict           default             broad
 #> 1         sale asset_disposition asset_disposition asset_disposition
 #> 2    dispersed           closure           closure           closure
@@ -270,10 +307,10 @@ where the year is the donor’s Schedule N tax year. A group ID ties
 together all the donors that fold into one recipient:
 
 ``` r
-
-merger_id(2020, "01-0215911", "010431680")
+merger_id( 2020, "01-0215911", "010431680" )
 #> [1] "2020-010215911-010431680"
-merger_group_id(2020, "010431680")
+
+merger_group_id( 2020, "010431680" )
 #> [1] "2020-010431680"
 ```
 
@@ -284,11 +321,20 @@ pipeline can run offline. Here it is run without the **fiscal** ratios,
 to keep this page quick:
 
 ``` r
-
+# bundled inputs: sn, evidence, core, names, bmf
 ex <- npmerger_example()
-md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
-                        names = ex$names, bmf_data = ex$bmf,
-                        ratios = FALSE, verbose = FALSE)
+
+md <-
+  build_merger_data(
+    sn       = ex$sn,
+    evidence = ex$evidence,
+    core     = ex$core,
+    names    = ex$names,
+    bmf_data = ex$bmf,
+    ratios   = FALSE,
+    verbose  = FALSE
+  )
+
 md
 #> <merger_data>
 #> Schedule N filings by type:
@@ -305,6 +351,8 @@ md
 #>   recipients       16 rows
 #>   part7          1618 rows
 #>   fiscal          166 rows
+#>   leadership       11 rows
+#>   typology         16 rows
 ```
 
 ### Schedule N table
@@ -313,8 +361,10 @@ md
 evidence behind it:
 
 ``` r
+cols <- c( "TAX_YEAR", "OBJECTID", "EIN2", "TYPE",
+           "BASIS", "AFFILIATED", "N_DONORS" )
 
-head(md$sched_n[, c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "BASIS", "AFFILIATED", "N_DONORS")])
+md$sched_n[ , ..cols ] |> head()
 #>    TAX_YEAR               OBJECTID           EIN2           TYPE  BASIS
 #>       <int>                 <char>         <char>         <char> <char>
 #> 1:     2021 OID-202440449349301959 EIN-04-2305850 asset_transfer   <NA>
@@ -345,8 +395,11 @@ head(md$sched_n[, c("TAX_YEAR", "OBJECTID", "EIN2", "TYPE", "BASIS", "AFFILIATED
   the same successor.
 
 ``` r
+cols <- c( "MERGER_ID", "MERGER_GROUP_ID", "TYPE",
+           "MERGER_YEAR", "RECIP_MERGER_YEAR",
+           "N_GROUP", "FMV_TO_RECIP" )
 
-md$cases[, c("MERGER_ID", "MERGER_GROUP_ID", "TYPE", "MERGER_YEAR", "RECIP_MERGER_YEAR", "N_GROUP", "FMV_TO_RECIP")]
+md$cases[ , ..cols ]
 #>                    MERGER_ID MERGER_GROUP_ID          TYPE MERGER_YEAR
 #>                       <char>          <char>        <char>       <int>
 #>  1: 2021-132890752-861250084  2021-861250084 consolidation        2021
@@ -395,8 +448,10 @@ md$cases[, c("MERGER_ID", "MERGER_GROUP_ID", "TYPE", "MERGER_YEAR", "RECIP_MERGE
   assets. Values far above 1 are flagged in `FLAG_OUTLIER`.
 
 ``` r
+cols <- c( "MERGER_ID", "FMV_TOTAL", "FMV_ASSETS", "FMV_CASH",
+           "FMV_REAL_ESTATE", "COVERAGE", "FLAG_OUTLIER" )
 
-head(md$transfers[, c("MERGER_ID", "FMV_TOTAL", "FMV_ASSETS", "FMV_CASH", "FMV_REAL_ESTATE", "COVERAGE", "FLAG_OUTLIER")])
+md$transfers[ , ..cols ] |> head()
 #>                   MERGER_ID FMV_TOTAL FMV_ASSETS FMV_CASH FMV_REAL_ESTATE
 #>                      <char>     <num>      <num>    <num>           <num>
 #> 1: 2021-132890752-861250084    621192     621192        0               0
@@ -426,9 +481,11 @@ head(md$transfers[, c("MERGER_ID", "FMV_TOTAL", "FMV_ASSETS", "FMV_CASH", "FMV_R
 - revenue, expenses, and assets for the five years up to `REF_YEAR`.
 
 ``` r
+cols <- c( "MERGER_ID", "NAME", "STATE", "AGE", "NTEE",
+           "REVENUE_TM4", "REVENUE_TM2", "REVENUE_T0",
+           "ASSETS_T0" )
 
-d <- md$donors
-d[1:3, c("MERGER_ID", "NAME", "STATE", "AGE", "NTEE", "REVENUE_TM4", "REVENUE_TM2", "REVENUE_T0", "ASSETS_T0")]
+md$donors[ 1:3, ..cols ]
 #> Key: <MERGER_ID>
 #>                   MERGER_ID                                     NAME  STATE
 #>                      <char>                                   <char> <char>
@@ -448,9 +505,13 @@ d[1:3, c("MERGER_ID", "NAME", "STATE", "AGE", "NTEE", "REVENUE_TM4", "REVENUE_TM
 t+2. `IN_BOTH` marks people who appear on both:
 
 ``` r
+cols <- c( "MERGER_ID", "ROLE", "TIME_FROM_MERGER",
+           "PERSON_NAME", "TITLE", "COMP_ORG" )
 
-p <- md$part7
-p[IN_BOTH == TRUE][1:6, c("MERGER_ID", "ROLE", "TIME_FROM_MERGER", "PERSON_NAME", "TITLE", "COMP_ORG")]
+# people on both organizations' rosters
+in_both <- md$part7[ IN_BOTH == TRUE ]
+
+in_both[ 1:6, ..cols ]
 #>                   MERGER_ID   ROLE TIME_FROM_MERGER       PERSON_NAME     TITLE
 #>                      <char> <char>            <int>            <char>    <char>
 #> 1: 2021-132890752-861250084  donor               -2         ERIN ROTH   TRUSTEE
@@ -477,9 +538,12 @@ measures. Overhead, executive compensation, employees, and debt detail
 come from the full Form 990 only.
 
 ``` r
+cols <- c( "MERGER_ID", "TIME_FROM_MERGER", "REVENUE",
+           "EXPENSES", "ASSETS", "STAFF_EXP", "OVERHEAD_RATIO" )
 
-f <- md$fiscal
-f[ROLE == "recipient"][1:6, c("MERGER_ID", "TIME_FROM_MERGER", "REVENUE", "EXPENSES", "ASSETS", "STAFF_EXP", "OVERHEAD_RATIO")]
+recips <- md$fiscal[ ROLE == "recipient" ]
+
+recips[ 1:6, ..cols ]
 #>                   MERGER_ID TIME_FROM_MERGER  REVENUE  EXPENSES   ASSETS
 #>                      <char>            <int>    <num>     <num>    <num>
 #> 1: 2021-132890752-861250084                0 36146755  17521070 87757237
@@ -499,16 +563,14 @@ f[ROLE == "recipient"][1:6, c("MERGER_ID", "TIME_FROM_MERGER", "REVENUE", "EXPEN
 ```
 
 With `ratios = TRUE` (the default), the panel also gets the ratios from
-[`fiscal::compute_all_panel()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/compute_all_panel.html).
+[`fiscal::compute_all_panel()`](https://rdrr.io/pkg/fiscal/man/compute_all_panel.html).
 Two choices matter when you study change over time:
 
 - **A fixed calibration.** The ratios’ winsorized and percentile
   variants are recomputed within each year. For an index that is
-  comparable across years, fit
-  [`fiscal::fiscal_health_fit()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_health_fit.html)
-  once on a reference sample and pass it (and
-  [`fiscal::fiscal_weights()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_weights.html))
-  as `fit` and `weights`.
+  comparable across years, fit `fiscal::fiscal_health_fit()` once on a
+  reference sample and pass it (and `fiscal::fiscal_weights()`) as `fit`
+  and `weights`.
 - **Backward-looking smoothing.** `smooth = "trailing"` averages each
   organization’s current and two previous years
   ([`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)).

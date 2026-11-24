@@ -150,6 +150,22 @@ fiscal-health panel around each merger.
 - [`smooth_trailing()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/smooth_trailing.md)
   : Smooth panel variables using only current and past years
 
+## Outcome measures
+
+Measures from the merger and financial-vulnerability literatures beyond
+the ‘fiscal’ ratios, such as revenue concentration, growth, volatility,
+deficit history, Tuckman-Chang flags, and a combined donor + recipient
+pre-merger baseline.
+
+- [`revenue_hhi()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/revenue_hhi.md)
+  : Revenue concentration (Herfindahl-Hirschman index)
+- [`trend_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/trend_measures.md)
+  : Growth, volatility, and deficit history within each organization
+- [`tuckman_chang()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/tuckman_chang.md)
+  : Tuckman-Chang financial vulnerability flags
+- [`merger_proforma()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_proforma.md)
+  : Combined donor + recipient (pro forma) series
+
 ## Matched comparison samples
 
 Build the full 990 panel, a research sample of mergers with a full
@@ -186,6 +202,66 @@ recipients.
   : Convert nominal dollars to constant dollars
 - [`cpi_u()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/cpi_u.md)
   : Consumer price index (CPI-U, annual average)
+
+## Merger characteristics
+
+Leadership and board outcomes, a typology of merger cases, and a file
+for checking leadership matches by hand.
+
+- [`merger_leadership()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_leadership.md)
+  : Leadership and board outcomes for each merger case
+- [`leadership_inspection()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/leadership_inspection.md)
+  : Leadership inspection file
+- [`merger_typology()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_typology.md)
+  [`typology_levels()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_typology.md)
+  : Merger typology
+
+## Models
+
+Matched difference-in-differences for merger recipients. Build the model
+data once, then run the main estimates, breakouts, sensitivity variants,
+and event study from it.
+
+- [`build_model_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_model_data.md)
+  : Build the data for the merger models
+- [`merger_did()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_did.md)
+  [`did_breakouts()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_did.md)
+  [`did_sensitivity()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_did.md)
+  : Matched difference-in-differences for merger recipients
+- [`did_event_study()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_event_study.md)
+  : Event-study estimates for merger recipients
+- [`did_baseline_means()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_baseline_means.md)
+  [`did_funnel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_baseline_means.md)
+  [`did_composition()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_baseline_means.md)
+  : Baseline means, sample funnel, and sample composition
+- [`did_outcomes()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_outcomes.md)
+  : Outcomes for the merger models
+- [`did_designs()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_designs.md)
+  : Designs for the merger models
+- [`did_variants()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_variants.md)
+  : Sensitivity variants used in the paper
+- [`did_breakout_vars()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_breakout_vars.md)
+  : Unit-level breakout variables
+
+## Project folder and database
+
+Run the whole workflow into one project folder, with one DuckDB
+database, a log for each stage, and a README.
+
+- [`merger_project()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_project.md)
+  : Create or open an npmerger project folder
+- [`build_merger_database()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_database.md)
+  : Build a project database stage by stage
+- [`load_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/load_merger_data.md)
+  [`load_match_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/load_merger_data.md)
+  [`load_model_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/load_merger_data.md)
+  : Load stage outputs from a project database
+- [`db_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/db_tables.md)
+  [`db_read()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/db_tables.md)
+  [`db_write()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/db_tables.md)
+  : Tables in a project database
+- [`write_project_readme()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/write_project_readme.md)
+  : Write the project README
 
 ## Package
 

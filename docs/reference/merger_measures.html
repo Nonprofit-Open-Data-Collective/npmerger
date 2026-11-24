@@ -3,13 +3,13 @@
 panel. Revenue, expenses, assets, liabilities, net assets, grants, and
 contributions are available for both 990 and 990-EZ filers. The
 functional-expense breakdown (overhead), executive compensation,
-employees, and debt detail come from the full Form 990 only and are NA
-for 990-EZ filers."><meta property="og:description" content="Adds plain-named measures used by the attribute tables and the fiscal
+employees, the revenue-source breakdown, and debt detail come from the
+full Form 990 only and are NA for 990-EZ filers."><meta property="og:description" content="Adds plain-named measures used by the attribute tables and the fiscal
 panel. Revenue, expenses, assets, liabilities, net assets, grants, and
 contributions are available for both 990 and 990-EZ filers. The
 functional-expense breakdown (overhead), executive compensation,
-employees, and debt detail come from the full Form 990 only and are NA
-for 990-EZ filers."></head><body>
+employees, the revenue-source breakdown, and debt detail come from the
+full Form 990 only and are NA for 990-EZ filers."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -26,6 +26,7 @@ for 990-EZ filers."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -58,8 +59,8 @@ for 990-EZ filers."></head><body>
 panel. Revenue, expenses, assets, liabilities, net assets, grants, and
 contributions are available for both 990 and 990-EZ filers. The
 functional-expense breakdown (overhead), executive compensation,
-employees, and debt detail come from the full Form 990 only and are <code>NA</code>
-for 990-EZ filers.</p>
+employees, the revenue-source breakdown, and debt detail come from the
+full Form 990 only and are <code>NA</code> for 990-EZ filers.</p>
     </div>
 
     <div class="section level2">
@@ -79,9 +80,29 @@ for 990-EZ filers.</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p><code>x</code> with measure columns added: <code>REVENUE</code>, <code>EXPENSES</code>, <code>SURPLUS</code>,
 <code>ASSETS</code>, <code>ASSETS_BOY</code>, <code>LIABILITIES</code>, <code>NET_ASSETS</code>, <code>DEBT</code>,
-<code>CONTRIBUTIONS</code>, <code>PROGRAM_REVENUE</code>, <code>NONCASH_CONTRIB</code>, <code>GRANTS</code>,
-<code>STAFF_EXP</code>, <code>EXEC_COMP</code>, <code>PROGRAM_EXP</code>, <code>MGMT_EXP</code>, <code>FUNDR_EXP</code>,
-<code>OVERHEAD_RATIO</code>, <code>EMPLOYEES</code>, and <code>EZ</code> (990-EZ return).</p>
+<code>CONTRIBUTIONS</code>, <code>PROGRAM_REVENUE</code>, <code>INVEST_INCOME</code>, <code>OTHER_REVENUE</code>,
+<code>NONCASH_CONTRIB</code>, <code>GRANTS</code>, <code>STAFF_EXP</code>, <code>EXEC_COMP</code>, <code>PROGRAM_EXP</code>,
+<code>MGMT_EXP</code>, <code>FUNDR_EXP</code>, <code>OVERHEAD_RATIO</code>, <code>ADMIN_RATIO</code> (management and
+general / total expenses), <code>REVENUE_HHI</code>, <code>EMPLOYEES</code>,
+<code>REV_PER_EMPLOYEE</code>, <code>EXP_PER_EMPLOYEE</code>, <code>COMP_PER_EMPLOYEE</code> (salaries
+and benefits / employees), <code>DEFICIT</code> (expenses exceed revenue),
+<code>NEG_NET_ASSETS</code>, and <code>EZ</code> (990-EZ return).</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p><code>REVENUE_HHI</code> is the Herfindahl-Hirschman index of revenue concentration
+across the four Part I sources (contributions, program service revenue,
+investment income, other revenue), the revenue-concentration indicator
+of Tuckman and Chang (1991). Negative sources count as zero. It ranges
+from 0.25 (equal shares) to 1 (one source). Per-employee measures are
+<code>NA</code> when the return reports no employees.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
+    <p>Tuckman, H. P., &amp; Chang, C. F. (1991). A methodology for
+measuring the financial vulnerability of charitable nonprofit
+organizations. <em>Nonprofit and Voluntary Sector Quarterly</em>, 20(4),
+445-460.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

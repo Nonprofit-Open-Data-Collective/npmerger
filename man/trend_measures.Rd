@@ -44,9 +44,15 @@ log change it is defined for zero and negative values (net assets), and
 it is close to the percentage change for small changes.
 }
 \examples{
-x <- data.frame(EIN2 = "A", TAX_YEAR = 2018:2021, REVENUE = c(100, 120, 90, 90),
-                SURPLUS = c(5, -2, -8, 1))
-trend_measures(x, vars = "REVENUE")
+x <-
+  data.frame(
+    EIN2     = "A",
+    TAX_YEAR = 2018:2021,
+    REVENUE  = c( 100, 120, 90, 90 ),
+    SURPLUS  = c(   5,  -2, -8,  1 )
+  )
+
+trend_measures( x, vars = "REVENUE" )
 }
 \references{
 Mayer, W. J. (2023). Simmer or boil: Revenue volatility and

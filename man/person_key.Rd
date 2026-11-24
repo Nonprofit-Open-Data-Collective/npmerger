@@ -18,5 +18,7 @@ PhD, ...), and keeps the first and last remaining tokens, so
 \code{"Dr. Jane Q. Smith, PhD"} and \code{"JANE SMITH"} match.
 }
 \examples{
-person_key(c("Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith"))
+people <- c( "Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith" )
+
+person_key( people )
 }

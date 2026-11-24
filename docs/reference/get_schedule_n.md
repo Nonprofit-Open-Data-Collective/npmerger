@@ -54,6 +54,6 @@ A list of class `sn_raw` with data.tables `p1_header`, `p1_assets`,
 
 ``` r
 if (FALSE) { # \dontrun{
-sn <- get_schedule_n(2019:2021)
+sn <- get_schedule_n( 2019:2021 )
 } # }
 ```

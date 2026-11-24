@@ -10,8 +10,9 @@
 #' @return A character vector.
 #' @export
 #' @examples
-#' merger_id(2020, "01-0215911", "010431680")
-#' merger_group_id(2020, "010431680")
+#' merger_id( 2020, "01-0215911", "010431680" )
+#'
+#' merger_group_id( 2020, "010431680" )
 merger_id <- function(year, from_ein, to_ein) {
   f <- clean_ein(from_ein); t <- clean_ein(to_ein)
   ifelse(is.na(year) | is.na(f) | is.na(t), NA_character_, paste(as.integer(year), f, t, sep = "-"))
@@ -118,9 +119,16 @@ merger_roles <- function(cases) {
 #'   `"unknown"`.
 #' @export
 #' @examples
-#' asset_class(c("Cash & Cash Equivalents", "Accounts Receivable", "Land and building",
-#'               "All remaining assets", "Furniture and equipment", "Program contracts",
-#'               "Accounts payable & accrued expenses", "Prepaid expenses"))
+#' desc <- c( "Cash & Cash Equivalents",
+#'            "Accounts Receivable",
+#'            "Land and building",
+#'            "All remaining assets",
+#'            "Furniture and equipment",
+#'            "Program contracts",
+#'            "Accounts payable & accrued expenses",
+#'            "Prepaid expenses" )
+#'
+#' asset_class( desc )
 asset_class <- function(x) {
   u <- toupper(as.character(x))
   fcase(

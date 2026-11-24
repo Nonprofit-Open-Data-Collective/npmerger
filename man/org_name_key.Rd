@@ -19,5 +19,8 @@ words such as \code{FOUNDATION} are kept, since they distinguish
 organizations.
 }
 \examples{
-org_name_key(c("The Arc of Maine, Inc.", "ARC OF MAINE", "Smith & Jones Co."))
+orgs <- c( "The Arc of Maine, Inc.", "ARC OF MAINE",
+           "Smith & Jones Co." )
+
+org_name_key( orgs )
 }

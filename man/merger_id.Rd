@@ -25,6 +25,7 @@ EINs, donor first). \code{merger_group_id()} builds \code{YEAR-TOEIN}, which lin
 all donors folding into one recipient.
 }
 \examples{
-merger_id(2020, "01-0215911", "010431680")
-merger_group_id(2020, "010431680")
+merger_id( 2020, "01-0215911", "010431680" )
+
+merger_group_id( 2020, "010431680" )
 }

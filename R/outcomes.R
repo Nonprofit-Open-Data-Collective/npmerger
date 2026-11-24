@@ -32,9 +32,15 @@
 #'   nonprofit dissolution. *Nonprofit and Voluntary Sector Quarterly*.
 #' @export
 #' @examples
-#' x <- data.frame(EIN2 = "A", TAX_YEAR = 2018:2021, REVENUE = c(100, 120, 90, 90),
-#'                 SURPLUS = c(5, -2, -8, 1))
-#' trend_measures(x, vars = "REVENUE")
+#' x <-
+#'   data.frame(
+#'     EIN2     = "A",
+#'     TAX_YEAR = 2018:2021,
+#'     REVENUE  = c( 100, 120, 90, 90 ),
+#'     SURPLUS  = c(   5,  -2, -8,  1 )
+#'   )
+#'
+#' trend_measures( x, vars = "REVENUE" )
 trend_measures <- function(x, vars = c("REVENUE", "EXPENSES", "CONTRIBUTIONS", "PROGRAM_REVENUE", "NET_ASSETS"),
                            k = 3L, min_obs = k, id = "EIN2", time = "TAX_YEAR") {
   dt <- data.table::copy(as.data.table(x))

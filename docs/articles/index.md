@@ -8,3 +8,5 @@
   recipients](https://nonprofit-open-data-collective.github.io/npmerger/articles/matching.md):
 - [Overview: finding nonprofit mergers in IRS 990
   data](https://nonprofit-open-data-collective.github.io/npmerger/articles/npmerger.md):
+- [Workflow: from Schedule N to merger
+  estimates](https://nonprofit-open-data-collective.github.io/npmerger/articles/workflow.md):

@@ -11,8 +11,8 @@ merger_features(fl, evidence, rules = merger_rules(), donor_window = 1L)
 
 \item{evidence}{List from \code{\link[=get_evidence_tables]{get_evidence_tables()}}.}
 
-\item{rules}{A \code{\link[=merger_rules]{merger_rules()}} object (uses \code{min_top_share} and
-\code{new_entity_years}).}
+\item{rules}{A \code{\link[=merger_rules]{merger_rules()}} object (uses \code{min_top_share},
+\code{new_entity_years}, and \code{name_key}).}
 
 \item{donor_window}{Years either side for counting donors to one successor.}
 }
@@ -27,9 +27,10 @@ using whichever evidence tables are present. The result is ready for
 }
 \examples{
 \dontrun{
-sn  <- get_schedule_n(2019:2021)
-fl  <- sn_filings(sn)
-ev  <- get_evidence_tables(fl)
-lab <- classify_transactions(merger_features(fl, ev))
+sn  <- get_schedule_n( 2019:2021 )
+fl  <- sn_filings( sn )
+ev  <- get_evidence_tables( fl )
+fe  <- merger_features( fl, ev )
+lab <- classify_transactions( fe )
 }
 }

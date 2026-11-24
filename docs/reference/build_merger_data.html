@@ -22,6 +22,7 @@ the fiscal panel. Every stage is also available as its own function."></head><bo
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -135,8 +136,10 @@ the fiscal panel. Every stage is also available as its own function.</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list of class <code>merger_data</code> with <code>sched_n</code> (one row per Schedule N
 filing), <code>cases</code>, <code>transfers</code>, <code>donors</code>, <code>recipients</code>, <code>part7</code>,
-<code>fiscal</code>, <code>transactions</code> (asset lines), and <code>manifest</code> (row counts per
-stage).</p>
+<code>fiscal</code>, <code>leadership</code> (<code><a href="merger_leadership.html">merger_leadership()</a></code>), <code>typology</code>
+(<code><a href="merger_typology.html">merger_typology()</a></code>), <code>name_matches</code> (<code><a href="name_match_basis.html">name_match_basis()</a></code>: why each
+person on both rosters matched), <code>transactions</code> (asset lines), and <code>manifest</code>
+(row counts per stage).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -147,26 +150,19 @@ pipeline offline, for example on <code><a href="npmerger_example.html">npmerger_
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="npmerger_example.html">npmerger_example</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu">build_merger_data</span><span class="op">(</span>sn <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">sn</span>, evidence <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">evidence</span>, core <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">core</span>,</span></span>
-<span class="r-in"><span>                        names <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">names</span>, bmf_data <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">bmf</span>, ratios <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">md</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;merger_data&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Schedule N filings by type:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   merger2                  8</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   asset_transfer           6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   closure                  6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   mergerN                  4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   consolidation            4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   asset_disposition        1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Tables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   cases            16 rows</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   transfers        16 rows</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   donors           16 rows</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   recipients       16 rows</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   part7          1618 rows</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   fiscal          166 rows</span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="npmerger_example.html">npmerger_example</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">md</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">build_merger_data</span><span class="op">(</span></span>
+<span>    sn       <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">sn</span>,</span>
+<span>    evidence <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">evidence</span>,</span>
+<span>    core     <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">core</span>,</span>
+<span>    names    <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">names</span>,</span>
+<span>    bmf_data <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">bmf</span>,</span>
+<span>    ratios   <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">md</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

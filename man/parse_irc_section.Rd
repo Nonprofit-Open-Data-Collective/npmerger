@@ -20,6 +20,8 @@ entity types (LLC, corporation), "individual", "government", and so on.
 This maps it to a small set of recipient types.
 }
 \examples{
-parse_irc_section(c("501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
-                    "Individual", "City of Portland", NA))
+irc <- c( "501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
+          "Individual", "City of Portland", NA )
+
+parse_irc_section( irc )
 }

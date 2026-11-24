@@ -37,11 +37,13 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' md <- build_merger_data(years = efile_years())
-#' mm <- build_match_data(md, path = "PANEL990")
+#' md <- build_merger_data( years = efile_years() )
+#' mm <- build_match_data( md, path = "PANEL990" )
+#'
 #' mm$coverage
+#'
 #' # the five closest comparison org-years for each recipient
-#' mm$candidates$margin[RANK <= 5]
+#' mm$candidates$margin[ RANK <= 5 ]
 #' }
 build_match_data <- function(merger_data, panel = NULL, years = efile_years(), path = "PANEL990",
                              types = "merger2", pre = 2L, post = 2L, years_back = 2:3, exclude_window = -3:2,

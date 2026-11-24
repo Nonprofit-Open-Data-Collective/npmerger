@@ -27,6 +27,8 @@ A logical vector the same length as `x`.
 ## Examples
 
 ``` r
-sn_flag(c("1", "true", "X", "0", "false", NA, ""))
+flags <- c( "1", "true", "X", "0", "false", NA, "" )
+
+sn_flag( flags )
 #> [1]  TRUE  TRUE  TRUE FALSE FALSE    NA    NA
 ```

@@ -23,7 +23,10 @@ A data.table with \code{EIN2}, \code{TAX_YEAR}, \code{OBJECTID}, \code{RETURN_TY
 fiscal-health ratios (\code{MARGIN} = surplus / revenue, \code{EQUITY_RATIO} = net
 assets / assets, \code{MONTHS_CASH} = cash and savings / monthly expenses),
 the Tuckman-Chang inputs \code{ADMIN_RATIO} and \code{REVENUE_HHI} (see
-\code{\link[=merger_measures]{merger_measures()}}; full 990 only), \code{NTEE}, \code{NTEE2}, \code{NTEE_MAJOR}, and
+\code{\link[=merger_measures]{merger_measures()}}; full 990 only), the revenue sources
+(\code{CONTRIBUTIONS}, \code{PROGRAM_REVENUE}, \code{INVEST_INCOME}, \code{OTHER_REVENUE},
+from Part I), Part IX total functional and management expenses
+(\code{FUNC_EXP}, \code{MGMT_EXP}), \code{NTEE}, \code{NTEE2}, \code{NTEE_MAJOR}, and
 \code{SUBSECTION} (IRC 501(c) subsection, from the BMF). Ratios are bounded
 to -1..1 (months of cash to 0..120).
 }

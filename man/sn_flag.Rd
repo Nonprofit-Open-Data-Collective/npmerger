@@ -20,5 +20,7 @@ Schedule N (and most efile checkboxes) mix \code{0/1}, \code{true/false}, and \c
 encodings across schema versions. This normalizes them to logical.
 }
 \examples{
-sn_flag(c("1", "true", "X", "0", "false", NA, ""))
+flags <- c( "1", "true", "X", "0", "false", NA, "" )
+
+sn_flag( flags )
 }

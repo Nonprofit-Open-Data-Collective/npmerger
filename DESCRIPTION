@@ -21,19 +21,23 @@ Encoding: UTF-8
 Depends: R (>= 4.1.0)
 Imports:
     data.table,
-    panel990
+    panel990,
+    peopleparser (>= 0.2.0)
 Suggests:
     fiscal,
+    fixest,
+    DBI,
     duckdb,
     arrow,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown
 Remotes:
-    Nonprofit-Open-Data-Collective/panel990,
-    Nonprofit-Open-Data-Collective/fiscal
+    Nonprofit-Open-Data-Collective/peopleparser@53924a4d0326329240b9e615cc50ebda47be9ba4,
+    Nonprofit-Open-Data-Collective/panel990@4971a986bd61cb37594d6a3a961178d77fe6e8df,
+    Nonprofit-Open-Data-Collective/fiscal@f29d9ada6dd866da3bf05fcead475444c7734c32
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/Needs/website: Nonprofit-Open-Data-Collective/pkgstyle

@@ -1,5 +1,55 @@
 # npmerger 0.0.0.9000
 
+* Part VII names are now matched on the **canonical first name** plus the
+  surname. `name_keys()` parses each name with peopleparser, which strips
+  titles and credentials and orders the name parts, and resolves nicknames
+  and spelling variants (BOB → ROBERT, STEVEN → STEPHEN). `leader_overlap()`,
+  `merger_part7()`, and so `LEADER_P7`, the leadership outcomes, and
+  `IN_BOTH` all use it. `merger_rules(name_key = "simple")` restores the old
+  first-and-last-token key (`person_key()`). Parsed names are cached for the
+  session and saved in the project database (`name_keys`), so rebuilds do
+  not parse them again. peopleparser (>= 0.2.0) is now an import.
+  `name_keys( workers = n )` passes `workers` to
+  `peopleparser::parse_names()`; with 8 workers all 1.77 million Part VII
+  names parse in about 4 minutes.
+* `name_match_basis()` (and `md$name_matches`) records why each person on
+  both rosters matched: `exact`, a reviewed pair (`nickname`, `spelling`,
+  `cognate`, `compound`), an unreviewed pair (`misspelling`, `sound_alike`),
+  or `indirect` (linked only through the canonical form). `REVIEW` flags the
+  last three. `leadership_inspection()` shows it as `MATCH_BASIS`.
+* The whole workflow now runs inside the package, into one project folder:
+  - `merger_project()` creates a folder with the download cache, one DuckDB
+    database, a `logs/` folder, and a README. `build_merger_database()`
+    runs the three stages (`"merger"`, `"match"`, `"model"`) into it. Each
+    stage writes its tables to the database, a log with package versions,
+    git commit, settings, and `sessionInfo()`, and a row in `build_log`.
+    `load_merger_data()`, `load_match_data()`, and `load_model_data()`
+    rebuild each stage's object from the database. `db_tables()`,
+    `db_read()`, and `db_write()` give direct access. `dev/build-project.R`
+    replaces `dev/build-database.R` and `dev/build-matching.R`.
+  - `merger_leadership()` (CEO and board outcomes from the Part VII panel)
+    and `merger_typology()` (deal structure, affiliation, relative size,
+    and donor distress) were scripts; `build_merger_data()` now returns
+    both as `leadership` and `typology`.
+  - Models: `build_model_data()` assembles the treated units, control sets
+    (including a match on the combined recipient + donor baseline), donor
+    sums, and outcome panel once. `merger_did()` (long differences for
+    every outcome and design), `did_breakouts()`, `did_sensitivity()` with
+    `did_variants()`, `did_event_study()`, `did_baseline_means()`,
+    `did_funnel()`, and `did_composition()` run from it. These replace the
+    paper's model script.
+  - `panel_measures()` keeps the Part I revenue sources and Part IX
+    functional and management expenses, so the models no longer re-read
+    the e-file cache.
+  - New vignette, "Workflow: from Schedule N to merger estimates".
+* `merger_fiscal_panel()` no longer fails with current `fiscal` versions,
+  whose `compute_all_panel(append_to_df = FALSE)` errors when re-sorting
+  rows.
+* `panel990` and `fiscal` are pinned to tested commits in `Remotes`.
+  `fixest` and `DBI` are suggested.
+* Vignettes, the README, and examples use a narrower code style: one
+  argument per line and each step's result shown.
+
 * Outcome measures from the merger and financial-vulnerability literatures:
   - `merger_measures()` adds investment and other revenue, `REVENUE_HHI`
     (Part I revenue concentration, via `revenue_hhi()`), `ADMIN_RATIO`,

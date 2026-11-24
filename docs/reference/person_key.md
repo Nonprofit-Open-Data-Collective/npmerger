@@ -23,6 +23,8 @@ Character vector of keys (`NA` when fewer than two tokens remain).
 ## Examples
 
 ``` r
-person_key(c("Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith"))
+people <- c( "Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith" )
+
+person_key( people )
 #> [1] "JANE SMITH" "JANE SMITH" NA          
 ```

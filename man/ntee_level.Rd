@@ -20,5 +20,7 @@ placeholder such as \code{"UNDEFINED"}).
 Clean NTEE code to a given number of characters
 }
 \examples{
-ntee_level(c("E21", "b82z", "", NA, "X"), 2)
+ntee <- c( "E21", "b82z", "", NA, "X" )
+
+ntee_level( ntee, 2 )
 }

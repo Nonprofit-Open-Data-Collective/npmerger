@@ -27,9 +27,16 @@ and amounts due), `"investments"`, `"real_estate"`, `"equipment"`,
 ## Examples
 
 ``` r
-asset_class(c("Cash & Cash Equivalents", "Accounts Receivable", "Land and building",
-              "All remaining assets", "Furniture and equipment", "Program contracts",
-              "Accounts payable & accrued expenses", "Prepaid expenses"))
+desc <- c( "Cash & Cash Equivalents",
+           "Accounts Receivable",
+           "Land and building",
+           "All remaining assets",
+           "Furniture and equipment",
+           "Program contracts",
+           "Accounts payable & accrued expenses",
+           "Prepaid expenses" )
+
+asset_class( desc )
 #> [1] "cash"        "receivables" "real_estate" "all_assets"  "equipment"  
 #> [6] "program"     "liabilities" "prepaid"    
 ```

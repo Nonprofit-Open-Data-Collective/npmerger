@@ -38,24 +38,32 @@
 #'   signals: Schedule O merger language on the donor's and the recipient's
 #'   return, and a Part VI line 4 governing-document change at the recipient
 #'   in year t or t+1.
+#' @param name_key How Part VII names are matched between donor and recipient:
+#'   `"canonical"` (default; canonical first name plus surname, via
+#'   [name_keys()] and the peopleparser package) or `"simple"` (first and last
+#'   token, [person_key()]).
 #' @return A list of class `merger_rules`.
 #' @export
 #' @examples
 #' merger_rules()
-#' merger_rules(leader = "sn", sn_text = FALSE)
-#' merger_rules(promote = TRUE)   # broad definition
+#'
+#' # strict: Schedule N boxes only
+#' merger_rules( leader = "sn", sn_text = FALSE )
+#'
+#' # broad: corroborating signals can promote a filing
+#' merger_rules( promote = TRUE )
 merger_rules <- function(min_top_share = 0.75, leader = c("either", "sn", "p7"),
                          min_donors_n = 2L, new_entity_years = 1L, sn_text = TRUE,
                          promote = FALSE, min_corroborate = 2L,
                          corroborate = c("SO_MERGER_TEXT_DONOR", "SO_MERGER_TEXT_RECIP",
                                          "GOV_DOC_CHANGE_RECIP"),
-                         final_as_termination = TRUE) {
+                         final_as_termination = TRUE, name_key = c("canonical", "simple")) {
   structure(list(min_top_share = min_top_share, leader = match.arg(leader),
                  final_as_termination = isTRUE(final_as_termination), sn_text = isTRUE(sn_text),
                  min_donors_n = as.integer(min_donors_n),
                  new_entity_years = as.integer(new_entity_years),
                  promote = isTRUE(promote), min_corroborate = as.integer(min_corroborate),
-                 corroborate = corroborate),
+                 corroborate = corroborate, name_key = match.arg(name_key)),
             class = "merger_rules")
 }
 

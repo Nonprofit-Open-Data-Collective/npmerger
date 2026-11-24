@@ -27,6 +27,8 @@ placeholder such as `"UNDEFINED"`).
 ## Examples
 
 ``` r
-ntee_level(c("E21", "b82z", "", NA, "X"), 2)
+ntee <- c( "E21", "b82z", "", NA, "X" )
+
+ntee_level( ntee, 2 )
 #> [1] "E2" "B8" NA   NA   NA  
 ```

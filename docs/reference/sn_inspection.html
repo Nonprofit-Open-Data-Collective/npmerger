@@ -20,6 +20,7 @@ do not share filings, so they can go to different reviewers."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -110,11 +111,21 @@ and line.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">sn</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span><span class="fu"><a href="efile_years.html">efile_years</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="build_merger_data.html">build_merger_data</a></span><span class="op">(</span>sn <span class="op">=</span> <span class="va">sn</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="sn_labeled.html">sn_labeled</a></span><span class="op">(</span><span class="va">sn</span>, <span class="va">md</span><span class="op">$</span><span class="va">sched_n</span>, <span class="va">md</span><span class="op">$</span><span class="va">cases</span>, <span class="va">md</span><span class="op">$</span><span class="va">transactions</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">tabs</span> <span class="op">&lt;-</span> <span class="fu">sn_inspection</span><span class="op">(</span><span class="va">lab</span>, num <span class="op">=</span> <span class="fl">3</span>, n <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span><span class="va">tabs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"inspection-01.csv"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sn</span> <span class="op">&lt;-</span> <span class="fu"><a href="get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span> <span class="fu"><a href="efile_years.html">efile_years</a></span><span class="op">(</span><span class="op">)</span> <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="build_merger_data.html">build_merger_data</a></span><span class="op">(</span> sn <span class="op">=</span> <span class="va">sn</span> <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">lab</span> <span class="op">&lt;-</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="sn_labeled.html">sn_labeled</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">sn</span>,</span></span>
+<span class="r-in"><span>    <span class="va">md</span><span class="op">$</span><span class="va">sched_n</span>,</span></span>
+<span class="r-in"><span>    <span class="va">md</span><span class="op">$</span><span class="va">cases</span>,</span></span>
+<span class="r-in"><span>    <span class="va">md</span><span class="op">$</span><span class="va">transactions</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># three stratified samples of 100 filings each</span></span></span>
+<span class="r-in"><span><span class="va">tabs</span> <span class="op">&lt;-</span> <span class="fu">sn_inspection</span><span class="op">(</span> <span class="va">lab</span>, num <span class="op">=</span> <span class="fl">3</span>, n <span class="op">=</span> <span class="fl">100</span> <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fwrite.html" class="external-link">fwrite</a></span><span class="op">(</span> <span class="va">tabs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"inspection-01.csv"</span> <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

@@ -12,11 +12,14 @@ home:
 
 navbar:
   structure:
-    left: [intro, classifier, matching, reference, roadmap, news]
+    left: [intro, workflow, classifier, matching, reference, roadmap, news]
   components:
     intro:
       text: Overview
       href: articles/npmerger.html
+    workflow:
+      text: Workflow
+      href: articles/workflow.html
     classifier:
       text: Classifier
       href: articles/classifier.html
@@ -57,6 +60,8 @@ reference:
   - evidence_tables
   - merger_features
   - leader_overlap
+  - name_keys
+  - name_match_basis
   - add_donor_counts
   - add_filing_history
   - add_corroboration
@@ -126,6 +131,31 @@ reference:
   - fill_ntee
   - real_dollars
   - cpi_u
+- title: Merger characteristics
+  desc: Leadership and board outcomes, a typology of merger cases, and a file for checking leadership matches by hand.
+  contents:
+  - merger_leadership
+  - leadership_inspection
+  - merger_typology
+- title: Models
+  desc: Matched difference-in-differences for merger recipients. Build the model data once, then run the main estimates, breakouts, sensitivity variants, and event study from it.
+  contents:
+  - build_model_data
+  - merger_did
+  - did_event_study
+  - did_baseline_means
+  - did_outcomes
+  - did_designs
+  - did_variants
+  - did_breakout_vars
+- title: Project folder and database
+  desc: Run the whole workflow into one project folder, with one DuckDB database, a log for each stage, and a README.
+  contents:
+  - merger_project
+  - build_merger_database
+  - load_merger_data
+  - db_tables
+  - write_project_readme
 - title: Package
   contents:
   - npmerger-package

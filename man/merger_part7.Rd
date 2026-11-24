@@ -4,7 +4,7 @@
 \alias{merger_part7}
 \title{Part VII panel around each merger}
 \usage{
-merger_part7(cases, p7, window = -2:2)
+merger_part7(cases, p7, window = -2:2, name_key = c("canonical", "simple"))
 }
 \arguments{
 \item{cases}{Output of \code{\link[=build_merger_cases]{build_merger_cases()}}.}
@@ -12,10 +12,14 @@ merger_part7(cases, p7, window = -2:2)
 \item{p7}{Part VII rows (the \code{p7} element of \code{\link[=get_core]{get_core()}}).}
 
 \item{window}{Integer offsets from the merger year.}
+
+\item{name_key}{\code{"canonical"} or \code{"simple"}; see \code{\link[=name_keys]{name_keys()}}.}
 }
 \value{
 A data.table with \code{MERGER_ID}, \code{MERGER_GROUP_ID}, \code{ROLE}, \code{EIN2},
-\code{TAX_YEAR}, \code{TIME_FROM_MERGER}, \code{PERSON_NAME}, \code{PERSON_KEY}, \code{TITLE},
+\code{TAX_YEAR}, \code{TIME_FROM_MERGER}, \code{PERSON_NAME}, \code{PERSON_KEY} (with
+\code{FIRST_NAME}, \code{LAST_NAME}, \code{FIRST_CANONICAL}, and \code{CANONICAL_RULE} from
+the canonical key), \code{TITLE},
 \code{HOURS}, \code{COMP_ORG}, \code{COMP_RELATED}, \code{COMP_OTHER}, position flags
 (\code{TRUSTEE}, \code{OFFICER}, \code{KEY_EMPLOYEE}, \code{HIGH_COMP}, \code{FORMER}), and
 \code{IN_BOTH} (the person appears on both the donor's and the recipient's

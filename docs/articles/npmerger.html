@@ -33,6 +33,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -256,18 +257,38 @@ Schedule N flags or Part VII overlap as the leadership evidence:</p>
 <p><code><a href="../reference/build_merger_data.html">build_merger_data()</a></code> runs everything and returns every
 table:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span>, path <span class="op">=</span> <span class="st">"PANEL990"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">md</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span></span>
+<span>    years <span class="op">=</span> <span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span>,</span>
+<span>    path  <span class="op">=</span> <span class="st">"PANEL990"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p>Each stage is also a separate function, so you can stop at any point,
 inspect the result, or substitute your own step:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sn</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span>   <span class="co"># Schedule N tables, via panel990</span></span>
-<span><span class="va">tx</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sn_transactions.html">sn_transactions</a></span><span class="op">(</span><span class="va">sn</span><span class="op">)</span>         <span class="co"># one row per asset line, Parts I and II</span></span>
-<span><span class="va">tx</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recover_recipient_ein.html">recover_recipient_ein</a></span><span class="op">(</span><span class="va">tx</span>, <span class="fu"><a href="../reference/get_name_index.html">get_name_index</a></span><span class="op">(</span><span class="fl">2018</span><span class="op">:</span><span class="fl">2022</span><span class="op">)</span><span class="op">)</span>  <span class="co"># fill missing EINs</span></span>
-<span><span class="va">fl</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sn_filings.html">sn_filings</a></span><span class="op">(</span><span class="va">sn</span>, <span class="va">tx</span><span class="op">)</span>          <span class="co"># one row per Schedule N filing</span></span>
-<span><span class="va">ev</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_evidence_tables.html">get_evidence_tables</a></span><span class="op">(</span><span class="va">fl</span><span class="op">)</span>     <span class="co"># 990 tables for the donors and recipients</span></span>
-<span><span class="va">fe</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merger_features.html">merger_features</a></span><span class="op">(</span><span class="va">fl</span>, <span class="va">ev</span><span class="op">)</span>     <span class="co"># add the evidence to each filing</span></span>
-<span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">fe</span><span class="op">)</span>   <span class="co"># labels plus the evidence behind them</span></span>
-<span><span class="fu"><a href="../reference/sched_n_table.html">sched_n_table</a></span><span class="op">(</span><span class="va">lab</span><span class="op">)</span>                 <span class="co"># YEAR, OBJECTID, EIN2, TYPE, evidence</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Schedule N tables, via panel990</span></span>
+<span><span class="va">sn</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span> <span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># one row per asset line, Parts I and II</span></span>
+<span><span class="va">tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sn_transactions.html">sn_transactions</a></span><span class="op">(</span> <span class="va">sn</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># fill missing recipient EINs by name (index covers t-1 to t+1)</span></span>
+<span><span class="va">name_index</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_name_index.html">get_name_index</a></span><span class="op">(</span> <span class="fl">2018</span><span class="op">:</span><span class="fl">2022</span> <span class="op">)</span></span>
+<span><span class="va">tx</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/recover_recipient_ein.html">recover_recipient_ein</a></span><span class="op">(</span> <span class="va">tx</span>, <span class="va">name_index</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># one row per Schedule N filing</span></span>
+<span><span class="va">fl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sn_filings.html">sn_filings</a></span><span class="op">(</span> <span class="va">sn</span>, <span class="va">tx</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 990 tables for the donors and recipients</span></span>
+<span><span class="va">ev</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_evidence_tables.html">get_evidence_tables</a></span><span class="op">(</span> <span class="va">fl</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># add the evidence to each filing</span></span>
+<span><span class="va">fe</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merger_features.html">merger_features</a></span><span class="op">(</span> <span class="va">fl</span>, <span class="va">ev</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># labels, plus the evidence behind them</span></span>
+<span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span> <span class="va">fe</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># YEAR, OBJECTID, EIN2, TYPE, evidence</span></span>
+<span><span class="fu"><a href="../reference/sched_n_table.html">sched_n_table</a></span><span class="op">(</span> <span class="va">lab</span> <span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/get_schedule_n.html">get_schedule_n()</a></code> downloads about 1 MB per tax year.
 <code><a href="../reference/get_evidence_tables.html">get_evidence_tables()</a></code> is much heavier on its first run:
 Schedule O is about 150 MB per year and Part VII about 100 MB. Both
@@ -337,19 +358,26 @@ evidence:</p>
 <p>Schedule N is messy, and the low-level helpers handle the recurring
 problems. Checkboxes come in several encodings:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/sn_flag.html">sn_flag</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1"</span>, <span class="st">"true"</span>, <span class="st">"X"</span>, <span class="st">"0"</span>, <span class="st">"false"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">flags</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"1"</span>, <span class="st">"true"</span>, <span class="st">"X"</span>, <span class="st">"0"</span>, <span class="st">"false"</span>, <span class="cn">NA</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/sn_flag.html">sn_flag</a></span><span class="op">(</span> <span class="va">flags</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1]  TRUE  TRUE  TRUE FALSE FALSE    NA</span></span></code></pre></div>
 <p>Recipient EINs arrive in many formats, including placeholders:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/clean_ein.html">clean_ein</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01-0215911"</span>, <span class="st">"10215911"</span>, <span class="st">"000000000"</span>, <span class="st">"EIN-01-0215911"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">eins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"01-0215911"</span>, <span class="st">"10215911"</span>, <span class="st">"000000000"</span>, <span class="st">"EIN-01-0215911"</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/clean_ein.html">clean_ein</a></span><span class="op">(</span> <span class="va">eins</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "010215911" "010215911" NA          "010215911"</span></span>
-<span><span class="fu"><a href="../reference/clean_ein.html">as_ein2</a></span><span class="op">(</span><span class="st">"010215911"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/clean_ein.html">as_ein2</a></span><span class="op">(</span> <span class="st">"010215911"</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "EIN-01-0215911"</span></span></code></pre></div>
 <p>The recipient’s IRC section is free text, with dozens of spellings of
 501(c)(3) alone:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/parse_irc_section.html">parse_irc_section</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"501(c)(3)"</span>, <span class="st">"501 C 3"</span>, <span class="st">"501(c)(6)"</span>, <span class="st">"LLC"</span>,</span>
-<span>                    <span class="st">"Individual"</span>, <span class="st">"City of Portland"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">irc</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"501(c)(3)"</span>, <span class="st">"501 C 3"</span>, <span class="st">"501(c)(6)"</span>, <span class="st">"LLC"</span>,</span>
+<span>          <span class="st">"Individual"</span>, <span class="st">"City of Portland"</span>, <span class="cn">NA</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/parse_irc_section.html">parse_irc_section</a></span><span class="op">(</span> <span class="va">irc</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "501c3"        "501c3"        "other_exempt" "business"     "individual"  </span></span>
 <span><span class="co">#&gt; [6] "government"   "unknown"</span></span></code></pre></div>
 <p><code><a href="../reference/sn_filings.html">sn_filings()</a></code> also deals with Schedule N’s header and
@@ -363,22 +391,31 @@ the filing list is built from both.</p>
 adds a label, plus the evidence used to reach it. Here is a small
 made-up example with one filing of each kind:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">filings</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  case          <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sale"</span>, <span class="st">"dispersed"</span>, <span class="st">"flags"</span>, <span class="st">"part7"</span>, <span class="st">"corroborated"</span>, <span class="st">"no evidence"</span><span class="op">)</span>,</span>
-<span>  EIN2          <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"EIN-01-000000"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span>,</span>
-<span>  HAS_P1        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>  HAS_P2        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  LEADER_SN     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  LEADER_P7     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  N_NP_RECIP    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fl">6L</span>, <span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">1L</span><span class="op">)</span>,</span>
-<span>  TOP_SHARE     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">0.2</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>  TOP_RECIP_EIN <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="st">"020000002"</span>, <span class="st">"020000002"</span>, <span class="st">"020000002"</span>, <span class="st">"020000002"</span>, <span class="st">"020000002"</span><span class="op">)</span>,</span>
-<span>  SO_MERGER_TEXT_DONOR <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
-<span>  GOV_DOC_CHANGE_RECIP <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">case</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"sale"</span>, <span class="st">"dispersed"</span>, <span class="st">"flags"</span>,</span>
+<span>           <span class="st">"part7"</span>, <span class="st">"corroborated"</span>, <span class="st">"no evidence"</span> <span class="op">)</span></span>
+<span><span class="va">recip</span> <span class="op">&lt;-</span> <span class="st">"020000002"</span>   <span class="co"># the one nonprofit successor</span></span>
 <span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">filings</span><span class="op">)</span></span>
-<span><span class="va">out</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"case"</span>, <span class="st">"LEADER"</span>, <span class="st">"N_CORROBORATE"</span>, <span class="st">"BASIS"</span>, <span class="st">"TYPE"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">filings</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    <span class="va">case</span>,</span>
+<span>    EIN2          <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="st">"EIN-01-000000"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">6</span> <span class="op">)</span>,</span>
+<span>    HAS_P1        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span>, <span class="cn">TRUE</span> <span class="op">)</span>,</span>
+<span>    HAS_P2        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span> <span class="op">)</span>,</span>
+<span>    LEADER_SN     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span> <span class="op">)</span>,</span>
+<span>    LEADER_P7     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span> <span class="op">)</span>,</span>
+<span>    N_NP_RECIP    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="fl">0L</span>, <span class="fl">6L</span>, <span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">1L</span>, <span class="fl">1L</span> <span class="op">)</span>,</span>
+<span>    TOP_SHARE     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">NA</span>, <span class="fl">0.2</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span> <span class="op">)</span>,</span>
+<span>    TOP_RECIP_EIN <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span> <span class="va">recip</span>, <span class="fl">5</span> <span class="op">)</span> <span class="op">)</span>,</span>
+<span>    SO_MERGER_TEXT_DONOR <span class="op">=</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span> <span class="op">)</span>,</span>
+<span>    GOV_DOC_CHANGE_RECIP <span class="op">=</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span> <span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span> <span class="va">filings</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"case"</span>, <span class="st">"LEADER"</span>, <span class="st">"N_CORROBORATE"</span>, <span class="st">"BASIS"</span>, <span class="st">"TYPE"</span> <span class="op">)</span></span>
+<span><span class="va">out</span><span class="op">[</span> , <span class="va">..cols</span> <span class="op">]</span></span>
 <span><span class="co">#&gt;            case LEADER N_CORROBORATE  BASIS              TYPE</span></span>
 <span><span class="co">#&gt;          &lt;char&gt; &lt;lgcl&gt;         &lt;int&gt; &lt;char&gt;            &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1:         sale  FALSE             0   &lt;NA&gt; asset_disposition</span></span>
@@ -391,9 +428,18 @@ made-up example with one filing of each kind:</p>
 side by side. For example, a strict definition counts only the Schedule
 N boxes, and a broad one turns promotion on:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">strict</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">filings</span>, <span class="fu"><a href="../reference/merger_rules.html">merger_rules</a></span><span class="op">(</span>leader <span class="op">=</span> <span class="st">"sn"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">broad</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="va">filings</span>, <span class="fu"><a href="../reference/merger_rules.html">merger_rules</a></span><span class="op">(</span>promote <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>case <span class="op">=</span> <span class="va">filings</span><span class="op">$</span><span class="va">case</span>, strict <span class="op">=</span> <span class="va">strict</span><span class="op">$</span><span class="va">TYPE</span>, default <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">TYPE</span>, broad <span class="op">=</span> <span class="va">broad</span><span class="op">$</span><span class="va">TYPE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">strict_rules</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merger_rules.html">merger_rules</a></span><span class="op">(</span> leader <span class="op">=</span> <span class="st">"sn"</span> <span class="op">)</span></span>
+<span><span class="va">broad_rules</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merger_rules.html">merger_rules</a></span><span class="op">(</span> promote <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">strict</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span> <span class="va">filings</span>, <span class="va">strict_rules</span> <span class="op">)</span></span>
+<span><span class="va">broad</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/classify_transactions.html">classify_transactions</a></span><span class="op">(</span> <span class="va">filings</span>, <span class="va">broad_rules</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  case    <span class="op">=</span> <span class="va">filings</span><span class="op">$</span><span class="va">case</span>,</span>
+<span>  strict  <span class="op">=</span> <span class="va">strict</span><span class="op">$</span><span class="va">TYPE</span>,</span>
+<span>  default <span class="op">=</span> <span class="va">out</span><span class="op">$</span><span class="va">TYPE</span>,</span>
+<span>  broad   <span class="op">=</span> <span class="va">broad</span><span class="op">$</span><span class="va">TYPE</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt;           case            strict           default             broad</span></span>
 <span><span class="co">#&gt; 1         sale asset_disposition asset_disposition asset_disposition</span></span>
 <span><span class="co">#&gt; 2    dispersed           closure           closure           closure</span></span>
@@ -424,9 +470,10 @@ entity (<code>new_entity_years</code>).</li>
 N tax year. A group ID ties together all the donors that fold into one
 recipient:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/merger_id.html">merger_id</a></span><span class="op">(</span><span class="fl">2020</span>, <span class="st">"01-0215911"</span>, <span class="st">"010431680"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/merger_id.html">merger_id</a></span><span class="op">(</span> <span class="fl">2020</span>, <span class="st">"01-0215911"</span>, <span class="st">"010431680"</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "2020-010215911-010431680"</span></span>
-<span><span class="fu"><a href="../reference/merger_id.html">merger_group_id</a></span><span class="op">(</span><span class="fl">2020</span>, <span class="st">"010431680"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/merger_id.html">merger_group_id</a></span><span class="op">(</span> <span class="fl">2020</span>, <span class="st">"010431680"</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "2020-010431680"</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -436,10 +483,20 @@ recipient:</p>
 pipeline can run offline. Here it is run without the
 <strong>fiscal</strong> ratios, to keep this page quick:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/npmerger_example.html">npmerger_example</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span>sn <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">sn</span>, evidence <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">evidence</span>, core <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">core</span>,</span>
-<span>                        names <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">names</span>, bmf_data <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">bmf</span>,</span>
-<span>                        ratios <span class="op">=</span> <span class="cn">FALSE</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># bundled inputs: sn, evidence, core, names, bmf</span></span>
+<span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/npmerger_example.html">npmerger_example</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">md</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span></span>
+<span>    sn       <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">sn</span>,</span>
+<span>    evidence <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">evidence</span>,</span>
+<span>    core     <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">core</span>,</span>
+<span>    names    <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">names</span>,</span>
+<span>    bmf_data <span class="op">=</span> <span class="va">ex</span><span class="op">$</span><span class="va">bmf</span>,</span>
+<span>    ratios   <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    verbose  <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
 <span><span class="va">md</span></span>
 <span><span class="co">#&gt; &lt;merger_data&gt;</span></span>
 <span><span class="co">#&gt; Schedule N filings by type:</span></span>
@@ -455,14 +512,19 @@ pipeline can run offline. Here it is run without the
 <span><span class="co">#&gt;   donors           16 rows</span></span>
 <span><span class="co">#&gt;   recipients       16 rows</span></span>
 <span><span class="co">#&gt;   part7          1618 rows</span></span>
-<span><span class="co">#&gt;   fiscal          166 rows</span></span></code></pre></div>
+<span><span class="co">#&gt;   fiscal          166 rows</span></span>
+<span><span class="co">#&gt;   leadership       11 rows</span></span>
+<span><span class="co">#&gt;   typology         16 rows</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="schedule-n-table">Schedule N table<a class="anchor" aria-label="anchor" href="#schedule-n-table"></a>
 </h3>
 <p><code>md$sched_n</code> has one row per Schedule N filing, with its
 label and the evidence behind it:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">md</span><span class="op">$</span><span class="va">sched_n</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TAX_YEAR"</span>, <span class="st">"OBJECTID"</span>, <span class="st">"EIN2"</span>, <span class="st">"TYPE"</span>, <span class="st">"BASIS"</span>, <span class="st">"AFFILIATED"</span>, <span class="st">"N_DONORS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"TAX_YEAR"</span>, <span class="st">"OBJECTID"</span>, <span class="st">"EIN2"</span>, <span class="st">"TYPE"</span>,</span>
+<span>           <span class="st">"BASIS"</span>, <span class="st">"AFFILIATED"</span>, <span class="st">"N_DONORS"</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">sched_n</span><span class="op">[</span> , <span class="va">..cols</span> <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    TAX_YEAR               OBJECTID           EIN2           TYPE  BASIS</span></span>
 <span><span class="co">#&gt;       &lt;int&gt;                 &lt;char&gt;         &lt;char&gt;         &lt;char&gt; &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1:     2021 OID-202440449349301959 EIN-04-2305850 asset_transfer   &lt;NA&gt;</span></span>
@@ -497,7 +559,11 @@ years.</li>
 the donors that fold into the same successor.</li>
 </ul>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md</span><span class="op">$</span><span class="va">cases</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"MERGER_GROUP_ID"</span>, <span class="st">"TYPE"</span>, <span class="st">"MERGER_YEAR"</span>, <span class="st">"RECIP_MERGER_YEAR"</span>, <span class="st">"N_GROUP"</span>, <span class="st">"FMV_TO_RECIP"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"MERGER_ID"</span>, <span class="st">"MERGER_GROUP_ID"</span>, <span class="st">"TYPE"</span>,</span>
+<span>           <span class="st">"MERGER_YEAR"</span>, <span class="st">"RECIP_MERGER_YEAR"</span>,</span>
+<span>           <span class="st">"N_GROUP"</span>, <span class="st">"FMV_TO_RECIP"</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">cases</span><span class="op">[</span> , <span class="va">..cols</span> <span class="op">]</span></span>
 <span><span class="co">#&gt;                    MERGER_ID MERGER_GROUP_ID          TYPE MERGER_YEAR</span></span>
 <span><span class="co">#&gt;                       &lt;char&gt;          &lt;char&gt;        &lt;char&gt;       &lt;int&gt;</span></span>
 <span><span class="co">#&gt;  1: 2021-132890752-861250084  2021-861250084 consolidation        2021</span></span>
@@ -550,7 +616,10 @@ beginning-of-year assets. Values far above 1 are flagged in
 <code>FLAG_OUTLIER</code>.</li>
 </ul>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">md</span><span class="op">$</span><span class="va">transfers</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"FMV_TOTAL"</span>, <span class="st">"FMV_ASSETS"</span>, <span class="st">"FMV_CASH"</span>, <span class="st">"FMV_REAL_ESTATE"</span>, <span class="st">"COVERAGE"</span>, <span class="st">"FLAG_OUTLIER"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"MERGER_ID"</span>, <span class="st">"FMV_TOTAL"</span>, <span class="st">"FMV_ASSETS"</span>, <span class="st">"FMV_CASH"</span>,</span>
+<span>           <span class="st">"FMV_REAL_ESTATE"</span>, <span class="st">"COVERAGE"</span>, <span class="st">"FLAG_OUTLIER"</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">transfers</span><span class="op">[</span> , <span class="va">..cols</span> <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                   MERGER_ID FMV_TOTAL FMV_ASSETS FMV_CASH FMV_REAL_ESTATE</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;     &lt;num&gt;      &lt;num&gt;    &lt;num&gt;           &lt;num&gt;</span></span>
 <span><span class="co">#&gt; 1: 2021-132890752-861250084    621192     621192        0               0</span></span>
@@ -584,8 +653,11 @@ organization’s calendar);</li>
 <code>REF_YEAR</code>.</li>
 </ul>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="va">md</span><span class="op">$</span><span class="va">donors</span></span>
-<span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"NAME"</span>, <span class="st">"STATE"</span>, <span class="st">"AGE"</span>, <span class="st">"NTEE"</span>, <span class="st">"REVENUE_TM4"</span>, <span class="st">"REVENUE_TM2"</span>, <span class="st">"REVENUE_T0"</span>, <span class="st">"ASSETS_T0"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"MERGER_ID"</span>, <span class="st">"NAME"</span>, <span class="st">"STATE"</span>, <span class="st">"AGE"</span>, <span class="st">"NTEE"</span>,</span>
+<span>           <span class="st">"REVENUE_TM4"</span>, <span class="st">"REVENUE_TM2"</span>, <span class="st">"REVENUE_T0"</span>,</span>
+<span>           <span class="st">"ASSETS_T0"</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">md</span><span class="op">$</span><span class="va">donors</span><span class="op">[</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="va">..cols</span> <span class="op">]</span></span>
 <span><span class="co">#&gt; Key: &lt;MERGER_ID&gt;</span></span>
 <span><span class="co">#&gt;                   MERGER_ID                                     NAME  STATE</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;                                   &lt;char&gt; &lt;char&gt;</span></span>
@@ -605,8 +677,13 @@ organization’s calendar);</li>
 VII from t-2 to t+2. <code>IN_BOTH</code> marks people who appear on
 both:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="va">md</span><span class="op">$</span><span class="va">part7</span></span>
-<span><span class="va">p</span><span class="op">[</span><span class="va">IN_BOTH</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"ROLE"</span>, <span class="st">"TIME_FROM_MERGER"</span>, <span class="st">"PERSON_NAME"</span>, <span class="st">"TITLE"</span>, <span class="st">"COMP_ORG"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"MERGER_ID"</span>, <span class="st">"ROLE"</span>, <span class="st">"TIME_FROM_MERGER"</span>,</span>
+<span>           <span class="st">"PERSON_NAME"</span>, <span class="st">"TITLE"</span>, <span class="st">"COMP_ORG"</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># people on both organizations' rosters</span></span>
+<span><span class="va">in_both</span> <span class="op">&lt;-</span> <span class="va">md</span><span class="op">$</span><span class="va">part7</span><span class="op">[</span> <span class="va">IN_BOTH</span> <span class="op">==</span> <span class="cn">TRUE</span> <span class="op">]</span></span>
+<span></span>
+<span><span class="va">in_both</span><span class="op">[</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">..cols</span> <span class="op">]</span></span>
 <span><span class="co">#&gt;                   MERGER_ID   ROLE TIME_FROM_MERGER       PERSON_NAME     TITLE</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt; &lt;char&gt;            &lt;int&gt;            &lt;char&gt;    &lt;char&gt;</span></span>
 <span><span class="co">#&gt; 1: 2021-132890752-861250084  donor               -2         ERIN ROTH   TRUSTEE</span></span>
@@ -632,8 +709,12 @@ the recipient’s years before and after it, with harmonized 990 and
 990-EZ measures. Overhead, executive compensation, employees, and debt
 detail come from the full Form 990 only.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="va">md</span><span class="op">$</span><span class="va">fiscal</span></span>
-<span><span class="va">f</span><span class="op">[</span><span class="va">ROLE</span> <span class="op">==</span> <span class="st">"recipient"</span><span class="op">]</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MERGER_ID"</span>, <span class="st">"TIME_FROM_MERGER"</span>, <span class="st">"REVENUE"</span>, <span class="st">"EXPENSES"</span>, <span class="st">"ASSETS"</span>, <span class="st">"STAFF_EXP"</span>, <span class="st">"OVERHEAD_RATIO"</span><span class="op">)</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"MERGER_ID"</span>, <span class="st">"TIME_FROM_MERGER"</span>, <span class="st">"REVENUE"</span>,</span>
+<span>           <span class="st">"EXPENSES"</span>, <span class="st">"ASSETS"</span>, <span class="st">"STAFF_EXP"</span>, <span class="st">"OVERHEAD_RATIO"</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">recips</span> <span class="op">&lt;-</span> <span class="va">md</span><span class="op">$</span><span class="va">fiscal</span><span class="op">[</span> <span class="va">ROLE</span> <span class="op">==</span> <span class="st">"recipient"</span> <span class="op">]</span></span>
+<span></span>
+<span><span class="va">recips</span><span class="op">[</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span>, <span class="va">..cols</span> <span class="op">]</span></span>
 <span><span class="co">#&gt;                   MERGER_ID TIME_FROM_MERGER  REVENUE  EXPENSES   ASSETS</span></span>
 <span><span class="co">#&gt;                      &lt;char&gt;            &lt;int&gt;    &lt;num&gt;     &lt;num&gt;    &lt;num&gt;</span></span>
 <span><span class="co">#&gt; 1: 2021-132890752-861250084                0 36146755  17521070 87757237</span></span>
@@ -651,15 +732,15 @@ detail come from the full Form 990 only.</p>
 <span><span class="co">#&gt; 5:    683892     0.10239511</span></span>
 <span><span class="co">#&gt; 6:    589851     0.11333852</span></span></code></pre></div>
 <p>With <code>ratios = TRUE</code> (the default), the panel also gets
-the ratios from <code><a href="https://nonprofit-open-data-collective.github.io/fiscal/reference/compute_all_panel.html" class="external-link">fiscal::compute_all_panel()</a></code>. Two choices
+the ratios from <code><a href="https://rdrr.io/pkg/fiscal/man/compute_all_panel.html" class="external-link">fiscal::compute_all_panel()</a></code>. Two choices
 matter when you study change over time:</p>
 <ul>
 <li>
 <strong>A fixed calibration.</strong> The ratios’ winsorized and
 percentile variants are recomputed within each year. For an index that
-is comparable across years, fit <code><a href="https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_health_fit.html" class="external-link">fiscal::fiscal_health_fit()</a></code>
+is comparable across years, fit <code>fiscal::fiscal_health_fit()</code>
 once on a reference sample and pass it (and
-<code><a href="https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_weights.html" class="external-link">fiscal::fiscal_weights()</a></code>) as <code>fit</code> and
+<code>fiscal::fiscal_weights()</code>) as <code>fit</code> and
 <code>weights</code>.</li>
 <li>
 <strong>Backward-looking smoothing.</strong>
