@@ -110,9 +110,12 @@ smooth_trailing <- function(x, vars, k = 3L, id = "EIN2", time = "TAX_YEAR") {
 #' standardized, and percentile variants are re-estimated within each tax
 #' year, so they rank organizations within a year rather than measure
 #' change. To track change, pass a `fit` (a fitted
-#' [fiscal::fiscal_health_fit()] model calibrated once on a reference
-#' sample) and `weights` ([fiscal::fiscal_weights()]). Every
-#' organization-year is then scored with the same fixed parameters.
+#' `fiscal_health_fit()` model calibrated once on a reference sample) and
+#' `weights` (`fiscal_weights()`). Every organization-year is then scored
+#' with the same fixed parameters. Scoring needs a 'fiscal' version that
+#' exports `fiscal_health_score()` and `fiscal_health_index()`. The version
+#' pinned in `DESCRIPTION` does not, so with it a non-`NULL` `fit` stops
+#' with an error.
 #'
 #' @section Smoothing:
 #' `smooth = "trailing"` replaces the financial fields with trailing
@@ -181,8 +184,8 @@ merger_fiscal_panel <- function(cases, oy, pre = 5L, post = 5L, ratios = TRUE, f
       mcols[match(clash, mcols)] <- paste0(clash, "_ratio")
     }
     if (!is.null(fit)) {
-      sc <- fiscal::fiscal_health_score(as.data.frame(rt), fit)
-      if (!is.null(weights)) sc <- fiscal::fiscal_health_index(sc, weights)
+      sc <- .fiscal_fun("fiscal_health_score")(as.data.frame(rt), fit)
+      if (!is.null(weights)) sc <- .fiscal_fun("fiscal_health_index")(sc, weights)
       sc <- as.data.table(sc)
       mcols <- union(mcols, grep("^fh_|^fiscal_health", names(sc), value = TRUE))
       rt <- sc
@@ -193,6 +196,16 @@ merger_fiscal_panel <- function(cases, oy, pre = 5L, post = 5L, ratios = TRUE, f
   data.table::setorderv(out, c("MERGER_ID", "ROLE", "TAX_YEAR"))
   attr(out, "smooth") <- smooth
   out[]
+}
+
+# Look up a 'fiscal' export at run time. Fiscal-health scoring exists only
+# in newer 'fiscal' versions, so the package must not refer to it directly.
+.fiscal_fun <- function(name) {
+  if (!name %in% getNamespaceExports("fiscal"))
+    stop("`fit` needs fiscal::", name, "(), which the installed 'fiscal' (",
+         as.character(utils::packageVersion("fiscal")), ") does not export. ",
+         "Install a newer 'fiscal' or leave `fit = NULL`.", call. = FALSE)
+  getExportedValue("fiscal", name)
 }
 
 utils::globalVariables(c("TIME_FROM_MERGER", "PERSON_NAME", "PERSON_KEY", "N_ROLES", "IN_BOTH", "ROW_ID_", "sm", "val", "t"))

@@ -8,7 +8,7 @@
   `IN_BOTH` all use it. `merger_rules(name_key = "simple")` restores the old
   first-and-last-token key (`person_key()`). Parsed names are cached for the
   session and saved in the project database (`name_keys`), so rebuilds do
-  not parse them again. peopleparser (>= 0.2.0) is now an import.
+  not parse them again. peopleparser (>= 0.2.3) is now an import.
   `name_keys( workers = n )` passes `workers` to
   `peopleparser::parse_names()`; with 8 workers all 1.77 million Part VII
   names parse in about 4 minutes.

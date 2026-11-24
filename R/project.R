@@ -97,6 +97,16 @@ db_write <- function(project, tables) {
   invisible(n)
 }
 
+# Build arguments worth recording: atomic values and short lists such as
+# merger_rules(). Data passed through *_args (sn, panel, core, ...) is
+# dropped, so it is not deparsed into the log or the settings table.
+.settings_only <- function(x) {
+  ok <- function(v) is.null(v) || inherits(v, "formula") ||
+    (is.atomic(v) && length(v) <= 100L) ||
+    (is.list(v) && !is.data.frame(v) && length(v) <= 100L && all(vapply(v, ok, logical(1L))))
+  x[vapply(x, ok, logical(1L))]
+}
+
 # key/value settings stored as deparsed R
 .kv_table <- function(stage, x) {
   data.table(stage = stage, item = names(x),
@@ -209,9 +219,9 @@ db_write <- function(project, tables) {
 build_merger_database <- function(project, stages = c("merger", "match", "model"), years = efile_years(),
                                   merger_args = list(), match_args = list(), model_args = list(), verbose = TRUE) {
   stages <- match.arg(stages, several.ok = TRUE)
-  run <- function(stage, settings, f) .with_log(project, stage, f(), settings, echo = verbose)
+  run <- function(stage, settings, f) .with_log(project, stage, f(), .settings_only(settings), echo = verbose)
   if ("merger" %in% stages) {
-    st <- c(list(years = years), merger_args)
+    st <- .settings_only(c(list(years = years), merger_args))
     # names parsed in an earlier build are reused (parsing is the slow step),
     # but only when the same peopleparser build parsed them
     parser <- name_parser_id()
