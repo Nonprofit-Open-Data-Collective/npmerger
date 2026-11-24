@@ -9,7 +9,10 @@
 #' @return Character vector of keys (`NA` for blank names).
 #' @export
 #' @examples
-#' org_name_key(c("The Arc of Maine, Inc.", "ARC OF MAINE", "Smith & Jones Co."))
+#' orgs <- c( "The Arc of Maine, Inc.", "ARC OF MAINE",
+#'            "Smith & Jones Co." )
+#'
+#' org_name_key( orgs )
 org_name_key <- function(x) {
   u <- toupper(as.character(x))
   u <- gsub("&", " AND ", u, fixed = TRUE)

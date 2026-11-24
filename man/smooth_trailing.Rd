@@ -31,6 +31,13 @@ panel990 supports it, and an equivalent internal implementation
 otherwise.
 }
 \examples{
-x <- data.frame(EIN2 = "A", TAX_YEAR = c(2018, 2019, 2021), REVENUE = c(10, 20, 60))
-smooth_trailing(x, "REVENUE")   # 2021 uses 2019 and 2021 only (2020 missing)
+x <-
+  data.frame(
+    EIN2     = "A",
+    TAX_YEAR = c( 2018, 2019, 2021 ),
+    REVENUE  = c(   10,   20,   60 )
+  )
+
+# 2021 averages 2019 and 2021 only (2020 is missing)
+smooth_trailing( x, "REVENUE" )
 }

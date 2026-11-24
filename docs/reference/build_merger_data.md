@@ -86,8 +86,11 @@ build_merger_data(
 
 A list of class `merger_data` with `sched_n` (one row per Schedule N
 filing), `cases`, `transfers`, `donors`, `recipients`, `part7`,
-`fiscal`, `transactions` (asset lines), and `manifest` (row counts per
-stage).
+`fiscal`, `leadership`
+([`merger_leadership()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_leadership.md)),
+`typology`
+([`merger_typology()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_typology.md)),
+`transactions` (asset lines), and `manifest` (row counts per stage).
 
 ## Details
 
@@ -100,8 +103,18 @@ pipeline offline, for example on
 
 ``` r
 ex <- npmerger_example()
-md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
-                        names = ex$names, bmf_data = ex$bmf, ratios = FALSE)
+
+md <-
+  build_merger_data(
+    sn       = ex$sn,
+    evidence = ex$evidence,
+    core     = ex$core,
+    names    = ex$names,
+    bmf_data = ex$bmf,
+    ratios   = FALSE
+  )
+#> Leadership and typology
+
 md
 #> <merger_data>
 #> Schedule N filings by type:
@@ -118,4 +131,6 @@ md
 #>   recipients       16 rows
 #>   part7          1618 rows
 #>   fiscal          166 rows
+#>   leadership       11 rows
+#>   typology         16 rows
 ```

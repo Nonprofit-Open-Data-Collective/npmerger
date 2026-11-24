@@ -22,6 +22,10 @@ placeholder values (all zeros, all nines, wrong length). \code{as_ein2()}
 converts to the \code{EIN-XX-XXXXXXX} key used by the NCCS efile tables.
 }
 \examples{
-clean_ein(c("01-0215911", "10215911", "000000000", "EIN-01-0215911", NA))
-as_ein2("010215911")
+eins <- c( "01-0215911", "10215911", "000000000",
+           "EIN-01-0215911", NA )
+
+clean_ein( eins )
+
+as_ein2( "010215911" )
 }

@@ -167,7 +167,7 @@ not reimplement them.** fiscal now defaults to the current efile release
 smoothing. - NTEE, ruling year and address come from the BMF through
 [`panel990::bmf_merge()`](https://nonprofit-open-data-collective.github.io/panel990/reference/bmf_merge.html)
 /
-[`fiscal::get_clean_ntee()`](https://nonprofit-open-data-collective.github.io/fiscal/reference/get_clean_ntee.html).
+[`fiscal::get_clean_ntee()`](https://rdrr.io/pkg/fiscal/man/get_clean_ntee.html).
 Org age = tax year − min(formation year, ruling year).
 
 ------------------------------------------------------------------------

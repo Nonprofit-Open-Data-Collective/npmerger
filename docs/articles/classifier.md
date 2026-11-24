@@ -12,7 +12,6 @@ and how the three merger labels (`merger2`, `mergerN`, and
 `consolidation`) differ.
 
 ``` r
-
 library(npmerger)
 transaction_types()
 #> [1] "merger2"           "mergerN"           "consolidation"    
@@ -105,13 +104,21 @@ share between 0.5 and 0.75 read as dispersed closures, and none as
 mergers.
 
 ``` r
+x <-
+  data.frame(
+    EIN2          = "EIN-01-0000001",
+    HAS_P1        = TRUE,
+    HAS_P2        = FALSE,
+    LEADER_SN     = FALSE,
+    LEADER_P7     = FALSE,
+    N_NP_RECIP    = c( 1L, 4L, 1L, 0L ),
+    TOP_SHARE     = c( 0.95, 0.40, 0.60, NA ),
+    TOP_RECIP_EIN = c( rep("020000002", 3), NA )
+  )
 
-x <- data.frame(
-  EIN2 = "EIN-01-0000001", HAS_P1 = TRUE, HAS_P2 = FALSE, LEADER_SN = FALSE,
-  LEADER_P7 = FALSE, N_NP_RECIP = c(1L, 4L, 1L, 0L),
-  TOP_SHARE = c(0.95, 0.40, 0.60, NA), TOP_RECIP_EIN = c(rep("020000002", 3), NA)
-)
-classify_transactions(x)[, c("N_NP_RECIP", "TOP_SHARE", "TYPE")]
+out <- classify_transactions( x )
+
+out[ , .( N_NP_RECIP, TOP_SHARE, TYPE ) ]
 #>    N_NP_RECIP TOP_SHARE           TYPE
 #>         <int>     <num>         <char>
 #> 1:          1      0.95 asset_transfer
@@ -142,8 +149,9 @@ recipient. The classifier accepts two kinds of evidence by default.
   ([`person_key()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/person_key.md)).
 
 ``` r
+people <- c( "Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith" )
 
-person_key(c("Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith"))
+person_key( people )
 #> [1] "JANE SMITH" "JANE SMITH" NA
 ```
 
@@ -163,7 +171,6 @@ due to merger”, “lodge merged with …”). This counts by default
 successor read as mergers.
 
 ``` r
-
 sn_merger_pattern()
 #> [1] "merg|consolidat|amalgamat"
 ```
@@ -192,21 +199,39 @@ precedence, then `"sn_text"`, then `"corroborated"`. It is `NA` for
 non-mergers.
 
 ``` r
+case <- c( "box checked", "Part VII overlap", "Schedule N text",
+           "two Schedule O signals", "nothing" )
 
-x <- data.frame(
-  case = c("box checked", "Part VII overlap", "Schedule N text", "two Schedule O signals", "nothing"),
-  EIN2 = "EIN-01-0000001", HAS_P1 = TRUE, HAS_P2 = FALSE,
-  LEADER_SN      = c(TRUE, FALSE, FALSE, FALSE, FALSE),
-  LEADER_P7      = c(FALSE, TRUE, FALSE, FALSE, FALSE),
-  SN_MERGER_TEXT = c(FALSE, FALSE, TRUE, FALSE, FALSE),
-  SO_MERGER_TEXT_DONOR = c(FALSE, FALSE, FALSE, TRUE, FALSE),
-  SO_MERGER_TEXT_RECIP = c(FALSE, FALSE, FALSE, TRUE, FALSE),
-  N_NP_RECIP = 1L, TOP_SHARE = 1, TOP_RECIP_EIN = "020000002"
+x <-
+  data.frame(
+    case,
+    EIN2           = "EIN-01-0000001",
+    HAS_P1         = TRUE,
+    HAS_P2         = FALSE,
+    LEADER_SN      = c( TRUE, FALSE, FALSE, FALSE, FALSE ),
+    LEADER_P7      = c( FALSE, TRUE, FALSE, FALSE, FALSE ),
+    SN_MERGER_TEXT = c( FALSE, FALSE, TRUE, FALSE, FALSE ),
+    SO_MERGER_TEXT_DONOR =
+      c( FALSE, FALSE, FALSE, TRUE, FALSE ),
+    SO_MERGER_TEXT_RECIP =
+      c( FALSE, FALSE, FALSE, TRUE, FALSE ),
+    N_NP_RECIP     = 1L,
+    TOP_SHARE      = 1,
+    TOP_RECIP_EIN  = "020000002"
+  )
+
+broad_rules <- merger_rules( promote = TRUE )
+
+default <- classify_transactions( x )
+broad   <- classify_transactions( x, broad_rules )
+
+data.frame(
+  case          = x$case,
+  default       = default$TYPE,
+  BASIS         = default$BASIS,
+  promote       = broad$TYPE,
+  BASIS_promote = broad$BASIS
 )
-default <- classify_transactions(x)
-broad   <- classify_transactions(x, merger_rules(promote = TRUE))
-data.frame(case = x$case, default = default$TYPE, BASIS = default$BASIS,
-           promote = broad$TYPE, BASIS_promote = broad$BASIS)
 #>                     case        default   BASIS        promote BASIS_promote
 #> 1            box checked        merger2  leader        merger2        leader
 #> 2       Part VII overlap        merger2  leader        merger2        leader
@@ -284,33 +309,57 @@ successors:
 - G merges into W, also formed in 2021, but alone.
 
 ``` r
+ein <- function(i) sprintf( "EIN-01-%07d", i )
 
-ein <- function(i) sprintf("EIN-01-%07d", i)
-rec <- c(X = "020000001", Y = "020000002", Z = "020000003", W = "020000004")
+# the four successors
+rec <- c( X = "020000001", Y = "020000002",
+          Z = "020000003", W = "020000004" )
 
-fl <- data.frame(
-  donor = c("A", "B", "C", "F", "D", "E", "G"),
-  OBJECTID = paste0("obj", 1:7), EIN2 = ein(1:7), TAX_YEAR = 2021L,
-  HAS_P1 = TRUE, HAS_P2 = FALSE,
-  LEADER_SN = c(TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE),
-  LEADER_P7 = c(FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE),
-  N_NP_RECIP = 1L, TOP_SHARE = 1,
-  TOP_RECIP_EIN = rec[c("X", "Y", "Y", "Y", "Z", "Z", "W")]
-)
+# each donor's successor
+donor   <- c( "A", "B", "C", "F", "D", "E", "G" )
+succ_of <- c( "X", "Y", "Y", "Y", "Z", "Z", "W" )
 
-# 990 headers for the four successors: formation year and initial-return box
-header <- data.frame(
-  EIN2 = as_ein2(rec), TAX_YEAR = 2021L, OBJECTID = paste0("r", 1:4),
-  F9_00_RETURN_FINAL_X = "0",
-  F9_00_RETURN_INITIAL_X = c("0", "0", "1", "1"),
-  F9_00_YEAR_FORMATION = c("1980", "1975", "2021", "2021")
-)
+fl <-
+  data.frame(
+    donor,
+    OBJECTID      = paste0( "obj", 1:7 ),
+    EIN2          = ein( 1:7 ),
+    TAX_YEAR      = 2021L,
+    HAS_P1        = TRUE,
+    HAS_P2        = FALSE,
+    LEADER_SN     = c( TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE ),
+    LEADER_P7     = c( FALSE, FALSE, TRUE, FALSE, FALSE, TRUE, FALSE ),
+    N_NP_RECIP    = 1L,
+    TOP_SHARE     = 1,
+    TOP_RECIP_EIN = rec[ succ_of ]
+  )
+```
 
-fl <- add_donor_counts(fl)
-fl <- add_filing_history(fl, header)
-out <- classify_transactions(fl)
-out <- out[order(out$donor)]
-out[, c("donor", "TOP_RECIP_EIN", "LEADER", "N_DONORS", "R_NEW", "TYPE")]
+The successors’ 990 headers carry their formation year and the
+initial-return box:
+
+``` r
+header <-
+  data.frame(
+    EIN2                   = as_ein2( rec ),
+    TAX_YEAR               = 2021L,
+    OBJECTID               = paste0( "r", 1:4 ),
+    F9_00_RETURN_FINAL_X   = "0",
+    F9_00_RETURN_INITIAL_X = c( "0", "0", "1", "1" ),
+    F9_00_YEAR_FORMATION   = c( "1980", "1975", "2021", "2021" )
+  )
+```
+
+Count donors per successor, add the filing history, then classify:
+
+``` r
+fl  <- add_donor_counts( fl )
+fl  <- add_filing_history( fl, header )
+out <- classify_transactions( fl )
+
+out <- out[ order( donor ) ]
+
+out[ , .( donor, TOP_RECIP_EIN, LEADER, N_DONORS, R_NEW, TYPE ) ]
 #>     donor TOP_RECIP_EIN LEADER N_DONORS  R_NEW           TYPE
 #>    <char>        <char> <lgcl>    <int> <lgcl>         <char>
 #> 1:      A     020000001   TRUE        1  FALSE        merger2
@@ -399,15 +448,19 @@ and every evidence column stays on the output. You can relabel without
 re-running the pipeline, and compare definitions side by side:
 
 ``` r
+rules <-
+  list(
+    default     = merger_rules(),
+    strict      = merger_rules( leader = "sn", sn_text = FALSE ),
+    broad       = merger_rules( promote = TRUE, min_top_share = 0.5 ),
+    bigger_deal = merger_rules( min_donors_n = 3L )
+  )
 
-rules <- list(
-  default     = merger_rules(),
-  strict      = merger_rules(leader = "sn", sn_text = FALSE),
-  broad       = merger_rules(promote = TRUE, min_top_share = 0.5),
-  bigger_deal = merger_rules(min_donors_n = 3L)
-)
-data.frame(donor = fl$donor,
-           sapply(rules, function(r) classify_transactions(fl, r)$TYPE))[order(fl$donor), ]
+# classify the same filings once per rule set; keep the labels
+label_with <- function(r) classify_transactions( fl, r )$TYPE
+labels     <- sapply( rules, label_with )
+
+data.frame( donor = fl$donor, labels )[ order( fl$donor ), ]
 #>   donor        default         strict          broad    bigger_deal
 #> 1     A        merger2        merger2        merger2        merger2
 #> 2     B        mergerN        mergerN        mergerN        mergerN

@@ -2,6 +2,97 @@
 
 ## npmerger 0.0.0.9000
 
+- The whole workflow now runs inside the package, into one project
+  folder:
+
+  - [`merger_project()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_project.md)
+    creates a folder with the download cache, one DuckDB database, a
+    `logs/` folder, and a README.
+    [`build_merger_database()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_database.md)
+    runs the three stages (`"merger"`, `"match"`, `"model"`) into it.
+    Each stage writes its tables to the database, a log with package
+    versions, git commit, settings, and
+    [`sessionInfo()`](https://rdrr.io/r/utils/sessionInfo.html), and a
+    row in `build_log`.
+    [`load_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/load_merger_data.md),
+    [`load_match_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/load_merger_data.md),
+    and
+    [`load_model_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/load_merger_data.md)
+    rebuild each stage’s object from the database.
+    [`db_tables()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/db_tables.md),
+    [`db_read()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/db_tables.md),
+    and
+    [`db_write()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/db_tables.md)
+    give direct access. `dev/build-project.R` replaces
+    `dev/build-database.R` and `dev/build-matching.R`.
+  - [`merger_leadership()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_leadership.md)
+    (CEO and board outcomes from the Part VII panel) and
+    [`merger_typology()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_typology.md)
+    (deal structure, affiliation, relative size, and donor distress)
+    were scripts;
+    [`build_merger_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_merger_data.md)
+    now returns both as `leadership` and `typology`.
+  - Models:
+    [`build_model_data()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/build_model_data.md)
+    assembles the treated units, control sets (including a match on the
+    combined recipient + donor baseline), donor sums, and outcome panel
+    once.
+    [`merger_did()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_did.md)
+    (long differences for every outcome and design),
+    [`did_breakouts()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_did.md),
+    [`did_sensitivity()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_did.md)
+    with
+    [`did_variants()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_variants.md),
+    [`did_event_study()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_event_study.md),
+    [`did_baseline_means()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_baseline_means.md),
+    [`did_funnel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_baseline_means.md),
+    and
+    [`did_composition()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/did_baseline_means.md)
+    run from it. These replace the paper’s model script.
+  - [`panel_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_measures.md)
+    keeps the Part I revenue sources and Part IX functional and
+    management expenses, so the models no longer re-read the e-file
+    cache.
+  - New vignette, “Workflow: from Schedule N to merger estimates”.
+
+- [`merger_fiscal_panel()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_fiscal_panel.md)
+  no longer fails with current `fiscal` versions, whose
+  `compute_all_panel(append_to_df = FALSE)` errors when re-sorting rows.
+
+- `panel990` and `fiscal` are pinned to tested commits in `Remotes`.
+  `fixest` and `DBI` are suggested.
+
+- Vignettes, the README, and examples use a narrower code style: one
+  argument per line and each step’s result shown.
+
+- Outcome measures from the merger and financial-vulnerability
+  literatures:
+
+  - [`merger_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_measures.md)
+    adds investment and other revenue, `REVENUE_HHI` (Part I revenue
+    concentration, via
+    [`revenue_hhi()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/revenue_hhi.md)),
+    `ADMIN_RATIO`, revenue, expenses, and compensation per employee, and
+    `DEFICIT` / `NEG_NET_ASSETS` flags.
+    [`panel_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_measures.md)
+    carries `ADMIN_RATIO` and `REVENUE_HHI`, and
+    [`panel_columns()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/panel_columns.md)
+    now reads Part I investment and other revenue.
+  - [`trend_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/trend_measures.md):
+    symmetric year-over-year growth (revenue, expenses, contributions,
+    program revenue, net assets), trailing revenue coefficient of
+    variation, and deficit-year counts. Windows never use future years
+    or bridge filing gaps. `merger_fiscal_panel(trends = TRUE)` adds
+    them by default.
+  - [`tuckman_chang()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/tuckman_chang.md):
+    Tuckman-Chang (1991) vulnerability flags (bottom quintile on equity,
+    margin, and admin costs, top quintile on revenue concentration),
+    with cutoffs from a reference panel.
+  - [`merger_proforma()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_proforma.md):
+    combined donor + recipient series that sums the organizations before
+    the merger and uses the recipient alone after it, with ratios
+    recomputed.
+
 - Classifier inspection tables:
   [`sn_labeled()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/sn_labeled.md)
   stacks Schedule N Part I and Part II asset lines into one tidy table,

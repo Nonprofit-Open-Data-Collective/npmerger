@@ -16,6 +16,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -78,9 +79,13 @@
 (<code>REAL_REVENUE</code>, <code>REAL_EXPENSES</code>, <code>REAL_ASSETS</code>), profitability and
 fiscal-health ratios (<code>MARGIN</code> = surplus / revenue, <code>EQUITY_RATIO</code> = net
 assets / assets, <code>MONTHS_CASH</code> = cash and savings / monthly expenses),
-<code>NTEE</code>, <code>NTEE2</code>, <code>NTEE_MAJOR</code>, and <code>SUBSECTION</code> (IRC 501(c) subsection,
-from the BMF). Ratios are bounded to -1..1
-(months of cash to 0..120).</p>
+the Tuckman-Chang inputs <code>ADMIN_RATIO</code> and <code>REVENUE_HHI</code> (see
+<code><a href="merger_measures.html">merger_measures()</a></code>; full 990 only), the revenue sources
+(<code>CONTRIBUTIONS</code>, <code>PROGRAM_REVENUE</code>, <code>INVEST_INCOME</code>, <code>OTHER_REVENUE</code>,
+from Part I), Part IX total functional and management expenses
+(<code>FUNC_EXP</code>, <code>MGMT_EXP</code>), <code>NTEE</code>, <code>NTEE2</code>, <code>NTEE_MAJOR</code>, and
+<code>SUBSECTION</code> (IRC 501(c) subsection, from the BMF). Ratios are bounded
+to -1..1 (months of cash to 0..120).</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

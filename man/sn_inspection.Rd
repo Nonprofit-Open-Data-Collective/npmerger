@@ -43,10 +43,20 @@ do not share filings, so they can go to different reviewers.
 }
 \examples{
 \dontrun{
-sn <- get_schedule_n(efile_years())
-md <- build_merger_data(sn = sn)
-lab <- sn_labeled(sn, md$sched_n, md$cases, md$transactions)
-tabs <- sn_inspection(lab, num = 3, n = 100)
-data.table::fwrite(tabs[[1]], "inspection-01.csv")
+sn <- get_schedule_n( efile_years() )
+md <- build_merger_data( sn = sn )
+
+lab <-
+  sn_labeled(
+    sn,
+    md$sched_n,
+    md$cases,
+    md$transactions
+  )
+
+# three stratified samples of 100 filings each
+tabs <- sn_inspection( lab, num = 3, n = 100 )
+
+data.table::fwrite( tabs[[1]], "inspection-01.csv" )
 }
 }

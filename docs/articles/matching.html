@@ -33,6 +33,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -169,30 +170,74 @@ weights.</p>
 <p>The real panel has more than six million organization-years. To show
 the mechanics, we simulate a small panel of 400 organizations in four
 NTEE groups and ten merger recipients.</p>
+<p>First, 400 organizations, each with an NTEE code, a typical size, and
+the year it first files:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">orgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>EIN2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"ORG-%03d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">400</span><span class="op">)</span>,</span>
-<span>                   NTEE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E21"</span>, <span class="st">"E22"</span>, <span class="st">"P20"</span>, <span class="st">"B82"</span><span class="op">)</span>, <span class="fl">400</span>, <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>                   SIZE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">14</span>, <span class="fl">1.5</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                   FIRST <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">2009</span><span class="op">:</span><span class="fl">2014</span>, <span class="fl">400</span>, <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">panel</span> <span class="op">&lt;-</span> <span class="va">orgs</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span>TAX_YEAR <span class="op">=</span> <span class="va">FIRST</span><span class="op">:</span><span class="op">(</span><span class="va">FIRST</span> <span class="op">+</span> <span class="fl">8L</span><span class="op">)</span><span class="op">)</span>, by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span><span class="va">EIN2</span>, <span class="va">NTEE</span>, <span class="va">SIZE</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">panel</span><span class="op">[</span>, <span class="fu">`:=`</span><span class="op">(</span>REAL_ASSETS <span class="op">=</span> <span class="va">SIZE</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">.N</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>             REAL_EXPENSES <span class="op">=</span> <span class="fl">0.6</span> <span class="op">*</span> <span class="va">SIZE</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">.N</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>             MARGIN <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">.N</span>, <span class="fl">0.03</span>, <span class="fl">0.08</span><span class="op">)</span>, EQUITY_RATIO <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">.N</span>, <span class="fl">0.2</span>, <span class="fl">0.9</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="va">panel</span><span class="op">[</span>, <span class="fu">`:=`</span><span class="op">(</span>REAL_REVENUE <span class="op">=</span> <span class="va">REAL_EXPENSES</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">MARGIN</span><span class="op">)</span>, MONTHS_CASH <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">.N</span>, <span class="fl">0</span>, <span class="fl">12</span><span class="op">)</span>,</span>
-<span>             EMPLOYEES <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">REAL_EXPENSES</span> <span class="op">/</span> <span class="fl">8e4</span><span class="op">)</span>, NTEE2 <span class="op">=</span> <span class="fu"><a href="../reference/ntee_level.html">ntee_level</a></span><span class="op">(</span><span class="va">NTEE</span>, <span class="fl">2L</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setkey.html" class="external-link">setkey</a></span><span class="op">(</span><span class="va">panel</span>, <span class="va">EIN2</span>, <span class="va">TAX_YEAR</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># ten mergers: organizations 1-10 absorb organizations 11-20 in 2015</span></span>
-<span><span class="va">cases</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>MERGER_ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>, MERGER_GROUP_ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"M"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span>,</span>
-<span>                    TYPE <span class="op">=</span> <span class="st">"merger2"</span>, DONOR_EIN2 <span class="op">=</span> <span class="va">orgs</span><span class="op">$</span><span class="va">EIN2</span><span class="op">[</span><span class="fl">11</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span>, RECIP_EIN2 <span class="op">=</span> <span class="va">orgs</span><span class="op">$</span><span class="va">EIN2</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,</span>
-<span>                    MERGER_YEAR <span class="op">=</span> <span class="fl">2015L</span>, RECIP_MERGER_YEAR <span class="op">=</span> <span class="fl">2015L</span><span class="op">)</span></span>
-<span><span class="va">sched_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span>EIN2 <span class="op">=</span> <span class="va">cases</span><span class="op">$</span><span class="va">DONOR_EIN2</span>, TAX_YEAR <span class="op">=</span> <span class="fl">2015L</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">EIN2</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span> <span class="st">"ORG-%03d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">400</span> <span class="op">)</span></span>
+<span><span class="va">NTEE</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E21"</span>, <span class="st">"E22"</span>, <span class="st">"P20"</span>, <span class="st">"B82"</span><span class="op">)</span>, <span class="fl">400</span>, <span class="cn">TRUE</span> <span class="op">)</span></span>
+<span><span class="va">SIZE</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">400</span>, <span class="fl">14</span>, <span class="fl">1.5</span><span class="op">)</span> <span class="op">)</span></span>
+<span><span class="va">FIRST</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span> <span class="fl">2009</span><span class="op">:</span><span class="fl">2014</span>, <span class="fl">400</span>, <span class="cn">TRUE</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">orgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span> <span class="va">EIN2</span>, <span class="va">NTEE</span>, <span class="va">SIZE</span>, <span class="va">FIRST</span> <span class="op">)</span></span></code></pre></div>
+<p>Next, a panel with nine years of returns for each one.
+<code>by =</code> runs the expression once per organization, so each row
+of <code>orgs</code> becomes nine organization-years:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">panel</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">orgs</span><span class="op">[</span> , <span class="fu">.</span><span class="op">(</span> TAX_YEAR <span class="op">=</span> <span class="va">FIRST</span><span class="op">:</span><span class="op">(</span><span class="va">FIRST</span> <span class="op">+</span> <span class="fl">8L</span><span class="op">)</span> <span class="op">)</span>,</span>
+<span>        by <span class="op">=</span> <span class="fu">.</span><span class="op">(</span> <span class="va">EIN2</span>, <span class="va">NTEE</span>, <span class="va">SIZE</span> <span class="op">)</span> <span class="op">]</span></span></code></pre></div>
+<p>Then the financial measures that matching uses. Size varies a little
+around each organization’s typical value from year to year:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">panel</span><span class="op">[</span> , <span class="fu">`:=`</span><span class="op">(</span></span>
+<span>  REAL_ASSETS   <span class="op">=</span> <span class="va">SIZE</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">.N</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span> <span class="op">)</span>,</span>
+<span>  REAL_EXPENSES <span class="op">=</span> <span class="fl">0.6</span> <span class="op">*</span> <span class="va">SIZE</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">.N</span>, <span class="fl">0</span>, <span class="fl">0.1</span><span class="op">)</span> <span class="op">)</span>,</span>
+<span>  MARGIN        <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span> <span class="va">.N</span>, <span class="fl">0.03</span>, <span class="fl">0.08</span> <span class="op">)</span>,</span>
+<span>  EQUITY_RATIO  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span> <span class="va">.N</span>, <span class="fl">0.2</span>, <span class="fl">0.9</span> <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">]</span></span>
+<span></span>
+<span><span class="va">panel</span><span class="op">[</span> , <span class="fu">`:=`</span><span class="op">(</span></span>
+<span>  REAL_REVENUE <span class="op">=</span> <span class="va">REAL_EXPENSES</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="va">MARGIN</span><span class="op">)</span>,</span>
+<span>  MONTHS_CASH  <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span> <span class="va">.N</span>, <span class="fl">0</span>, <span class="fl">12</span> <span class="op">)</span>,</span>
+<span>  EMPLOYEES    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span> <span class="va">REAL_EXPENSES</span> <span class="op">/</span> <span class="fl">8e4</span> <span class="op">)</span>,</span>
+<span>  NTEE2        <span class="op">=</span> <span class="fu"><a href="../reference/ntee_level.html">ntee_level</a></span><span class="op">(</span> <span class="va">NTEE</span>, <span class="fl">2L</span> <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setkey.html" class="external-link">setkey</a></span><span class="op">(</span> <span class="va">panel</span>, <span class="va">EIN2</span>, <span class="va">TAX_YEAR</span> <span class="op">)</span></span></code></pre></div>
+<p>Last, the mergers. Organizations 1-10 absorb organizations 11-20 in
+2015, and the ten donors file Schedule N that year:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">DONOR_EIN2</span> <span class="op">&lt;-</span> <span class="va">orgs</span><span class="op">$</span><span class="va">EIN2</span><span class="op">[</span> <span class="fl">11</span><span class="op">:</span><span class="fl">20</span> <span class="op">]</span></span>
+<span><span class="va">RECIP_EIN2</span> <span class="op">&lt;-</span> <span class="va">orgs</span><span class="op">$</span><span class="va">EIN2</span><span class="op">[</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span> <span class="op">]</span></span>
+<span><span class="va">MERGER_ID</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span> <span class="st">"M"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">cases</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span>
+<span>    <span class="va">MERGER_ID</span>,</span>
+<span>    MERGER_GROUP_ID   <span class="op">=</span> <span class="va">MERGER_ID</span>,</span>
+<span>    TYPE              <span class="op">=</span> <span class="st">"merger2"</span>,</span>
+<span>    <span class="va">DONOR_EIN2</span>,</span>
+<span>    <span class="va">RECIP_EIN2</span>,</span>
+<span>    MERGER_YEAR       <span class="op">=</span> <span class="fl">2015L</span>,</span>
+<span>    RECIP_MERGER_YEAR <span class="op">=</span> <span class="fl">2015L</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">sched_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span> EIN2 <span class="op">=</span> <span class="va">DONOR_EIN2</span>, TAX_YEAR <span class="op">=</span> <span class="fl">2015L</span> <span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/build_match_data.html">build_match_data()</a></code> takes the list that
 <code><a href="../reference/build_merger_data.html">build_merger_data()</a></code> returns. Here we pass only the two
 tables it uses.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_match_data.html">build_match_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cases <span class="op">=</span> <span class="va">cases</span>, sched_n <span class="op">=</span> <span class="va">sched_n</span><span class="op">)</span>, panel <span class="op">=</span> <span class="va">panel</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span> cases <span class="op">=</span> <span class="va">cases</span>, sched_n <span class="op">=</span> <span class="va">sched_n</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">mm</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/build_match_data.html">build_match_data</a></span><span class="op">(</span></span>
+<span>    merger_data <span class="op">=</span> <span class="va">md</span>,</span>
+<span>    panel       <span class="op">=</span> <span class="va">panel</span>,</span>
+<span>    verbose     <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
 <span><span class="va">mm</span></span>
 <span><span class="co">#&gt; &lt;merger_match_data&gt;</span></span>
 <span><span class="co">#&gt;   panel:     3,600 org-years</span></span>
@@ -204,7 +249,7 @@ tables it uses.</p>
 every year from t-2 to t+2. The coverage table counts, for each
 specification, how many treated units have candidates and how many they
 have:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mm</span><span class="op">$</span><span class="va">coverage</span></span>
 <span><span class="co">#&gt;      SPEC TREATED MATCHED N_GE_5 N_GE_25 MEAN_CANDIDATES MEDIAN_CANDIDATES</span></span>
 <span><span class="co">#&gt;    &lt;char&gt;   &lt;int&gt;   &lt;int&gt;  &lt;int&gt;   &lt;int&gt;           &lt;num&gt;             &lt;int&gt;</span></span>
@@ -219,8 +264,11 @@ merger year and the recipient’s EIN) with a comparison organization-year
 (<code>C_EIN2</code>, <code>C_YEAR</code>). <code>YEAR_GAP</code> is the
 difference in calendar years, and the <code>D_*</code> columns are the
 differences on each matching variable.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mm</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">margin</span><span class="op">[</span>, <span class="fu">.</span><span class="op">(</span><span class="va">T_ID</span>, <span class="va">C_EIN2</span>, <span class="va">C_YEAR</span>, <span class="va">NTEE_KEY</span>, <span class="va">YEAR_GAP</span>, <span class="va">D_MARGIN</span>, <span class="va">DIST</span>, <span class="va">RANK</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cand</span> <span class="op">&lt;-</span> <span class="va">mm</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">margin</span></span>
+<span></span>
+<span><span class="va">cand</span><span class="op">[</span> , <span class="fu">.</span><span class="op">(</span> <span class="va">T_ID</span>, <span class="va">C_EIN2</span>, <span class="va">C_YEAR</span>, <span class="va">NTEE_KEY</span>,</span>
+<span>           <span class="va">YEAR_GAP</span>, <span class="va">D_MARGIN</span>, <span class="va">DIST</span>, <span class="va">RANK</span> <span class="op">)</span> <span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;            T_ID  C_EIN2 C_YEAR NTEE_KEY YEAR_GAP      D_MARGIN       DIST  RANK</span></span>
 <span><span class="co">#&gt;          &lt;char&gt;  &lt;char&gt;  &lt;int&gt;   &lt;char&gt;    &lt;int&gt;         &lt;num&gt;      &lt;num&gt; &lt;int&gt;</span></span>
 <span><span class="co">#&gt; 1: 2015-ORG-001 ORG-052   2017       E2        2  1.363188e-03 0.06060345     1</span></span>
@@ -233,30 +281,92 @@ differences on each matching variable.</p>
 <code>ORG-318</code> in 2015 and 2016), because each of its
 organization-years is a separate candidate. To use each organization
 once per treated unit, keep its closest year:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">one_per_org</span> <span class="op">&lt;-</span> <span class="va">mm</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">margin</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">T_ID</span>, <span class="va">DIST</span><span class="op">)</span><span class="op">]</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">T_ID</span>, <span class="va">C_EIN2</span><span class="op">)</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">mm</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">margin</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">one_per_org</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># closest first, then drop later years of the same organization</span></span>
+<span><span class="va">cand</span> <span class="op">&lt;-</span> <span class="va">cand</span><span class="op">[</span> <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span> <span class="va">T_ID</span>, <span class="va">DIST</span> <span class="op">)</span> <span class="op">]</span></span>
+<span><span class="va">dup</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span> <span class="va">cand</span><span class="op">[</span> , <span class="fu">.</span><span class="op">(</span> <span class="va">T_ID</span>, <span class="va">C_EIN2</span> <span class="op">)</span> <span class="op">]</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="va">one_per_org</span> <span class="op">&lt;-</span> <span class="va">cand</span><span class="op">[</span> <span class="op">!</span><span class="va">dup</span> <span class="op">]</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span> <span class="va">cand</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 847</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span> <span class="va">one_per_org</span> <span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 242</span></span></code></pre></div>
 <p>Balance compares treated units with their closest <code>k</code>
 candidates, and with the whole pool in the same NTEE groups:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mm</span><span class="op">$</span><span class="va">balance</span><span class="op">[</span><span class="va">SPEC</span> <span class="op">==</span> <span class="st">"margin"</span> <span class="op">&amp;</span> <span class="va">K</span> <span class="op">==</span> <span class="fl">5</span>, <span class="fu">.</span><span class="op">(</span><span class="va">VAR</span>, <span class="va">TREATED</span>, <span class="va">MATCHED</span>, <span class="va">SMD_MATCHED</span>, <span class="va">SMD_POOL</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt;                  VAR     TREATED     MATCHED SMD_MATCHED   SMD_POOL</span></span>
-<span><span class="co">#&gt;               &lt;char&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;</span></span>
-<span><span class="co">#&gt; 1:   log REAL_ASSETS 15.47630764 15.40595615  0.04732470  0.9939018</span></span>
-<span><span class="co">#&gt; 2: log REAL_EXPENSES 15.01106451 14.88376171  0.08441589  1.0088485</span></span>
-<span><span class="co">#&gt; 3:  log REAL_REVENUE 14.97946584 14.86015209  0.07968262  0.9704348</span></span>
-<span><span class="co">#&gt; 4:            MARGIN -0.03921995 -0.02845837 -0.19072130 -1.2486475</span></span>
-<span><span class="co">#&gt; 5:      EQUITY_RATIO  0.48792004  0.55156858 -0.45903601 -0.4134452</span></span>
-<span><span class="co">#&gt; 6:       MONTHS_CASH  6.76384020  5.20294552  0.47217316  0.2524556</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bal</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">mm</span><span class="op">$</span><span class="va">balance</span><span class="op">[</span> <span class="va">SPEC</span> <span class="op">==</span> <span class="st">"margin"</span> <span class="op">&amp;</span> <span class="va">K</span> <span class="op">==</span> <span class="fl">5</span>,</span>
+<span>              <span class="fu">.</span><span class="op">(</span> <span class="va">VAR</span>, <span class="va">TREATED</span>, <span class="va">MATCHED</span>, <span class="va">SMD_MATCHED</span>, <span class="va">SMD_POOL</span> <span class="op">)</span> <span class="op">]</span></span>
+<span></span>
+<span><span class="va">bal</span> <span class="op">|&gt;</span> <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span> digits <span class="op">=</span> <span class="fl">3</span> <span class="op">)</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">VAR</th>
+<th align="right">TREATED</th>
+<th align="right">MATCHED</th>
+<th align="right">SMD_MATCHED</th>
+<th align="right">SMD_POOL</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">log REAL_ASSETS</td>
+<td align="right">15.476</td>
+<td align="right">15.406</td>
+<td align="right">0.047</td>
+<td align="right">0.994</td>
+</tr>
+<tr class="even">
+<td align="left">log REAL_EXPENSES</td>
+<td align="right">15.011</td>
+<td align="right">14.884</td>
+<td align="right">0.084</td>
+<td align="right">1.009</td>
+</tr>
+<tr class="odd">
+<td align="left">log REAL_REVENUE</td>
+<td align="right">14.979</td>
+<td align="right">14.860</td>
+<td align="right">0.080</td>
+<td align="right">0.970</td>
+</tr>
+<tr class="even">
+<td align="left">MARGIN</td>
+<td align="right">-0.039</td>
+<td align="right">-0.028</td>
+<td align="right">-0.191</td>
+<td align="right">-1.249</td>
+</tr>
+<tr class="odd">
+<td align="left">EQUITY_RATIO</td>
+<td align="right">0.488</td>
+<td align="right">0.552</td>
+<td align="right">-0.459</td>
+<td align="right">-0.413</td>
+</tr>
+<tr class="even">
+<td align="left">MONTHS_CASH</td>
+<td align="right">6.764</td>
+<td align="right">5.203</td>
+<td align="right">0.472</td>
+<td align="right">0.252</td>
+</tr>
+</tbody>
+</table>
 <p>To change the design, pass different arguments. For example, require
 the full three-character NTEE code, match on months of cash, and keep
 candidates within four years of the merger:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">alt</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_match_data.html">build_match_data</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>cases <span class="op">=</span> <span class="va">cases</span>, sched_n <span class="op">=</span> <span class="va">sched_n</span><span class="op">)</span>, panel <span class="op">=</span> <span class="va">panel</span>,</span>
-<span>                        health <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>cash <span class="op">=</span> <span class="st">"MONTHS_CASH"</span><span class="op">)</span>, ntee_chars <span class="op">=</span> <span class="fl">3L</span>,</span>
-<span>                        max_year_gap <span class="op">=</span> <span class="fl">4</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">alt</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/build_match_data.html">build_match_data</a></span><span class="op">(</span></span>
+<span>    merger_data  <span class="op">=</span> <span class="va">md</span>,</span>
+<span>    panel        <span class="op">=</span> <span class="va">panel</span>,</span>
+<span>    health       <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> cash <span class="op">=</span> <span class="st">"MONTHS_CASH"</span> <span class="op">)</span>,</span>
+<span>    ntee_chars   <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>    max_year_gap <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>    verbose      <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
 <span><span class="va">alt</span><span class="op">$</span><span class="va">coverage</span></span>
 <span><span class="co">#&gt;      SPEC TREATED MATCHED N_GE_5 N_GE_25 MEAN_CANDIDATES MEDIAN_CANDIDATES</span></span>
 <span><span class="co">#&gt;    &lt;char&gt;   &lt;int&gt;   &lt;int&gt;  &lt;int&gt;   &lt;int&gt;           &lt;num&gt;             &lt;int&gt;</span></span>
@@ -268,14 +378,21 @@ candidates within four years of the merger:</p>
 <div class="section level2">
 <h2 id="running-it-on-the-full-data">Running it on the full data<a class="anchor" aria-label="anchor" href="#running-it-on-the-full-data"></a>
 </h2>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span>years <span class="op">=</span> <span class="fu"><a href="../reference/efile_years.html">efile_years</a></span><span class="op">(</span><span class="op">)</span>, path <span class="op">=</span> <span class="st">"PANEL990"</span><span class="op">)</span></span>
-<span><span class="va">mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_match_data.html">build_match_data</a></span><span class="op">(</span><span class="va">md</span>, path <span class="op">=</span> <span class="st">"PANEL990"</span><span class="op">)</span>   <span class="co"># builds the full panel first</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">md</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="../reference/build_merger_data.html">build_merger_data</a></span><span class="op">(</span></span>
+<span>    years <span class="op">=</span> <span class="fu"><a href="../reference/efile_years.html">efile_years</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    path  <span class="op">=</span> <span class="st">"PANEL990"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># builds the full 990 panel first (several minutes)</span></span>
+<span><span class="va">mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/build_match_data.html">build_match_data</a></span><span class="op">(</span> <span class="va">md</span>, path <span class="op">=</span> <span class="st">"PANEL990"</span> <span class="op">)</span></span>
 <span></span>
 <span><span class="co"># the five closest comparison org-years for each recipient</span></span>
-<span><span class="va">top5</span> <span class="op">&lt;-</span> <span class="va">mm</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">margin</span><span class="op">[</span><span class="va">RANK</span> <span class="op">&lt;=</span> <span class="fl">5</span><span class="op">]</span></span></code></pre></div>
-<p><code>dev/build-matching.R</code> in the package repository does this
-and writes every table to a DuckDB database.</p>
+<span><span class="va">top5</span> <span class="op">&lt;-</span> <span class="va">mm</span><span class="op">$</span><span class="va">candidates</span><span class="op">$</span><span class="va">margin</span><span class="op">[</span> <span class="va">RANK</span> <span class="op">&lt;=</span> <span class="fl">5</span> <span class="op">]</span></span></code></pre></div>
+<p><code><a href="../reference/build_merger_database.html">build_merger_database()</a></code> runs this as the “match” stage
+of a project and writes every table to the project’s DuckDB database.
+See <code><a href="../articles/workflow.html">vignette("workflow")</a></code>.</p>
 <p><strong>NTEE codes.</strong> The current IRS Business Master File has
 no NTEE code for about a quarter of filers (it reports
 <code>"UNDEFINED"</code>), including many large charities.

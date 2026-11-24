@@ -122,7 +122,9 @@ merger_rules()
 #> 
 #> attr(,"class")
 #> [1] "merger_rules"
-merger_rules(leader = "sn", sn_text = FALSE)
+
+# strict: Schedule N boxes only
+merger_rules( leader = "sn", sn_text = FALSE )
 #> $min_top_share
 #> [1] 0.75
 #> 
@@ -152,7 +154,9 @@ merger_rules(leader = "sn", sn_text = FALSE)
 #> 
 #> attr(,"class")
 #> [1] "merger_rules"
-merger_rules(promote = TRUE)   # broad definition
+
+# broad: corroborating signals can promote a filing
+merger_rules( promote = TRUE )
 #> $min_top_share
 #> [1] 0.75
 #> 

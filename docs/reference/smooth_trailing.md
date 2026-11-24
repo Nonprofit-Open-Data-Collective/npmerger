@@ -43,8 +43,15 @@ otherwise.
 ## Examples
 
 ``` r
-x <- data.frame(EIN2 = "A", TAX_YEAR = c(2018, 2019, 2021), REVENUE = c(10, 20, 60))
-smooth_trailing(x, "REVENUE")   # 2021 uses 2019 and 2021 only (2020 missing)
+x <-
+  data.frame(
+    EIN2     = "A",
+    TAX_YEAR = c( 2018, 2019, 2021 ),
+    REVENUE  = c(   10,   20,   60 )
+  )
+
+# 2021 averages 2019 and 2021 only (2020 is missing)
+smooth_trailing( x, "REVENUE" )
 #>      EIN2 TAX_YEAR REVENUE
 #>    <char>    <num>   <num>
 #> 1:      A     2018      10

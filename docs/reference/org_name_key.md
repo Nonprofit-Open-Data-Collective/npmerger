@@ -24,6 +24,9 @@ Character vector of keys (`NA` for blank names).
 ## Examples
 
 ``` r
-org_name_key(c("The Arc of Maine, Inc.", "ARC OF MAINE", "Smith & Jones Co."))
+orgs <- c( "The Arc of Maine, Inc.", "ARC OF MAINE",
+           "Smith & Jones Co." )
+
+org_name_key( orgs )
 #> [1] "ARC OF MAINE"    "ARC OF MAINE"    "SMITH AND JONES"
 ```

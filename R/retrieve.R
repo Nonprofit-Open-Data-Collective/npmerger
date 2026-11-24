@@ -31,7 +31,7 @@ sn_table_names <- function() {
 #' @export
 #' @examples
 #' \dontrun{
-#' sn <- get_schedule_n(2019:2021)
+#' sn <- get_schedule_n( 2019:2021 )
 #' }
 get_schedule_n <- function(years, path = "PANEL990", source = panel990::data_source(),
                            verbose = TRUE, ...) {

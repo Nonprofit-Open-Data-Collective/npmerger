@@ -25,8 +25,10 @@ A character vector with values `"501c3"`, `"other_exempt"`,
 ## Examples
 
 ``` r
-parse_irc_section(c("501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
-                    "Individual", "City of Portland", NA))
+irc <- c( "501(c)(3)", "501 C 3", "501(c)(6)", "LLC",
+          "Individual", "City of Portland", NA )
+
+parse_irc_section( irc )
 #> [1] "501c3"        "501c3"        "other_exempt" "business"     "individual"  
 #> [6] "government"   "unknown"     
 ```

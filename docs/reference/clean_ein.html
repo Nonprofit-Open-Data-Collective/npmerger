@@ -20,6 +20,7 @@ converts to the EIN-XX-XXXXXXX key used by the NCCS efile tables."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -76,9 +77,13 @@ numeric with dropped leading zeros, or <code>EIN-XX-XXXXXXX</code>).</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">clean_ein</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"01-0215911"</span>, <span class="st">"10215911"</span>, <span class="st">"000000000"</span>, <span class="st">"EIN-01-0215911"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">eins</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span> <span class="st">"01-0215911"</span>, <span class="st">"10215911"</span>, <span class="st">"000000000"</span>,</span></span>
+<span class="r-in"><span>           <span class="st">"EIN-01-0215911"</span>, <span class="cn">NA</span> <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">clean_ein</span><span class="op">(</span> <span class="va">eins</span> <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "010215911" "010215911" NA          "010215911" NA         </span>
-<span class="r-in"><span><span class="fu">as_ein2</span><span class="op">(</span><span class="st">"010215911"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu">as_ein2</span><span class="op">(</span> <span class="st">"010215911"</span> <span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "EIN-01-0215911"</span>
 </code></pre></div>
     </div>

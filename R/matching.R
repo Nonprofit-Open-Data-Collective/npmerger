@@ -164,7 +164,9 @@ real_dollars <- function(x, year, base_year = 2024L) {
 #'   placeholder such as `"UNDEFINED"`).
 #' @export
 #' @examples
-#' ntee_level(c("E21", "b82z", "", NA, "X"), 2)
+#' ntee <- c( "E21", "b82z", "", NA, "X" )
+#'
+#' ntee_level( ntee, 2 )
 ntee_level <- function(x, n = 2L) {
   x <- toupper(gsub("[^A-Za-z0-9]", "", as.character(x)))
   out <- substr(x, 1L, n)
@@ -188,7 +190,10 @@ ntee_level <- function(x, n = 2L) {
 #'   fiscal-health ratios (`MARGIN` = surplus / revenue, `EQUITY_RATIO` = net
 #'   assets / assets, `MONTHS_CASH` = cash and savings / monthly expenses),
 #'   the Tuckman-Chang inputs `ADMIN_RATIO` and `REVENUE_HHI` (see
-#'   [merger_measures()]; full 990 only), `NTEE`, `NTEE2`, `NTEE_MAJOR`, and
+#'   [merger_measures()]; full 990 only), the revenue sources
+#'   (`CONTRIBUTIONS`, `PROGRAM_REVENUE`, `INVEST_INCOME`, `OTHER_REVENUE`,
+#'   from Part I), Part IX total functional and management expenses
+#'   (`FUNC_EXP`, `MGMT_EXP`), `NTEE`, `NTEE2`, `NTEE_MAJOR`, and
 #'   `SUBSECTION` (IRC 501(c) subsection, from the BMF). Ratios are bounded
 #'   to -1..1 (months of cash to 0..120).
 #' @export
@@ -208,7 +213,10 @@ panel_measures <- function(oy, bmf = NULL, base_year = 2024L) {
                     FINAL_RETURN = sn_flag(chr("F9_00_RETURN_FINAL_X"), FALSE),
                     REVENUE = x$REVENUE, EXPENSES = x$EXPENSES, ASSETS = x$ASSETS, LIABILITIES = x$LIABILITIES,
                     NET_ASSETS = x$NET_ASSETS, CASH = cash, SURPLUS = x$SURPLUS, STAFF_EXP = x$STAFF_EXP,
-                    EMPLOYEES = x$EMPLOYEES, ADMIN_RATIO = x$ADMIN_RATIO, REVENUE_HHI = x$REVENUE_HHI)
+                    EMPLOYEES = x$EMPLOYEES, ADMIN_RATIO = x$ADMIN_RATIO, REVENUE_HHI = x$REVENUE_HHI,
+                    CONTRIBUTIONS = x$CONTRIBUTIONS, PROGRAM_REVENUE = x$PROGRAM_REVENUE,
+                    INVEST_INCOME = x$INVEST_INCOME, OTHER_REVENUE = x$OTHER_REVENUE,
+                    FUNC_EXP = g("F9_09_EXP_TOT_TOT"), MGMT_EXP = x$MGMT_EXP)
   out[, `:=`(REAL_REVENUE = real_dollars(REVENUE, TAX_YEAR, base_year),
              REAL_EXPENSES = real_dollars(EXPENSES, TAX_YEAR, base_year),
              REAL_ASSETS = real_dollars(ASSETS, TAX_YEAR, base_year),

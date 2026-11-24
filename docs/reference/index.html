@@ -16,6 +16,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -196,6 +197,20 @@
 
         </dt>
         <dd>Part VII leadership overlap between donor and recipient</dd>
+
+        <dt>
+
+          <code><a href="name_keys.html">name_keys()</a></code> <code><a href="name_keys.html">name_key()</a></code> <code><a href="name_keys.html">name_keys_preload()</a></code> <code><a href="name_keys.html">name_keys_cached()</a></code> <code><a href="name_keys.html">name_parser_id()</a></code>
+
+        </dt>
+        <dd>Name keys for matching people across Part VII rosters</dd>
+
+        <dt>
+
+          <code><a href="name_match_basis.html">name_match_basis()</a></code>
+
+        </dt>
+        <dd>Why two Part VII names share a key</dd>
 
         <dt>
 
@@ -445,6 +460,43 @@
         </dt>
         <dd>Smooth panel variables using only current and past years</dd>
       </dl></div><div class="section level2">
+      <h2 id="outcome-measures">Outcome measures<a class="anchor" aria-label="anchor" href="#outcome-measures"></a></h2>
+
+      <div class="section-desc"><p>Measures from the merger and financial-vulnerability literatures beyond the ‘fiscal’ ratios, such as revenue concentration, growth, volatility, deficit history, Tuckman-Chang flags, and a combined donor + recipient pre-merger baseline.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="revenue_hhi.html">revenue_hhi()</a></code>
+
+        </dt>
+        <dd>Revenue concentration (Herfindahl-Hirschman index)</dd>
+
+        <dt>
+
+          <code><a href="trend_measures.html">trend_measures()</a></code>
+
+        </dt>
+        <dd>Growth, volatility, and deficit history within each organization</dd>
+
+        <dt>
+
+          <code><a href="tuckman_chang.html">tuckman_chang()</a></code>
+
+        </dt>
+        <dd>Tuckman-Chang financial vulnerability flags</dd>
+
+        <dt>
+
+          <code><a href="merger_proforma.html">merger_proforma()</a></code>
+
+        </dt>
+        <dd>Combined donor + recipient (pro forma) series</dd>
+      </dl></div><div class="section level2">
       <h2 id="matched-comparison-samples">Matched comparison samples<a class="anchor" aria-label="anchor" href="#matched-comparison-samples"></a></h2>
 
       <div class="section-desc"><p>Build the full 990 panel, a research sample of mergers with a full observation window, and candidate comparison organizations for merger recipients.</p></div>
@@ -558,6 +610,145 @@
 
         </dt>
         <dd>Consumer price index (CPI-U, annual average)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="merger-characteristics">Merger characteristics<a class="anchor" aria-label="anchor" href="#merger-characteristics"></a></h2>
+
+      <div class="section-desc"><p>Leadership and board outcomes, a typology of merger cases, and a file for checking leadership matches by hand.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="merger_leadership.html">merger_leadership()</a></code>
+
+        </dt>
+        <dd>Leadership and board outcomes for each merger case</dd>
+
+        <dt>
+
+          <code><a href="leadership_inspection.html">leadership_inspection()</a></code>
+
+        </dt>
+        <dd>Leadership inspection file</dd>
+
+        <dt>
+
+          <code><a href="merger_typology.html">merger_typology()</a></code> <code><a href="merger_typology.html">typology_levels()</a></code>
+
+        </dt>
+        <dd>Merger typology</dd>
+      </dl></div><div class="section level2">
+      <h2 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a></h2>
+
+      <div class="section-desc"><p>Matched difference-in-differences for merger recipients. Build the model data once, then run the main estimates, breakouts, sensitivity variants, and event study from it.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="build_model_data.html">build_model_data()</a></code>
+
+        </dt>
+        <dd>Build the data for the merger models</dd>
+
+        <dt>
+
+          <code><a href="merger_did.html">merger_did()</a></code> <code><a href="merger_did.html">did_breakouts()</a></code> <code><a href="merger_did.html">did_sensitivity()</a></code>
+
+        </dt>
+        <dd>Matched difference-in-differences for merger recipients</dd>
+
+        <dt>
+
+          <code><a href="did_event_study.html">did_event_study()</a></code>
+
+        </dt>
+        <dd>Event-study estimates for merger recipients</dd>
+
+        <dt>
+
+          <code><a href="did_baseline_means.html">did_baseline_means()</a></code> <code><a href="did_baseline_means.html">did_funnel()</a></code> <code><a href="did_baseline_means.html">did_composition()</a></code>
+
+        </dt>
+        <dd>Baseline means, sample funnel, and sample composition</dd>
+
+        <dt>
+
+          <code><a href="did_outcomes.html">did_outcomes()</a></code>
+
+        </dt>
+        <dd>Outcomes for the merger models</dd>
+
+        <dt>
+
+          <code><a href="did_designs.html">did_designs()</a></code>
+
+        </dt>
+        <dd>Designs for the merger models</dd>
+
+        <dt>
+
+          <code><a href="did_variants.html">did_variants()</a></code>
+
+        </dt>
+        <dd>Sensitivity variants used in the paper</dd>
+
+        <dt>
+
+          <code><a href="did_breakout_vars.html">did_breakout_vars()</a></code>
+
+        </dt>
+        <dd>Unit-level breakout variables</dd>
+      </dl></div><div class="section level2">
+      <h2 id="project-folder-and-database">Project folder and database<a class="anchor" aria-label="anchor" href="#project-folder-and-database"></a></h2>
+
+      <div class="section-desc"><p>Run the whole workflow into one project folder, with one DuckDB database, a log for each stage, and a README.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="merger_project.html">merger_project()</a></code>
+
+        </dt>
+        <dd>Create or open an npmerger project folder</dd>
+
+        <dt>
+
+          <code><a href="build_merger_database.html">build_merger_database()</a></code>
+
+        </dt>
+        <dd>Build a project database stage by stage</dd>
+
+        <dt>
+
+          <code><a href="load_merger_data.html">load_merger_data()</a></code> <code><a href="load_merger_data.html">load_match_data()</a></code> <code><a href="load_merger_data.html">load_model_data()</a></code>
+
+        </dt>
+        <dd>Load stage outputs from a project database</dd>
+
+        <dt>
+
+          <code><a href="db_tables.html">db_tables()</a></code> <code><a href="db_tables.html">db_read()</a></code> <code><a href="db_tables.html">db_write()</a></code>
+
+        </dt>
+        <dd>Tables in a project database</dd>
+
+        <dt>
+
+          <code><a href="write_project_readme.html">write_project_readme()</a></code>
+
+        </dt>
+        <dd>Write the project README</dd>
       </dl></div><div class="section level2">
       <h2 id="package">Package<a class="anchor" aria-label="anchor" href="#package"></a></h2>
 

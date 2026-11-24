@@ -74,22 +74,23 @@ get_evidence_tables <- function(fl, years = NULL, which = names(evidence_tables(
 #'
 #' @param fl Filing table from [sn_filings()].
 #' @param evidence List from [get_evidence_tables()].
-#' @param rules A [merger_rules()] object (uses `min_top_share` and
-#'   `new_entity_years`).
+#' @param rules A [merger_rules()] object (uses `min_top_share`,
+#'   `new_entity_years`, and `name_key`).
 #' @param donor_window Years either side for counting donors to one successor.
 #' @return The filing table with evidence columns added.
 #' @export
 #' @examples
 #' \dontrun{
-#' sn  <- get_schedule_n(2019:2021)
-#' fl  <- sn_filings(sn)
-#' ev  <- get_evidence_tables(fl)
-#' lab <- classify_transactions(merger_features(fl, ev))
+#' sn  <- get_schedule_n( 2019:2021 )
+#' fl  <- sn_filings( sn )
+#' ev  <- get_evidence_tables( fl )
+#' fe  <- merger_features( fl, ev )
+#' lab <- classify_transactions( fe )
 #' }
 merger_features <- function(fl, evidence, rules = merger_rules(), donor_window = 1L) {
   ev <- evidence
   fl <- .with_recip_ein2(fl)
-  if (!is.null(ev$p7)) fl <- leader_overlap(fl, ev$p7)
+  if (!is.null(ev$p7)) fl <- leader_overlap(fl, ev$p7, name_key = rules$name_key %||% "canonical")
   if (!is.null(ev$header)) fl <- add_filing_history(fl, ev$header, new_entity_years = rules$new_entity_years)
   fl <- add_donor_counts(fl, window = donor_window, min_top_share = rules$min_top_share,
                          final_as_termination = rules$final_as_termination %||% TRUE)

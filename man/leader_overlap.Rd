@@ -10,7 +10,8 @@ leader_overlap(
   donor_window = -1:0,
   recip_window = 0:1,
   min_shared = 1L,
-  name_col = "F9_07_COMP_DTK_NAME_PERS"
+  name_col = "F9_07_COMP_DTK_NAME_PERS",
+  name_key = c("canonical", "simple")
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ leader_overlap(
 \item{min_shared}{Shared people needed to set \code{LEADER_P7}.}
 
 \item{name_col}{Name column in \code{p7}.}
+
+\item{name_key}{\code{"canonical"} or \code{"simple"}; see \code{\link[=name_keys]{name_keys()}}.}
 }
 \value{
 \code{fl} with \code{N_DONOR_P7}, \code{N_RECIP_P7}, \code{N_SHARED_P7}, and
@@ -32,7 +35,7 @@ leader_overlap(
 \description{
 Matches the people listed on the donor's Part VII in years
 \code{t + donor_window} against those on the recipient's Part VII in years
-\code{t + recip_window}, using \code{\link[=person_key]{person_key()}}.
+\code{t + recip_window}, using the name key from \code{\link[=name_keys]{name_keys()}}.
 }
 \details{
 On 2019-21 data, 87\% of two-party pairs that checked a Schedule N line

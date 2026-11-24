@@ -39,7 +39,9 @@
 #' @return Character vector of keys (`NA` when fewer than two tokens remain).
 #' @export
 #' @examples
-#' person_key(c("Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith"))
+#' people <- c( "Dr. Jane Q. Smith, PhD", "JANE SMITH", "Smith" )
+#'
+#' person_key( people )
 person_key <- function(x) {
   x <- toupper(gsub("[^A-Za-z ]", " ", as.character(x)))
   x <- gsub("\\b(MR|MRS|MS|MISS|DR|REV|HON|JR|SR|II|III|IV|MD|PHD|ESQ|CPA|RN|DDS|JD|MBA|EDD)\\b", " ", x)
@@ -64,7 +66,7 @@ merger_text_pattern <- function() "merge|merger|consolidat|combin|acquir|affilia
 #'
 #' Matches the people listed on the donor's Part VII in years
 #' `t + donor_window` against those on the recipient's Part VII in years
-#' `t + recip_window`, using [person_key()].
+#' `t + recip_window`, using the name key from [name_keys()].
 #'
 #' On 2019-21 data, 87% of two-party pairs that checked a Schedule N line
 #' 2a-2c box shared at least one person, against 9% for closures; about 40%
@@ -76,16 +78,19 @@ merger_text_pattern <- function() "merge|merger|consolidat|combin|acquir|affilia
 #' @param donor_window,recip_window Year offsets from the Schedule N year.
 #' @param min_shared Shared people needed to set `LEADER_P7`.
 #' @param name_col Name column in `p7`.
+#' @param name_key `"canonical"` or `"simple"`; see [name_keys()].
 #' @return `fl` with `N_DONOR_P7`, `N_RECIP_P7`, `N_SHARED_P7`, and
 #'   `LEADER_P7` (`NA` when either side has no Part VII rows in the window).
 #' @export
 leader_overlap <- function(fl, p7, donor_window = -1:0, recip_window = 0:1,
-                           min_shared = 1L, name_col = "F9_07_COMP_DTK_NAME_PERS") {
+                           min_shared = 1L, name_col = "F9_07_COMP_DTK_NAME_PERS",
+                           name_key = c("canonical", "simple")) {
+  name_key <- match.arg(name_key)
   fl <- .with_recip_ein2(fl)
   for (v in c("N_DONOR_P7", "N_RECIP_P7", "N_SHARED_P7", "LEADER_P7")) if (v %in% names(fl)) fl[, (v) := NULL]
   p7 <- .dt(p7)
   .need(p7, c("EIN2", "TAX_YEAR", name_col), "p7")
-  k <- unique(data.table(EIN2 = p7$EIN2, TAX_YEAR = as.integer(p7$TAX_YEAR), KEY = person_key(p7[[name_col]]))[!is.na(KEY)])
+  k <- unique(data.table(EIN2 = p7$EIN2, TAX_YEAR = as.integer(p7$TAX_YEAR), KEY = name_key(p7[[name_col]], name_key))[!is.na(KEY)])
   fl[, .PAIR := .I]
   pr <- fl[!is.na(RECIP_EIN2), list(.PAIR, EIN2, RECIP_EIN2, TAX_YEAR)]
   dn <- unique(.window_join(pr, "EIN2", donor_window, k, "KEY")[, list(.PAIR, KEY)])

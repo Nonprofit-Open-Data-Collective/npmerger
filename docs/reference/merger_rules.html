@@ -18,6 +18,7 @@ stricter or broader definitions."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -61,7 +62,8 @@ stricter or broader definitions.</p>
 <span>  promote <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  min_corroborate <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  corroborate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SO_MERGER_TEXT_DONOR"</span>, <span class="st">"SO_MERGER_TEXT_RECIP"</span>, <span class="st">"GOV_DOC_CHANGE_RECIP"</span><span class="op">)</span>,</span>
-<span>  final_as_termination <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  final_as_termination <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  name_key <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"canonical"</span>, <span class="st">"simple"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -130,6 +132,13 @@ checked is treated as a termination, like a Part I filing. In hand
 validation none of these were ongoing dispositions; most were mergers
 or transfers at dissolution reported on the wrong part.</p></dd>
 
+
+<dt id="arg-name-key">name_key<a class="anchor" aria-label="anchor" href="#arg-name-key"></a></dt>
+<dd><p>How Part VII names are matched between donor and recipient:
+<code>"canonical"</code> (default; canonical first name plus surname, via
+<code><a href="name_keys.html">name_keys()</a></code> and the peopleparser package) or <code>"simple"</code> (first and last
+token, <code><a href="person_key.html">person_key()</a></code>).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -138,97 +147,13 @@ or transfers at dissolution reported on the wrong part.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">merger_rules</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_top_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $leader</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "either"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $final_as_termination</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $sn_text</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_donors_n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $new_entity_years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $promote</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_corroborate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $corroborate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "SO_MERGER_TEXT_DONOR" "SO_MERGER_TEXT_RECIP" "GOV_DOC_CHANGE_RECIP"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "merger_rules"</span>
-<span class="r-in"><span><span class="fu">merger_rules</span><span class="op">(</span>leader <span class="op">=</span> <span class="st">"sn"</span>, sn_text <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_top_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $leader</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "sn"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $final_as_termination</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $sn_text</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_donors_n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $new_entity_years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $promote</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_corroborate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $corroborate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "SO_MERGER_TEXT_DONOR" "SO_MERGER_TEXT_RECIP" "GOV_DOC_CHANGE_RECIP"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "merger_rules"</span>
-<span class="r-in"><span><span class="fu">merger_rules</span><span class="op">(</span>promote <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>   <span class="co"># broad definition</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_top_share</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $leader</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "either"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $final_as_termination</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $sn_text</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_donors_n</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $new_entity_years</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $promote</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $min_corroborate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $corroborate</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "SO_MERGER_TEXT_DONOR" "SO_MERGER_TEXT_RECIP" "GOV_DOC_CHANGE_RECIP"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "merger_rules"</span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">merger_rules</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># strict: Schedule N boxes only</span></span>
+<span><span class="fu">merger_rules</span><span class="op">(</span> leader <span class="op">=</span> <span class="st">"sn"</span>, sn_text <span class="op">=</span> <span class="cn">FALSE</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># broad: corroborating signals can promote a filing</span></span>
+<span><span class="fu">merger_rules</span><span class="op">(</span> promote <span class="op">=</span> <span class="cn">TRUE</span> <span class="op">)</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

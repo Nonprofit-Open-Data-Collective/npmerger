@@ -36,5 +36,10 @@ A data.table with `EIN2`, `TAX_YEAR`, `OBJECTID`, `RETURN_TYPE`, `EZ`,
 (`REAL_REVENUE`, `REAL_EXPENSES`, `REAL_ASSETS`), profitability and
 fiscal-health ratios (`MARGIN` = surplus / revenue, `EQUITY_RATIO` = net
 assets / assets, `MONTHS_CASH` = cash and savings / monthly expenses),
-`NTEE`, `NTEE2`, `NTEE_MAJOR`, and `SUBSECTION` (IRC 501(c) subsection,
-from the BMF). Ratios are bounded to -1..1 (months of cash to 0..120).
+the Tuckman-Chang inputs `ADMIN_RATIO` and `REVENUE_HHI` (see
+[`merger_measures()`](https://nonprofit-open-data-collective.github.io/npmerger/reference/merger_measures.md);
+full 990 only), the revenue sources (`CONTRIBUTIONS`, `PROGRAM_REVENUE`,
+`INVEST_INCOME`, `OTHER_REVENUE`, from Part I), Part IX total functional
+and management expenses (`FUNC_EXP`, `MGMT_EXP`), `NTEE`, `NTEE2`,
+`NTEE_MAJOR`, and `SUBSECTION` (IRC 501(c) subsection, from the BMF).
+Ratios are bounded to -1..1 (months of cash to 0..120).

@@ -35,6 +35,6 @@ Schedule N files are small (about 1 MB per year in total).
 }
 \examples{
 \dontrun{
-sn <- get_schedule_n(2019:2021)
+sn <- get_schedule_n( 2019:2021 )
 }
 }

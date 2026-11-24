@@ -114,10 +114,12 @@ A list of class `merger_match_data`:
 
 ``` r
 if (FALSE) { # \dontrun{
-md <- build_merger_data(years = efile_years())
-mm <- build_match_data(md, path = "PANEL990")
+md <- build_merger_data( years = efile_years() )
+mm <- build_match_data( md, path = "PANEL990" )
+
 mm$coverage
+
 # the five closest comparison org-years for each recipient
-mm$candidates$margin[RANK <= 5]
+mm$candidates$margin[ RANK <= 5 ]
 } # }
 ```

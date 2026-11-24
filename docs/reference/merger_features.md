@@ -47,9 +47,10 @@ The filing table with evidence columns added.
 
 ``` r
 if (FALSE) { # \dontrun{
-sn  <- get_schedule_n(2019:2021)
-fl  <- sn_filings(sn)
-ev  <- get_evidence_tables(fl)
-lab <- classify_transactions(merger_features(fl, ev))
+sn  <- get_schedule_n( 2019:2021 )
+fl  <- sn_filings( sn )
+ev  <- get_evidence_tables( fl )
+fe  <- merger_features( fl, ev )
+lab <- classify_transactions( fe )
 } # }
 ```

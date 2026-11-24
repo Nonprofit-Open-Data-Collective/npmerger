@@ -54,8 +54,10 @@ build_merger_data(
 \value{
 A list of class \code{merger_data} with \code{sched_n} (one row per Schedule N
 filing), \code{cases}, \code{transfers}, \code{donors}, \code{recipients}, \code{part7},
-\code{fiscal}, \code{transactions} (asset lines), and \code{manifest} (row counts per
-stage).
+\code{fiscal}, \code{leadership} (\code{\link[=merger_leadership]{merger_leadership()}}), \code{typology}
+(\code{\link[=merger_typology]{merger_typology()}}), \code{name_matches} (\code{\link[=name_match_basis]{name_match_basis()}}: why each
+person on both rosters matched), \code{transactions} (asset lines), and \code{manifest}
+(row counts per stage).
 }
 \description{
 Runs the whole pipeline: Schedule N retrieval, EIN recovery,
@@ -70,7 +72,16 @@ pipeline offline, for example on \code{\link[=npmerger_example]{npmerger_example
 }
 \examples{
 ex <- npmerger_example()
-md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
-                        names = ex$names, bmf_data = ex$bmf, ratios = FALSE)
+
+md <-
+  build_merger_data(
+    sn       = ex$sn,
+    evidence = ex$evidence,
+    core     = ex$core,
+    names    = ex$names,
+    bmf_data = ex$bmf,
+    ratios   = FALSE
+  )
+
 md
 }

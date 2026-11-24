@@ -34,13 +34,24 @@ efile_years <- function() 2009:2025
 #' @param verbose Print progress.
 #' @return A list of class `merger_data` with `sched_n` (one row per Schedule N
 #'   filing), `cases`, `transfers`, `donors`, `recipients`, `part7`,
-#'   `fiscal`, `transactions` (asset lines), and `manifest` (row counts per
-#'   stage).
+#'   `fiscal`, `leadership` ([merger_leadership()]), `typology`
+#'   ([merger_typology()]), `name_matches` ([name_match_basis()]: why each
+#'   person on both rosters matched), `transactions` (asset lines), and `manifest`
+#'   (row counts per stage).
 #' @export
 #' @examples
 #' ex <- npmerger_example()
-#' md <- build_merger_data(sn = ex$sn, evidence = ex$evidence, core = ex$core,
-#'                         names = ex$names, bmf_data = ex$bmf, ratios = FALSE)
+#'
+#' md <-
+#'   build_merger_data(
+#'     sn       = ex$sn,
+#'     evidence = ex$evidence,
+#'     core     = ex$core,
+#'     names    = ex$names,
+#'     bmf_data = ex$bmf,
+#'     ratios   = FALSE
+#'   )
+#'
 #' md
 build_merger_data <- function(years = NULL, path = "PANEL990", rules = merger_rules(),
                               types = c("merger2", "mergerN", "consolidation"), recover_eins = TRUE,
@@ -77,12 +88,19 @@ build_merger_data <- function(years = NULL, path = "PANEL990", rules = merger_ru
   transfers <- transfer_value(cases, tx, oy)
   donors <- merger_attributes(cases, oy, "donor", years_back, bmf_data)
   recipients <- merger_attributes(cases, oy, "recipient", years_back, bmf_data)
-  part7 <- if (!is.null(core$p7) && nrow(core$p7)) merger_part7(cases, core$p7) else NULL
+  part7 <- if (!is.null(core$p7) && nrow(core$p7)) merger_part7(cases, core$p7, name_key = rules$name_key %||% "canonical") else NULL
   note("Part VII person-years", part7)
   fiscal <- merger_fiscal_panel(cases, oy, pre, post, ratios = ratios, fit = fit, weights = weights, smooth = smooth, k = k)
   note("fiscal panel org-years", fiscal)
+  say("Leadership and typology")
+  leadership <- if (!is.null(part7)) merger_leadership(part7) else NULL
+  note("cases with leadership outcomes", leadership)
+  typology <- merger_typology(cases, donors, recipients, transfers)
+  name_matches <- if (!is.null(part7)) name_match_basis(part7) else NULL
+  note("people on both rosters", name_matches)
   structure(list(sched_n = sched_n_table(lab), cases = cases, transfers = transfers, donors = donors,
-                 recipients = recipients, part7 = part7, fiscal = fiscal, transactions = tx,
+                 recipients = recipients, part7 = part7, fiscal = fiscal, leadership = leadership,
+                 typology = typology, name_matches = name_matches, transactions = tx,
                  manifest = rbindlist(log), labels = lab[, .N, by = TYPE][order(-N)]),
             class = c("merger_data", "list"))
 }
@@ -93,7 +111,7 @@ print.merger_data <- function(x, ...) {
   cat("Schedule N filings by type:\n")
   for (i in seq_len(nrow(x$labels))) cat(sprintf("  %-18s %7d\n", x$labels$TYPE[i], x$labels$N[i]))
   cat("Tables:\n")
-  for (nm in c("cases", "transfers", "donors", "recipients", "part7", "fiscal"))
+  for (nm in c("cases", "transfers", "donors", "recipients", "part7", "fiscal", "leadership", "typology"))
     cat(sprintf("  %-11s %7d rows\n", nm, NROW(x[[nm]])))
   invisible(x)
 }

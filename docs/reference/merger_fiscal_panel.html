@@ -22,6 +22,7 @@ index from the 'fiscal' package."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -67,7 +68,8 @@ index from the 'fiscal' package.</p>
 <span>  fit <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  weights <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  smooth <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"none"</span>, <span class="st">"trailing"</span><span class="op">)</span>,</span>
-<span>  k <span class="op">=</span> <span class="fl">3L</span></span>
+<span>  k <span class="op">=</span> <span class="fl">3L</span>,</span>
+<span>  trends <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -104,6 +106,10 @@ only through their merger year.</p></dd>
 <dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
 <dd><p>Trailing window length in years.</p></dd>
 
+
+<dt id="arg-trends">trends<a class="anchor" aria-label="anchor" href="#arg-trends"></a></dt>
+<dd><p>Add <code><a href="trend_measures.html">trend_measures()</a></code> columns.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -116,12 +122,12 @@ columns.</p>
     <h2 id="comparability-over-time">Comparability over time<a class="anchor" aria-label="anchor" href="#comparability-over-time"></a></h2>
 
 
-<p>Ratios come from <code><a href="https://nonprofit-open-data-collective.github.io/fiscal/reference/compute_all_panel.html" class="external-link">fiscal::compute_all_panel()</a></code>. Its winsorized,
+<p>Ratios come from <code><a href="https://rdrr.io/pkg/fiscal/man/compute_all_panel.html" class="external-link">fiscal::compute_all_panel()</a></code>. Its winsorized,
 standardized, and percentile variants are re-estimated within each tax
 year, so they rank organizations within a year rather than measure
 change. To track change, pass a <code>fit</code> (a fitted
-<code><a href="https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_health_fit.html" class="external-link">fiscal::fiscal_health_fit()</a></code> model calibrated once on a reference
-sample) and <code>weights</code> (<code><a href="https://nonprofit-open-data-collective.github.io/fiscal/reference/fiscal_weights.html" class="external-link">fiscal::fiscal_weights()</a></code>). Every
+<code>fiscal::fiscal_health_fit()</code> model calibrated once on a reference
+sample) and <code>weights</code> (<code>fiscal::fiscal_weights()</code>). Every
 organization-year is then scored with the same fixed parameters.</p>
     </div>
     <div class="section level2">
@@ -133,6 +139,17 @@ organization-year is then scored with the same fixed parameters.</p>
 computed. Use smoothed values for matching and baselines. Use raw values
 (<code>smooth = "none"</code>) for event-time outcome estimates, because a trailing
 window spreads a real post-merger change over <code>k</code> years.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="trends">Trends<a class="anchor" aria-label="anchor" href="#trends"></a></h2>
+
+
+<p>With <code>trends = TRUE</code>, growth, revenue volatility, and deficit-year
+columns from <code><a href="trend_measures.html">trend_measures()</a></code> are computed on the full (unsmoothed)
+organization-year history before the window is cut, so the first window
+year still has its prior-year growth. Use <code><a href="merger_proforma.html">merger_proforma()</a></code> on the
+result for a combined donor + recipient pre-merger baseline, and
+<code><a href="tuckman_chang.html">tuckman_chang()</a></code> for vulnerability flags.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

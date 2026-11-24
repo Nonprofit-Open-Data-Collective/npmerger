@@ -8,14 +8,18 @@
 #' @param cases Output of [build_merger_cases()].
 #' @param p7 Part VII rows (the `p7` element of [get_core()]).
 #' @param window Integer offsets from the merger year.
+#' @param name_key `"canonical"` or `"simple"`; see [name_keys()].
 #' @return A data.table with `MERGER_ID`, `MERGER_GROUP_ID`, `ROLE`, `EIN2`,
-#'   `TAX_YEAR`, `TIME_FROM_MERGER`, `PERSON_NAME`, `PERSON_KEY`, `TITLE`,
+#'   `TAX_YEAR`, `TIME_FROM_MERGER`, `PERSON_NAME`, `PERSON_KEY` (with
+#'   `FIRST_NAME`, `LAST_NAME`, `FIRST_CANONICAL`, and `CANONICAL_RULE` from
+#'   the canonical key), `TITLE`,
 #'   `HOURS`, `COMP_ORG`, `COMP_RELATED`, `COMP_OTHER`, position flags
 #'   (`TRUSTEE`, `OFFICER`, `KEY_EMPLOYEE`, `HIGH_COMP`, `FORMER`), and
 #'   `IN_BOTH` (the person appears on both the donor's and the recipient's
 #'   Part VII within the window).
 #' @export
-merger_part7 <- function(cases, p7, window = -2:2) {
+merger_part7 <- function(cases, p7, window = -2:2, name_key = c("canonical", "simple")) {
+  name_key <- match.arg(name_key)
   r <- merger_roles(cases)
   p <- as.data.table(p7)
   .need(p, c("EIN2", "TAX_YEAR", "OBJECTID", "F9_07_COMP_DTK_NAME_PERS"), "p7")
@@ -35,7 +39,9 @@ merger_part7 <- function(cases, p7, window = -2:2) {
                    TRUSTEE = flg("F9_07_COMP_DTK_POS_INDIV_TRUST_X") | flg("F9_07_COMP_DTK_POS_INST_TRUST_X"),
                    OFFICER = flg("F9_07_COMP_DTK_POS_OFF_X"), KEY_EMPLOYEE = flg("F9_07_COMP_DTK_POS_KEY_EMPL_X"),
                    HIGH_COMP = flg("F9_07_COMP_DTK_POS_HIGH_COMP_X"), FORMER = flg("F9_07_COMP_DTK_POS_FORMER_X"))
-  pp[, PERSON_KEY := person_key(PERSON_NAME)]
+  nk <- name_keys(pp$PERSON_NAME, name_key)
+  pp <- merge(pp, nk[, list(PERSON_NAME, PERSON_KEY, FIRST_NAME, LAST_NAME, FIRST_CANONICAL, CANONICAL_RULE)],
+              by = "PERSON_NAME", all.x = TRUE, sort = FALSE)
   w <- rbindlist(lapply(window, function(o) r[, list(MERGER_ID, MERGER_GROUP_ID, ROLE, EIN2, TAX_YEAR = EVENT_YEAR + o,
                                                      TIME_FROM_MERGER = as.integer(o))]))
   out <- merge(w, pp, by = c("EIN2", "TAX_YEAR"), allow.cartesian = TRUE)
@@ -65,8 +71,15 @@ merger_part7 <- function(cases, p7, window = -2:2) {
 #' @return `x` with `vars` replaced by their trailing averages.
 #' @export
 #' @examples
-#' x <- data.frame(EIN2 = "A", TAX_YEAR = c(2018, 2019, 2021), REVENUE = c(10, 20, 60))
-#' smooth_trailing(x, "REVENUE")   # 2021 uses 2019 and 2021 only (2020 missing)
+#' x <-
+#'   data.frame(
+#'     EIN2     = "A",
+#'     TAX_YEAR = c( 2018, 2019, 2021 ),
+#'     REVENUE  = c(   10,   20,   60 )
+#'   )
+#'
+#' # 2021 averages 2019 and 2021 only (2020 is missing)
+#' smooth_trailing( x, "REVENUE" )
 smooth_trailing <- function(x, vars, k = 3L, id = "EIN2", time = "TAX_YEAR") {
   al <- formals(panel990::panel_smooth)$align
   if (!is.null(al) && "right" %in% eval(al)) {
@@ -153,11 +166,20 @@ merger_fiscal_panel <- function(cases, oy, pre = 5L, post = 5L, ratios = TRUE, f
   if (ratios && nrow(sub)) {
     if (!requireNamespace("fiscal", quietly = TRUE)) stop("`ratios = TRUE` needs the 'fiscal' package.", call. = FALSE)
     met <- if (is.null(fit)) "ratio" else c("ratio", "w")
+    # append_to_df = TRUE, then keep the new columns: fiscal's
+    # compute_all_panel(append_to_df = FALSE) fails when it re-sorts rows
     rt <- withCallingHandlers(
-      suppressMessages(fiscal::compute_all_panel(as.data.frame(sub), metrics = met, append_to_df = FALSE, verbose = FALSE)),
+      suppressMessages(fiscal::compute_all_panel(as.data.frame(sub), metrics = met, append_to_df = TRUE, verbose = FALSE)),
       warning = function(w) if (grepl("normalization is zero or NA", conditionMessage(w))) invokeRestart("muffleWarning"))
     rt <- as.data.table(rt)
-    mcols <- setdiff(names(rt), fiscal::get_idvars())
+    mcols <- setdiff(names(rt), names(sub))
+    # a ratio named like a measure column but in lower case (invest_income
+    # vs INVEST_INCOME) breaks case-insensitive databases: add "_ratio"
+    clash <- mcols[tolower(mcols) %in% tolower(c(names(out), names(sub)))]
+    if (length(clash)) {
+      data.table::setnames(rt, clash, paste0(clash, "_ratio"))
+      mcols[match(clash, mcols)] <- paste0(clash, "_ratio")
+    }
     if (!is.null(fit)) {
       sc <- fiscal::fiscal_health_score(as.data.frame(rt), fit)
       if (!is.null(weights)) sc <- fiscal::fiscal_health_index(sc, weights)

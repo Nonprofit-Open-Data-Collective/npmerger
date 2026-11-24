@@ -159,7 +159,13 @@ merger_measures <- function(x) {
 #' @return Numeric vector in 1/n..1, or `NA` when no source is positive.
 #' @export
 #' @examples
-#' revenue_hhi(c(100, 50), c(0, 50), c(0, 0), c(0, NA))   # 1 and 0.5
+#' contrib <- c( 100, 50 )
+#' program <- c(   0, 50 )
+#' invest  <- c(   0,  0 )
+#' other   <- c(   0, NA )
+#'
+#' # 1 (one source) and 0.5 (two equal sources)
+#' revenue_hhi( contrib, program, invest, other )
 revenue_hhi <- function(..., ok = TRUE) {
   m <- do.call(cbind, lapply(list(...), as.numeric))
   none <- rowSums(!is.na(m)) == 0

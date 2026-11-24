@@ -22,6 +22,7 @@ classify_transactions()."></head><body>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../articles/npmerger.html">Overview</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/workflow.html">Workflow</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/classifier.html">Classifier</a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/matching.html">Matching</a></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
@@ -74,8 +75,8 @@ using whichever evidence tables are present. The result is ready for
 
 
 <dt id="arg-rules">rules<a class="anchor" aria-label="anchor" href="#arg-rules"></a></dt>
-<dd><p>A <code><a href="merger_rules.html">merger_rules()</a></code> object (uses <code>min_top_share</code> and
-<code>new_entity_years</code>).</p></dd>
+<dd><p>A <code><a href="merger_rules.html">merger_rules()</a></code> object (uses <code>min_top_share</code>,
+<code>new_entity_years</code>, and <code>name_key</code>).</p></dd>
 
 
 <dt id="arg-donor-window">donor_window<a class="anchor" aria-label="anchor" href="#arg-donor-window"></a></dt>
@@ -89,13 +90,13 @@ using whichever evidence tables are present. The result is ready for
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">sn</span>  <span class="op">&lt;-</span> <span class="fu"><a href="get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span><span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">fl</span>  <span class="op">&lt;-</span> <span class="fu"><a href="sn_filings.html">sn_filings</a></span><span class="op">(</span><span class="va">sn</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ev</span>  <span class="op">&lt;-</span> <span class="fu"><a href="get_evidence_tables.html">get_evidence_tables</a></span><span class="op">(</span><span class="va">fl</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="classify_transactions.html">classify_transactions</a></span><span class="op">(</span><span class="fu">merger_features</span><span class="op">(</span><span class="va">fl</span>, <span class="va">ev</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
-</code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span>
+<span><span class="va">sn</span>  <span class="op">&lt;-</span> <span class="fu"><a href="get_schedule_n.html">get_schedule_n</a></span><span class="op">(</span> <span class="fl">2019</span><span class="op">:</span><span class="fl">2021</span> <span class="op">)</span></span>
+<span><span class="va">fl</span>  <span class="op">&lt;-</span> <span class="fu"><a href="sn_filings.html">sn_filings</a></span><span class="op">(</span> <span class="va">sn</span> <span class="op">)</span></span>
+<span><span class="va">ev</span>  <span class="op">&lt;-</span> <span class="fu"><a href="get_evidence_tables.html">get_evidence_tables</a></span><span class="op">(</span> <span class="va">fl</span> <span class="op">)</span></span>
+<span><span class="va">fe</span>  <span class="op">&lt;-</span> <span class="fu">merger_features</span><span class="op">(</span> <span class="va">fl</span>, <span class="va">ev</span> <span class="op">)</span></span>
+<span><span class="va">lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="classify_transactions.html">classify_transactions</a></span><span class="op">(</span> <span class="va">fe</span> <span class="op">)</span></span>
+<span><span class="op">}</span> <span class="co"># }</span></span></code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
