@@ -1856,14 +1856,14 @@
     },
     "peopleparser": {
       "Package": "peopleparser",
-      "Version": "0.2.3",
+      "Version": "0.2.4",
       "Source": "GitHub",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteUsername": "Nonprofit-Open-Data-Collective",
       "RemoteRepo": "peopleparser",
-      "RemoteRef": "v0.2.3",
-      "RemoteSha": "714772dadde547c65e0f088ea30fac58152c7d30"
+      "RemoteRef": "v0.2.4",
+      "RemoteSha": "83971c5c700efe6bbc7d838569e04293a828a149"
     },
     "pillar": {
       "Package": "pillar",
