@@ -54,9 +54,12 @@ Ratios come from \code{\link[fiscal:compute_all_panel]{fiscal::compute_all_panel
 standardized, and percentile variants are re-estimated within each tax
 year, so they rank organizations within a year rather than measure
 change. To track change, pass a \code{fit} (a fitted
-\code{\link[fiscal:fiscal_health_fit]{fiscal::fiscal_health_fit()}} model calibrated once on a reference
-sample) and \code{weights} (\code{\link[fiscal:fiscal_weights]{fiscal::fiscal_weights()}}). Every
-organization-year is then scored with the same fixed parameters.
+\code{fiscal_health_fit()} model calibrated once on a reference sample) and
+\code{weights} (\code{fiscal_weights()}). Every organization-year is then scored
+with the same fixed parameters. Scoring needs a 'fiscal' version that
+exports \code{fiscal_health_score()} and \code{fiscal_health_index()}. The version
+pinned in \code{DESCRIPTION} does not, so with it a non-\code{NULL} \code{fit} stops
+with an error.
 }
 
 \section{Smoothing}{

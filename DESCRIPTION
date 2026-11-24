@@ -22,7 +22,7 @@ Depends: R (>= 4.1.0)
 Imports:
     data.table,
     panel990,
-    peopleparser (>= 0.2.0)
+    peopleparser (>= 0.2.3)
 Suggests:
     fiscal,
     fixest,
@@ -30,10 +30,11 @@ Suggests:
     duckdb,
     arrow,
     testthat (>= 3.0.0),
+    withr,
     knitr,
     rmarkdown
 Remotes:
-    Nonprofit-Open-Data-Collective/peopleparser@53924a4d0326329240b9e615cc50ebda47be9ba4,
+    Nonprofit-Open-Data-Collective/peopleparser@714772dadde547c65e0f088ea30fac58152c7d30,
     Nonprofit-Open-Data-Collective/panel990@4971a986bd61cb37594d6a3a961178d77fe6e8df,
     Nonprofit-Open-Data-Collective/fiscal@f29d9ada6dd866da3bf05fcead475444c7734c32
 VignetteBuilder: knitr

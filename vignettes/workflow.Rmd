@@ -9,7 +9,6 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set( collapse = TRUE, comment = "#>" )
-has_fixest <- requireNamespace( "fixest", quietly = TRUE )
 ```
 
 A study of nonprofit mergers with **npmerger** has three stages. Each one
@@ -228,7 +227,7 @@ Every model reads only `dd`. `merger_did()` gives long-difference
 estimates, from two years before the merger to two years after, for each
 design:
 
-```{r, eval = has_fixest}
+```{r, eval = requireNamespace( "fixest", quietly = TRUE )}
 fit <-
   merger_did(
     data     = dd,
@@ -256,7 +255,7 @@ estimates are negative.
 
 Interact treatment with any unit-level variable from `did_breakout_vars()`:
 
-```{r, eval = has_fixest}
+```{r, eval = requireNamespace( "fixest", quietly = TRUE )}
 br <-
   did_breakouts(
     data     = dd,
@@ -275,7 +274,7 @@ br[ , .( spec, term, estimate, se ) ] |>
 `did_variants()` lists the paper's variants. Each is a set of
 `merger_did()` arguments, so adding one is a single line:
 
-```{r, eval = has_fixest}
+```{r, eval = requireNamespace( "fixest", quietly = TRUE )}
 v <- did_variants()[ c( "base", "k1", "gap2" ) ]
 
 # use every unit in this small example
@@ -298,7 +297,7 @@ sens[ , .( variant, estimate, se, n_sets ) ] |>
 
 ### Event study
 
-```{r, eval = has_fixest}
+```{r, eval = requireNamespace( "fixest", quietly = TRUE )}
 es <-
   did_event_study(
     data     = dd,

@@ -1,5 +1,7 @@
 # npmerger
 
+[![R-CMD-check](https://github.com/Nonprofit-Open-Data-Collective/npmerger/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Nonprofit-Open-Data-Collective/npmerger/actions/workflows/R-CMD-check.yaml)
+
 Build nonprofit merger datasets from IRS Form 990 e-file data.
 
 **npmerger** finds candidate mergers in Schedule N (liquidation, termination,
@@ -100,3 +102,20 @@ listed on the donor's and the recipient's Part VII (`merger_rules(leader = "eith
 
 Merger IDs take the form `YEAR-FROMEIN-TOEIN` (`merger_id()`), and
 `YEAR-TOEIN` groups multi-party mergers (`merger_group_id()`).
+
+## Development
+
+```r
+# offline tests and R CMD check (finds RStudio's Pandoc if none is on the path)
+Rscript dev/check.R
+
+# also download real 2021 data and run the merger stage, or all three stages
+Rscript dev/check.R live
+Rscript dev/check.R full
+```
+
+The offline tests run on the bundled example (`npmerger_example()`) and a
+simulated panel. The live test (`tests/testthat/test-live.R`) runs only when
+`NPMERGER_LIVE` is set. It reuses the download cache named in
+`NPMERGER_LIVE_CACHE`. GitHub Actions runs `R CMD check` on every push and
+pull request to `main`.

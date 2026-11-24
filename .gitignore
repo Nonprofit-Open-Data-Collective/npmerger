@@ -23,5 +23,10 @@ temp/
 # literature review drafts (local only)
 lit/
 
-# local paper draft
-paper/
+# local paper draft; only the analysis scripts that produce its tables are tracked
+paper/*
+!paper/analysis/
+paper/analysis/*
+!paper/analysis/README.md
+!paper/analysis/01-descriptives.R
+!paper/analysis/02-models.R
