@@ -113,7 +113,7 @@ name_keys_cached <- function(prefixes = NULL) {
 
 # ---- parsing --------------------------------------------------------------------
 
-# Parse names with peopleparser::parse_names() (>= 0.2.4), with the nickname
+# Parse names with peopleparser::parse_names() (>= 0.2.7), with the nickname
 # columns. workers = 1 parses in this session whatever future::plan() is set;
 # more starts that many workers for the call, and parse_names() stops if any
 # worker loads a different peopleparser build than this session. Sequential
